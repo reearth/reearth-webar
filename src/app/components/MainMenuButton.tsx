@@ -7,7 +7,11 @@ import {
   type IconButtonProps,
 } from "@mui/material";
 // import { useAtom, useAtomValue } from "jotai";
-import { bindMenu, bindTrigger, usePopupState } from "material-ui-popup-state/hooks";
+import {
+  bindMenu,
+  bindTrigger,
+  usePopupState,
+} from "material-ui-popup-state/hooks";
 import { forwardRef, useCallback, useId, useRef, type MouseEvent } from "react";
 
 // import { platformAtom } from "../../shared-states";
@@ -20,7 +24,7 @@ export interface MainMenuButtonProps extends Omit<IconButtonProps, "onClick"> {
   onClick?: (event: MouseEvent<HTMLElement>, name: string) => void;
 }
 
-export const MainMenuButton = forwardRef<HTMLButtonElement, MainMenuButtonProps>(
+const MainMenuButton = forwardRef<HTMLButtonElement, MainMenuButtonProps>(
   ({ onClick, ...props }, ref) => {
     const id = useId();
     const popupState = usePopupState({
@@ -51,13 +55,18 @@ export const MainMenuButton = forwardRef<HTMLButtonElement, MainMenuButtonProps>
         onClickRef.current?.(event, name);
         popupState.close();
       },
-      [popupState],//, setHideAppOverlay, setShowDeveloperPanels],
+      [popupState] //, setHideAppOverlay, setShowDeveloperPanels],
     );
 
     // const platform = useAtomValue(platformAtom);
     return (
       <>
-        <IconButton ref={ref} aria-label="メインメニュー" {...bindTrigger(popupState)} {...props}>
+        <IconButton
+          ref={ref}
+          aria-label="メインメニュー"
+          {...bindTrigger(popupState)}
+          {...props}
+        >
           <PlateauSymbol sx={{ fontSize: 24 }} />
         </IconButton>
         <Menu
@@ -69,13 +78,15 @@ export const MainMenuButton = forwardRef<HTMLButtonElement, MainMenuButtonProps>
           transformOrigin={{
             horizontal: "center",
             vertical: "top",
-          }}>
+          }}
+        >
           <MenuItem
             component="a"
             href="https://www.mlit.go.jp/plateau/"
             target="_blank"
             rel="noopener noreferrer"
-            onClick={handleClick}>
+            onClick={handleClick}
+          >
             <PlateauLogotype sx={{ height: 32, marginX: 2, marginY: 1 }} />
           </MenuItem>
           <Divider />
@@ -109,5 +120,8 @@ export const MainMenuButton = forwardRef<HTMLButtonElement, MainMenuButtonProps>
         </Menu>
       </>
     );
-  },
+  }
 );
+MainMenuButton.displayName = "MainMenuButton";
+
+export default MainMenuButton;
