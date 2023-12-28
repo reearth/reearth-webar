@@ -1,8 +1,8 @@
 import type { Preview } from "@storybook/react";
 import React, { StrictMode } from "react";
 import { ThemeProvider } from "@mui/material";
-import { CssBaseline } from "../src/app/components/ported";
-import { darkTheme, lightTheme } from "../src/app/components/ported/mui/theme";
+import { CssBaseline } from "../src/app/components/prototypes/ui-components";
+import { darkTheme, lightTheme } from "../src/app/components/prototypes/ui-components/theme";
 
 const preview: Preview = {
   parameters: {
