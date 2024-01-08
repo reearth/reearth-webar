@@ -4,7 +4,6 @@ import { isNotNullish } from "../type-helpers";
 
 import { type SelectionAtoms } from "./atomsWithSelection";
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export function atomsWithSelectionTransform<T, U = T>(
   selectionAtoms: SelectionAtoms<T>,
   transform: (object: U) => T | null | undefined,

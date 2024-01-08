@@ -19,6 +19,5 @@ export type CancelablePromise<T> = Promise<T> & {
 
 export function assertType<T>(_value: unknown): asserts _value is T {}
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 const splitAtomType = <T>() => splitAtom(atom<T[]>([]));
 export type SplitAtom<T> = ReturnType<typeof splitAtomType<T>>;

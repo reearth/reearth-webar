@@ -9,7 +9,6 @@ export function useFindLayer(): <T extends LayerType, U extends LayerType = Laye
   predicate: (LayerModel<T> & { type: U }) | Partial<LayerModel<U>> | LayerPredicate<T>,
 ) => LayerModel<T & U> | undefined;
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export function useFindLayer() {
   return useSetAtom(findLayerAtom);
 }

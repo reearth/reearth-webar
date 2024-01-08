@@ -3,7 +3,6 @@ import { type ComponentType, type HTMLAttributes } from "react";
 
 import { ScreenSpaceSelectionEntry } from "../screen-space-selection";
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface LayerModelOverrides {}
 
 export type LayerType = keyof LayerModelOverrides;

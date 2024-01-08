@@ -1,6 +1,5 @@
 import { type Primitive } from "type-fest";
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface ScreenSpaceSelectionOverrides {}
 
 export type ScreenSpaceSelectionType = keyof ScreenSpaceSelectionOverrides;

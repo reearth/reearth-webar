@@ -9,7 +9,6 @@ export function useFilterLayers(): <T extends LayerType, U extends LayerType = L
   predicate: (Partial<LayerModel<U>> & { type: U }) | Partial<LayerModel<U>> | LayerPredicate<T>,
 ) => Array<LayerModel<T & U>>;
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export function useFilterLayers() {
   return useSetAtom(filterLayersAtom);
 }

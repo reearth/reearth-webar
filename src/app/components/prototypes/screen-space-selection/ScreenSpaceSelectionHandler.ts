@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 import { Event } from "../../shared/helpers";
 import { MouseEvent } from "../../shared/reearth/types";
 import { DataType } from "../../shared/reearth/types/layer";

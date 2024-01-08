@@ -34,6 +34,5 @@ declare module "../layers" {
     imageSchemeAtom: Atom<LayerImageScheme | null>;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-interface
   interface LayerModelOverrides extends ReEarthLayerModelOverrides {}
 }

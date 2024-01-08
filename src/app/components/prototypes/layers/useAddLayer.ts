@@ -10,7 +10,6 @@ export function useAddLayer(): (
   options?: AddLayerOptions,
 ) => () => void;
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export function useAddLayer() {
   return useSetAtom(addLayerAtom);
 }

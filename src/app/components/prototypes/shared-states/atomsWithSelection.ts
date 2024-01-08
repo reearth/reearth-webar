@@ -7,7 +7,6 @@ export interface SelectionAtomsOptions<T> {
   onDeselect?: (value: T) => void;
 }
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export function atomsWithSelection<T>({
   getKey = value => value,
   onSelect,
