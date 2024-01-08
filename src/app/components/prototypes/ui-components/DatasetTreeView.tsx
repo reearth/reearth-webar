@@ -1,4 +1,4 @@
-import { TreeView, type TreeViewProps } from "@mui/lab";
+import { TreeView, type TreeViewProps } from "@mui/x-tree-view/TreeView";
 import { styled } from "@mui/material";
 import { type FC } from "react";
 
