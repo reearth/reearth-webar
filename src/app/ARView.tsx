@@ -1,5 +1,5 @@
-import Script from "next/script"
-import React from "react"
+import Script from "next/script";
+import React from "react";
 
 export default function ARView() {
   return (
@@ -9,24 +9,33 @@ export default function ARView() {
       <div id="status_container">
         <div id="geolocation_status"></div>
         <div id="absolute_orientation_status"></div>
-        <input type="button" value="iOSのIMUを許可" id="ios_imu_permission_button" />
+        <input
+          type="button"
+          value="iOSのIMUを許可"
+          id="ios_imu_permission_button"
+        />
         <div id="toolbox">
           <table>
             <tbody>
               <tr>
+                <td>Hide other Buildings</td>
                 <td>
-                  Hide other Bldgs
-                </td>
-                <td>
-                  <input type="checkbox" data-bind="checked: shouldHideOtherBldgs" />
+                  <input
+                    type="checkbox"
+                    data-bind="checked: shouldHideOtherBldgs"
+                  />
                 </td>
               </tr>
               <tr>
+                <td>FOV (PI over ~)</td>
                 <td>
-                  FOV (PI over ~)
-                </td>
-                <td>
-                  <input type="range" min="1" max="10" step="0.1" data-bind="value: fovPiOver, valueUpdate: 'input'" />
+                  <input
+                    type="range"
+                    min="1"
+                    max="10"
+                    step="0.1"
+                    data-bind="value: fovPiOver, valueUpdate: 'input'"
+                  />
                 </td>
               </tr>
             </tbody>
@@ -34,5 +43,5 @@ export default function ARView() {
         </div>
       </div>
     </div>
-  )
+  );
 }
