@@ -1,4 +1,4 @@
-import { TreeItem, treeItemClasses, type TreeItemProps } from "@mui/x-tree-view/TreeItem";
+import { TreeItem, treeItemClasses, type TreeItemProps } from "@mui/lab";
 import { Stack, styled } from "@mui/material";
 import { useState, type FC, type ReactNode } from "react";
 
