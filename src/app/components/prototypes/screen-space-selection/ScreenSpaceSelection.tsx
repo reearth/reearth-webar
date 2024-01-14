@@ -29,6 +29,7 @@ export const ScreenSpaceSelection: FC<ScreenSpaceSelectionProps> = ({ ...options
     assignPropertyProps(handler, options, defaultOptions);
   }
 
+  // TODO: useSetAtomはWritablwAtomを取る必要があるが、このatomがwrite引数をとっていないためWritablwAtomに適合しておらず、それでエラーになっている
   const setHandler = useSetAtom(screenSpaceSelectionHandlerAtom);
   useEffect(() => {
     setHandler(handler ?? null);

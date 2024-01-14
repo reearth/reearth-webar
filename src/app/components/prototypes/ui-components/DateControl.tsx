@@ -122,7 +122,7 @@ export const DateControl = forwardRef<HTMLDivElement, DateControlProps>(
     const year = useMemo(() => `${date.getFullYear()}`, [date]);
     const yearOptions = useMemo(() => {
       const currentYear = date.getFullYear();
-      const years = [];
+      const years: number[] = [];
       for (let i = currentYear; i >= 1900; i -= 1) {
         years.push(i);
       }

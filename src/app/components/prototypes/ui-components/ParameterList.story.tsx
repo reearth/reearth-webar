@@ -58,7 +58,6 @@ export const Default: Story = {
       <SliderParameterItem label="Range Slider" min={0} max={10} range atom={sliderAtom3} />
       <SegmentParameterItem
         label="Segment"
-        // @ts-expect-error TODO: Fix type
         atom={segmentAtom}
         items={[
           [1, "Value 1"],

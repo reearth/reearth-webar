@@ -111,4 +111,6 @@ export {
 //     : undefined;
 // });
 
-export const screenSpaceSelectionHandlerAtom = atom<ScreenSpaceSelectionHandler | null>(null);
+export const screenSpaceSelectionHandlerAtom = atom<ScreenSpaceSelectionHandler>(null);
+// export const screenSpaceSelectionHandlerAtom = atom<ScreenSpaceSelectionHandler | null, [], null>(null, null);
+

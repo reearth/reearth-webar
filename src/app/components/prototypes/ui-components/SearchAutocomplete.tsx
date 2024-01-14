@@ -135,7 +135,6 @@ function renderOption(props: HTMLAttributes<HTMLLIElement>, option: SearchOption
     // @ts-expect-error TODO
     <EntityTitleButton
       title={option.name}
-      // @ts-expect-error TODO
       iconComponent={iconComponents[option.type]}
       {...props}
     />
