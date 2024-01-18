@@ -127,7 +127,9 @@ async function setupCesiumViewer() {
         // オプション一覧はこちら https://cesium.com/learn/cesiumjs/ref-doc/Cesium3DTileset.html#.ConstructorOptions
         const plateauTileset = await Cesium.Cesium3DTileset.fromUrl(
             // 港区LOD2
-            "https://assets.cms.plateau.reearth.io/assets/df/b95190-23af-4087-9981-430ca798f502/13100_tokyo23-ku_2022_3dtiles%20_1_1_op_bldg_13103_minato-ku_lod2/tileset.json",
+            // "https://assets.cms.plateau.reearth.io/assets/df/b95190-23af-4087-9981-430ca798f502/13100_tokyo23-ku_2022_3dtiles%20_1_1_op_bldg_13103_minato-ku_lod2/tileset.json",
+            // 中央区LOD2
+            "https://assets.cms.plateau.reearth.io/assets/38/9cf378-c397-49bb-a4fb-894ce86647d8/13100_tokyo23-ku_2022_3dtiles_1_1_op_bldg_13102_chuo-ku_lod2/tileset.json",
             // 千代田区LOD2
             // "https://assets.cms.plateau.reearth.io/assets/14/b8f886-921d-46d3-9fd4-4f6e568b27d4/13100_tokyo23-ku_2022_3dtiles%20_1_1_op_bldg_13101_chiyoda-ku_lod2/tileset.json",
             // 川崎市多摩区LOD1
@@ -284,10 +286,10 @@ function gpsTrackingProcess(pos) {
 
     // 緯度経度高度のデカルト座標にまとめる
     // Cesiumの指定はlong, lat, altの順であることに注意
-    const destination = Cesium.Cartesian3.fromDegrees(139.74530681029205, 35.65807022172221, 60); // 東京タワー前
+    // const destination = Cesium.Cartesian3.fromDegrees(139.74530681029205, 35.65807022172221, 60); // 東京タワー前
     // const destination = Cesium.Cartesian3.fromDegrees(140.38804838405298, 37.39840050666605, 400); // 郡山駅前
-    // const destination = Cesium.Cartesian3.fromDegrees(long, lat, alt);
     // const destination = Cesium.Cartesian3.fromDegrees(long, lat, 300);
+    const destination = Cesium.Cartesian3.fromDegrees(long, lat, alt);
 
     // カメラ座標を更新
     moveCesiumCamera(destination);
