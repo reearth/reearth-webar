@@ -52,7 +52,6 @@ export const QuantitativeColorLegend: FC<QuantitativeColorLegendProps> = ({
   return (
     <Stack {...props} spacing={0.25}>
       <ColorMapGradient colorMap={colorMap} min={min} max={max} />
-      {percents !== false && (
         <Values>
           {percents.map(({ value, percent }, index, { length }) => (
             <Value
@@ -66,7 +65,6 @@ export const QuantitativeColorLegend: FC<QuantitativeColorLegendProps> = ({
             </Value>
           ))}
         </Values>
-      )}
     </Stack>
   );
 };

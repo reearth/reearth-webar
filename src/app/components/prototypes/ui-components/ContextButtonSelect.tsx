@@ -114,7 +114,7 @@ export const ContextButtonSelect = forwardRef<HTMLDivElement, ContextButtonSelec
           multiple
           value={value != null && value !== "" ? [value] : []}
           IconComponent={DropDownIcon}
-          {...(props as SelectProps<string[]>)}
+          {...(props as any as SelectProps<string[]>)}
           renderValue={renderValue}
           onChange={handleChange}
           MenuProps={{

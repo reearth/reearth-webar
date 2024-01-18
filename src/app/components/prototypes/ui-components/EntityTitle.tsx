@@ -71,7 +71,7 @@ export const EntityTitle = forwardRef<HTMLDivElement, EntityTitleProps>(
           primary={
             typeof title === "object" && title != null && "primary" in title
               ? title?.primary
-              : title
+              : title as ReactNode
           }
           secondary={
             typeof title === "object" && title != null && "secondary" in title

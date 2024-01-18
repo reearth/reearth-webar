@@ -10,6 +10,7 @@ import { Events } from "../../reearth/types";
 import { Properties } from "../../reearth/utils";
 import { findRootLayerAtom } from "../../states/rootLayer";
 import { LayerModel, LayerModelParams } from "../model";
+import { Atom } from "jotai";
 
 import { GENERAL_FORMAT } from "./format";
 import { GeneralLayerType } from "./types";
@@ -23,7 +24,7 @@ export interface GeneralLayerModelParams extends LayerModelParams {
 export interface GeneralLayerModel extends LayerModel {
   municipalityCode: string;
   title: string;
-  propertiesAtom: PrimitiveAtom<Properties | null>;
+  propertiesAtom: Atom<Properties | null>;
 }
 
 export function createGeneralDatasetLayer(

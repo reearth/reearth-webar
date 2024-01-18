@@ -16,6 +16,7 @@ import { datasetTypeLayers } from "../constants/datasetTypeLayers";
 import { datasetTypeNames } from "../constants/datasetTypeNames";
 import { PlateauDatasetType } from "../constants/plateau";
 import { showDataFormatsAtom } from "../states/app";
+import { WritableAtom } from "jotai/ts3.8";
 
 interface Params {
   datasetId: string;
@@ -76,7 +77,7 @@ export const DefaultDatasetSelect: FC<DefaultDatasetSelectProps> = memo(
 
     const addLayer = useAddLayer();
     const removeLayer = useSetAtom(removeLayerAtom);
-    const paramsAtom = useMemo(() => {
+    const paramsAtom = useMemo<WritableAtom<any, [_params: SetStateAction<Params[]>], void>>(() => {
       if (!layerType) {
         return atom(null, (_get, _set, _params: SetStateAction<Params[]>) => {});
       }

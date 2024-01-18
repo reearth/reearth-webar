@@ -1,6 +1,6 @@
-import { DatasetStoryFieldPreset } from "../../../editor/containers/common/fieldComponentEditor/fields/general/EditorDatasetStoryField";
-import { LinkButtonFieldPreset } from "../../../editor/containers/common/fieldComponentEditor/fields/general/EditorLinkButtonField";
-import { EditorTimelineCustomizedFieldPreset } from "../../../editor/containers/common/fieldComponentEditor/fields/general/EditorTimelineCustomizedField";
+// import { DatasetStoryFieldPreset } from "../../../editor/containers/common/fieldComponentEditor/fields/general/EditorDatasetStoryField";
+// import { LinkButtonFieldPreset } from "../../../editor/containers/common/fieldComponentEditor/fields/general/EditorLinkButtonField";
+// import { EditorTimelineCustomizedFieldPreset } from "../../../editor/containers/common/fieldComponentEditor/fields/general/EditorTimelineCustomizedField";
 
 import { FieldBase } from "./base";
 
@@ -54,7 +54,7 @@ export type ApplyTimeValueField = FieldBase<{
 export const TIMELINE_CUSTOMIZED_FIELD = "TIMELINE_CUSTOMIZED_FIELD";
 export type TimelineCustomizedField = FieldBase<{
   type: typeof TIMELINE_CUSTOMIZED_FIELD;
-  preset?: EditorTimelineCustomizedFieldPreset;
+  // preset?: EditorTimelineCustomizedFieldPreset;
 }>;
 
 export const TIMELINE_MONTH_FIELD = "TIMELINE_MONTH_FIELD";
@@ -65,13 +65,13 @@ export type TimelineMonthField = FieldBase<{
 export const LINK_BUTTON_FIELD = "LINK_BUTTON_FIELD";
 export type LinkButtonField = FieldBase<{
   type: typeof LINK_BUTTON_FIELD;
-  preset: LinkButtonFieldPreset;
+  // preset: LinkButtonFieldPreset;
 }>;
 
 export const DATASET_STORY_FIELD = "DATASET_STORY_FIELD";
 export type DatasetStoryField = FieldBase<{
   type: typeof DATASET_STORY_FIELD;
-  preset: DatasetStoryFieldPreset;
+  // preset: DatasetStoryFieldPreset;
 }>;
 
 export type GeneralFields =

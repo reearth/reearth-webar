@@ -1,19 +1,19 @@
 import { get } from "lodash-es";
 
-import attributesData from "./attributes.csv?raw";
+// import attributesData from "./attributes.csv?raw";
 import type { Json, JsonArray, JsonObject, JsonPrimitive } from "./json";
 import type { FldInfo, Properties } from "./types";
 
 export const attributesMap = new Map<string, string>();
 const ignoredSuffix = ["_codeSpace"];
 
-attributesData
-  .split("\n")
-  .map(l => l.split(","))
-  .forEach(l => {
-    if (!l || !l[0] || !l[1] || typeof l[0] !== "string" || typeof l[1] !== "string") return;
-    attributesMap.set(l[0], l[1]);
-  });
+// attributesData
+//   .split("\n")
+//   .map(l => l.split(","))
+//   .forEach(l => {
+//     if (!l || !l[0] || !l[1] || typeof l[0] !== "string" || typeof l[1] !== "string") return;
+//     attributesMap.set(l[0], l[1]);
+//   });
 
 export const getAttributeLabel = (key: string) => attributesMap?.get(key);
 

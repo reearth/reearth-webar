@@ -70,13 +70,13 @@ export const makeSimpleValue = (
   switch (comp.type) {
     // Point
     case POINT_FILL_COLOR_VALUE_FIELD:
-      return comp.value?.color || comp.preset?.defaultValue;
+      return comp.value?.color;
     // Polyline
     case POLYLINE_FILL_COLOR_VALUE_FIELD:
-      return comp.value?.color || comp.preset?.defaultValue;
+      return comp.value?.color;
     // Polygon
     case POLYGON_FILL_COLOR_VALUE_FIELD:
-      return comp.value?.color || comp.preset?.defaultValue;
+      return comp.value?.color;
     default:
       return comp.preset?.defaultValue;
   }
@@ -95,37 +95,37 @@ export const makeConditionalExpression = (
   if (!comp) return;
 
   const currentRuleId = comp.value?.useDefault
-    ? comp.value?.currentRuleId ?? comp.preset?.rules?.[0].id
+    ? comp.value?.currentRuleId
     : comp.value?.currentRuleId;
 
   return {
     expression: {
       conditions: [
-        ...(
-          comp.preset?.rules?.flatMap(rule => {
-            if (rule.id !== currentRuleId) return;
-            const overriddenRules = comp.value?.overrideRules.filter(r => r.ruleId === rule.id);
-            return rule.conditions?.map(cond => {
-              const overriddenCondition = overriddenRules?.find(r => r.conditionId === cond.id);
-              const colorValue = overriddenCondition?.color || cond.color;
-              if (!rule.propertyName || !cond.value || !colorValue) return;
-              const stringCondition = `${variable(rule.propertyName)} ${cond.operation} ${string(
-                cond.value,
-              )}`;
-              const numberCondition = !isNaN(Number(cond.value))
-                ? `${defaultConditionalNumber(rule.propertyName)} ${cond.operation} ${number(
-                    Number(cond.value),
-                  )}`
-                : undefined;
-              return rule.propertyName && cond.value && colorValue
-                ? ([numberCondition ? numberCondition : stringCondition, color(colorValue, 1)] as [
-                    string,
-                    string,
-                  ])
-                : undefined;
-            });
-          }) ?? []
-        ).filter(isNotNullish),
+        // ...(
+        //   comp.preset?.rules?.flatMap(rule => {
+        //     if (rule.id !== currentRuleId) return;
+        //     const overriddenRules = comp.value?.overrideRules.filter(r => r.ruleId === rule.id);
+        //     return rule.conditions?.map(cond => {
+        //       const overriddenCondition = overriddenRules?.find(r => r.conditionId === cond.id);
+        //       const colorValue = overriddenCondition?.color || cond.color;
+        //       if (!rule.propertyName || !cond.value || !colorValue) return;
+        //       const stringCondition = `${variable(rule.propertyName)} ${cond.operation} ${string(
+        //         cond.value,
+        //       )}`;
+        //       const numberCondition = !isNaN(Number(cond.value))
+        //         ? `${defaultConditionalNumber(rule.propertyName)} ${cond.operation} ${number(
+        //             Number(cond.value),
+        //           )}`
+        //         : undefined;
+        //       return rule.propertyName && cond.value && colorValue
+        //         ? ([numberCondition ? numberCondition : stringCondition, color(colorValue, 1)] as [
+        //             string,
+        //             string,
+        //           ])
+        //         : undefined;
+        //     });
+        //   }) ?? []
+        // ).filter(isNotNullish),
         ["true", color(DEFAULT_COLOR, 1)],
       ],
     },
@@ -142,15 +142,15 @@ export const makeGradientExpression = (
   const preset = comp.preset;
   const value = comp.value;
   const currentRuleId = comp.value?.useDefault
-    ? comp.value?.currentRuleId ?? comp.preset?.rules?.[0].id
+    ? comp.value?.currentRuleId
     : comp.value?.currentRuleId;
-  const rule = preset?.rules?.find(r => r.id === currentRuleId);
+  // const rule = preset?.rules?.find(r => r.id === currentRuleId);
 
   const conditions: [string, string][] = [["true", color(DEFAULT_COLOR, 1)]];
 
   const [minValue, maxValue] = [
-    value?.currentMin ?? rule?.min ?? 0,
-    value?.currentMax ?? rule?.max ?? 0,
+    value?.currentMin,
+    value?.currentMax,
   ];
   if (minValue === maxValue) {
     return {
@@ -159,20 +159,20 @@ export const makeGradientExpression = (
   }
 
   const colorMap = COLOR_MAPS.find(
-    c => c.name === (value?.currentColorMapName ?? rule?.colorMapName),
+    c => c.name === (value?.currentColorMapName),
   );
-  const colorProperty = rule?.propertyName;
+  // const colorProperty = rule?.propertyName;
 
-  if (!colorMap || !colorProperty) return { expression: { conditions } };
+  if (!colorMap) return { expression: { conditions } };
 
-  const distance = 5;
-  for (let i = minValue; i <= maxValue; i += distance) {
-    const color = colorMap.linear((i - minValue) / (maxValue - minValue));
-    conditions.unshift([
-      `${defaultConditionalNumber(colorProperty, minValue - 1)} >= ${number(i)}`,
-      rgba({ r: color[0] * 255, g: color[1] * 255, b: color[2] * 255, a: 1 }),
-    ]);
-  }
+  // const distance = 5;
+  // for (let i = minValue; i <= maxValue; i += distance) {
+  //   const color = colorMap.linear((i - minValue) / (maxValue - minValue));
+  //   conditions.unshift([
+  //     `${defaultConditionalNumber(colorProperty, minValue - 1)} >= ${number(i)}`,
+  //     rgba({ r: color[0] * 255, g: color[1] * 255, b: color[2] * 255, a: 1 }),
+  //   ]);
+  // }
 
   return {
     expression: {
@@ -190,28 +190,30 @@ const makeVisibilityConditionExpression = (
       >
     | undefined,
 ): ExpressionContainer | undefined => {
-  const conditions = comp?.preset?.conditions;
+  // const conditions = comp?.preset?.conditions;
 
-  if (!conditions) return;
+  // if (!conditions) return;
 
-  return {
-    expression: {
-      conditions: conditions.reduce(
-        (res, cond) => {
-          const isNumber = !isNaN(Number(cond.value));
-          if (!cond.operation || !cond.value || !cond.propertyName) return res;
-          res.unshift([
-            isNumber
-              ? `${defaultConditionalNumber(cond.propertyName)} ${cond.operation} ${cond.value}`
-              : `${variable(cond.propertyName)} ${cond.operation} ${string(cond.value)}`,
-            cond.show ? "true" : "false",
-          ]);
-          return res;
-        },
-        [["true", "false"]],
-      ),
-    },
-  };
+  // return {
+  //   expression: {
+  //     conditions: conditions.reduce(
+  //       (res, cond) => {
+  //         const isNumber = !isNaN(Number(cond.value));
+  //         if (!cond.operation || !cond.value || !cond.propertyName) return res;
+  //         res.unshift([
+  //           isNumber
+  //             ? `${defaultConditionalNumber(cond.propertyName)} ${cond.operation} ${cond.value}`
+  //             : `${variable(cond.propertyName)} ${cond.operation} ${string(cond.value)}`,
+  //           cond.show ? "true" : "false",
+  //         ]);
+  //         return res;
+  //       },
+  //       [["true", "false"]],
+  //     ),
+  //   },
+  // };
+
+  return undefined;
 };
 
 const makeVisibilityFilterExpression = (
@@ -223,65 +225,67 @@ const makeVisibilityFilterExpression = (
       >
     | undefined,
 ): ExpressionContainer | undefined => {
-  const rule =
-    comp?.preset?.rules?.find(rule => rule.id === comp.value) ?? comp?.preset?.rules?.[0];
-  const property = rule?.propertyName;
+  // const rule =
+  //   comp?.preset?.rules?.find(rule => rule.id === comp.value) ?? comp?.preset?.rules?.[0];
+  // const property = rule?.propertyName;
 
-  if (!rule?.conditions || !property) return;
+  // if (!rule?.conditions || !property) return;
 
-  return {
-    expression: {
-      conditions: rule.conditions.reduce(
-        (res, cond) => {
-          const isNumber = !isNaN(Number(cond.value));
-          if (!cond.operation || !cond.value) return res;
-          res.unshift([
-            isNumber
-              ? `${defaultConditionalNumber(property)} ${cond.operation} ${cond.value}`
-              : `${variable(property)} ${cond.operation} ${string(cond.value)}`,
-            "true",
-          ]);
-          return res;
-        },
-        [["true", "false"]],
-      ),
-    },
-  };
+  // return {
+  //   expression: {
+  //     conditions: rule.conditions.reduce(
+  //       (res, cond) => {
+  //         const isNumber = !isNaN(Number(cond.value));
+  //         if (!cond.operation || !cond.value) return res;
+  //         res.unshift([
+  //           isNumber
+  //             ? `${defaultConditionalNumber(property)} ${cond.operation} ${cond.value}`
+  //             : `${variable(property)} ${cond.operation} ${string(cond.value)}`,
+  //           "true",
+  //         ]);
+  //         return res;
+  //       },
+  //       [["true", "false"]],
+  //     ),
+  //   },
+  // };
+
+  return undefined;
 };
 
 export const makeConditionalImageExpression = (
   comp: Component<typeof POINT_USE_IMAGE_CONDITION_FIELD> | undefined,
 ): ExpressionContainer | undefined => {
   if (!comp) return;
-  const currentRuleId = comp.value?.currentRuleId ?? comp.preset?.rules?.[0].id;
+  const currentRuleId = comp.value?.currentRuleId;
   return {
     expression: {
       conditions: [
-        ...(
-          comp.preset?.rules?.flatMap(rule => {
-            if (rule.id !== currentRuleId) return;
-            const overriddenRules = comp.value?.overrideRules.filter(r => r.ruleId === rule.id);
-            return rule.conditions?.map(cond => {
-              const overriddenCondition = overriddenRules?.find(r => r.conditionId === cond.id);
-              const imageURLValue = overriddenCondition?.imageURL || cond.imageURL;
-              if (!rule.propertyName || !cond.value || !imageURLValue) return;
-              const stringCondition = `${variable(rule.propertyName)} ${cond.operation} ${string(
-                cond.value,
-              )}`;
-              const numberCondition = !isNaN(Number(cond.value))
-                ? `${defaultConditionalNumber(rule.propertyName)} ${cond.operation} ${number(
-                    Number(cond.value),
-                  )}`
-                : undefined;
-              return rule.propertyName && cond.value && imageURLValue
-                ? ([
-                    numberCondition ? `${numberCondition} || ${stringCondition}` : stringCondition,
-                    `"${imageURLValue}"`,
-                  ] as [string, string])
-                : undefined;
-            });
-          }) ?? []
-        ).filter(isNotNullish),
+        // ...(
+        //   comp.preset?.rules?.flatMap(rule => {
+        //     if (rule.id !== currentRuleId) return;
+        //     const overriddenRules = comp.value?.overrideRules.filter(r => r.ruleId === rule.id);
+        //     return rule.conditions?.map(cond => {
+        //       const overriddenCondition = overriddenRules?.find(r => r.conditionId === cond.id);
+        //       const imageURLValue = overriddenCondition?.imageURL || cond.imageURL;
+        //       if (!rule.propertyName || !cond.value || !imageURLValue) return;
+        //       const stringCondition = `${variable(rule.propertyName)} ${cond.operation} ${string(
+        //         cond.value,
+        //       )}`;
+        //       const numberCondition = !isNaN(Number(cond.value))
+        //         ? `${defaultConditionalNumber(rule.propertyName)} ${cond.operation} ${number(
+        //             Number(cond.value),
+        //           )}`
+        //         : undefined;
+        //       return rule.propertyName && cond.value && imageURLValue
+        //         ? ([
+        //             numberCondition ? `${numberCondition} || ${stringCondition}` : stringCondition,
+        //             `"${imageURLValue}"`,
+        //           ] as [string, string])
+        //         : undefined;
+        //     });
+        //   }) ?? []
+        // ).filter(isNotNullish),
       ],
     },
   };
@@ -291,35 +295,35 @@ export const makeConditionalImageColorExpression = (
   comp: Component<typeof POINT_USE_IMAGE_CONDITION_FIELD> | undefined,
 ): ExpressionContainer | undefined => {
   if (!comp) return;
-  const currentRuleId = comp.value?.currentRuleId ?? comp.preset?.rules?.[0].id;
+  // const currentRuleId = comp.value?.currentRuleId ?? comp.preset?.rules?.[0].id;
   return {
     expression: {
       conditions: [
-        ...(
-          comp.preset?.rules?.flatMap(rule => {
-            if (rule.id !== currentRuleId) return;
-            const overriddenRules = comp.value?.overrideRules.filter(r => r.ruleId === rule.id);
-            return rule.conditions?.map(cond => {
-              const overriddenCondition = overriddenRules?.find(r => r.conditionId === cond.id);
-              const imageColorValue = overriddenCondition?.imageColor || cond.imageColor;
-              if (!rule.propertyName || !cond.value || !imageColorValue) return;
-              const stringCondition = `${variable(rule.propertyName)} ${cond.operation} ${string(
-                cond.value,
-              )}`;
-              const numberCondition = !isNaN(Number(cond.value))
-                ? `${defaultConditionalNumber(rule.propertyName)} ${cond.operation} ${number(
-                    Number(cond.value),
-                  )}`
-                : undefined;
-              return rule.propertyName && cond.value && imageColorValue
-                ? ([
-                    numberCondition ? `${numberCondition} || ${stringCondition}` : stringCondition,
-                    `color("${imageColorValue}")`,
-                  ] as [string, string])
-                : undefined;
-            });
-          }) ?? []
-        ).filter(isNotNullish),
+        // ...(
+        //   comp.preset?.rules?.flatMap(rule => {
+        //     if (rule.id !== currentRuleId) return;
+        //     const overriddenRules = comp.value?.overrideRules.filter(r => r.ruleId === rule.id);
+        //     return rule.conditions?.map(cond => {
+        //       const overriddenCondition = overriddenRules?.find(r => r.conditionId === cond.id);
+        //       const imageColorValue = overriddenCondition?.imageColor || cond.imageColor;
+        //       if (!rule.propertyName || !cond.value || !imageColorValue) return;
+        //       const stringCondition = `${variable(rule.propertyName)} ${cond.operation} ${string(
+        //         cond.value,
+        //       )}`;
+        //       const numberCondition = !isNaN(Number(cond.value))
+        //         ? `${defaultConditionalNumber(rule.propertyName)} ${cond.operation} ${number(
+        //             Number(cond.value),
+        //           )}`
+        //         : undefined;
+        //       return rule.propertyName && cond.value && imageColorValue
+        //         ? ([
+        //             numberCondition ? `${numberCondition} || ${stringCondition}` : stringCondition,
+        //             `color("${imageColorValue}")`,
+        //           ] as [string, string])
+        //         : undefined;
+        //     });
+        //   }) ?? []
+        // ).filter(isNotNullish),
       ],
     },
   };
@@ -329,11 +333,11 @@ export const makeLabelTextExpression = (
   comp: Component<typeof POINT_USE_LABEL_FIELD> | undefined,
 ): ExpressionContainer | string | undefined => {
   if (!comp) return;
-  const textExpression = comp.preset?.textExpression;
-  if (!textExpression?.startsWith("=")) return textExpression;
+  // const textExpression = comp.preset?.textExpression;
+  // if (!textExpression?.startsWith("=")) return textExpression;
   return {
     expression: {
-      conditions: [["true", textExpression.substring(1)]],
+      conditions: [],
     },
   };
 };
@@ -463,26 +467,24 @@ export const useEvaluateGeneralAppearance = ({
             makeGradientExpression(pointFillGradientColor),
           pointSize: pointSize?.preset?.defaultValue,
           image:
-            pointImageValue?.preset?.imageURL ??
             makeConditionalImageExpression(pointImageCondition),
           imageColor:
-            pointImageValue?.preset?.imageColor ??
             makeConditionalImageColorExpression(pointImageCondition),
           imageSize: pointImageSize?.preset?.defaultValue,
           imageSizeInMeters: pointImageSize?.preset?.enableSizeInMeters,
           show:
             makeVisibilityFilterExpression(pointVisibilityFilter) ??
             makeVisibilityConditionExpression(pointVisibilityCondition),
-          label: pointLabel?.preset?.textExpression ? true : undefined,
+          label: undefined,
           labelText: makeLabelTextExpression(pointLabel),
           labelTypography: {
-            fontSize: pointLabel?.preset?.fontSize,
-            color: pointLabel?.preset?.fontColor,
+            // fontSize: pointLabel?.preset?.fontSize,
+            // color: pointLabel?.preset?.fontColor,
           },
-          labelBackground: pointLabel?.preset?.background,
-          labelBackgroundColor: pointLabel?.preset?.backgroundColor,
-          height: pointLabel?.preset?.height,
-          extrude: pointLabel?.preset?.extruded,
+          // labelBackground: pointLabel?.preset?.background,
+          // labelBackgroundColor: pointLabel?.preset?.backgroundColor,
+          // height: pointLabel?.preset?.height,
+          // extrude: pointLabel?.preset?.extruded,
           heightReference: pointHeightReference?.preset?.defaultValue,
         },
         polyline: {

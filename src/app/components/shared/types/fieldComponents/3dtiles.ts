@@ -1,5 +1,5 @@
-import { FillColorConditionFieldPreset } from "../../../editor/containers/common/fieldComponentEditor/fields/common/EditorFillColorConditionField";
-import { FillGradientColorFieldPreset } from "../../../editor/containers/common/fieldComponentEditor/fields/common/EditorFillColorGradientField";
+// import { FillColorConditionFieldPreset } from "../../../editor/containers/common/fieldComponentEditor/fields/common/EditorFillColorConditionField";
+// import { FillGradientColorFieldPreset } from "../../../editor/containers/common/fieldComponentEditor/fields/common/EditorFillColorGradientField";
 
 import { FieldBase } from "./base";
 import { ConditionalColorSchemeValue, GradientColorSchemeValue } from "./colorScheme";
@@ -18,14 +18,14 @@ export const TILESET_FILL_COLOR_CONDITION_FIELD = "TILESET_FILL_COLOR_CONDITION_
 export type TilesetFillColorConditionField = FieldBase<{
   type: typeof TILESET_FILL_COLOR_CONDITION_FIELD;
   value?: ConditionalColorSchemeValue;
-  preset?: FillColorConditionFieldPreset;
+  // preset?: FillColorConditionFieldPreset;
 }>;
 
 export const TILESET_FILL_COLOR_GRADIENT_FIELD = "TILESET_FILL_COLOR_GRADIENT_FIELD";
 export type TilesetFillGradientColorField = FieldBase<{
   type: typeof TILESET_FILL_COLOR_GRADIENT_FIELD;
   value?: GradientColorSchemeValue;
-  preset?: FillGradientColorFieldPreset;
+  // preset?: FillGradientColorFieldPreset;
 }>;
 
 export const TILESET_CLIPPING = "TILESET_CLIPPING";

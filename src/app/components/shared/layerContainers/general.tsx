@@ -18,10 +18,12 @@ import { ComponentAtom } from "../view-layers/component";
 import { useEvaluateGeneralAppearance } from "./hooks/useEvaluateGeneralAppearance";
 import { useEvaluateGeneralData } from "./hooks/useEvaluateGeneralData";
 
+import { Atom, WritableAtom } from "jotai";
+
 type GeneralContainerProps = Omit<GeneralProps, "appearances" | "appendData"> & {
   id: string;
-  layerIdAtom: PrimitiveAtom<string | null>;
-  propertiesAtom: PrimitiveAtom<Properties | null>;
+  layerIdAtom: WritableAtom<any, [string], any>;
+  propertiesAtom: WritableAtom<any, [string], any>;
   selections?: ScreenSpaceSelectionEntry<typeof GENERAL_FEATURE>[];
   hidden: boolean;
   type: LayerType;

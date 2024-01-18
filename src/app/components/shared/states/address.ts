@@ -31,7 +31,7 @@ export type MunicipalityArea<R extends boolean = boolean> = Area<R> & {
   type: "municipality";
 };
 
-const addressPrimitiveAtom = atom<ReverseGeocoderResult | null>(null);
+const addressPrimitiveAtom = atom<ReverseGeocoderResult, [SetStateAction<ReverseGeocoderResult>], unknown>(null, null);
 
 export const addressAtom = atom(
   get => get(addressPrimitiveAtom),
@@ -59,8 +59,8 @@ export const addressAtom = atom(
   },
 );
 
-const areasPrimitiveAtom = atom<Area[] | null>(null);
+const areasPrimitiveAtom = atom<Area<boolean>[], unknown[], unknown>(null, null);
 export const areasAtom = atom(get => get(areasPrimitiveAtom));
 
-const prefecturePrimitiveAtom = atom<PrefectureArea | null>(null);
+const prefecturePrimitiveAtom = atom<PrefectureArea<boolean>, unknown[], unknown>(null, null);
 export const prefectureAtom = atom(get => get(prefecturePrimitiveAtom));

@@ -30,9 +30,9 @@ export const useEvaluateGeneralData = ({
           : undefined,
       csv: csvProperty?.preset
         ? {
-            lngColumn: csvProperty.preset.lngColumn,
-            latColumn: csvProperty.preset.latColumn,
-            heightColumn: csvProperty.preset.heightColumn,
+            // lngColumn: csvProperty.preset.lngColumn,
+            // latColumn: csvProperty.preset.latColumn,
+            // heightColumn: csvProperty.preset.heightColumn,
           }
         : undefined,
     }),
