@@ -3,7 +3,7 @@ import { atom, useAtomValue, useSetAtom } from "jotai";
 import { useCallback, useMemo, type FC } from "react";
 import invariant from "tiny-invariant";
 
-import { makeColorSchemeAtomForComponent } from "../../../shared/view/state/colorSchemeForComponent";
+// import { makeColorSchemeAtomForComponent } from "../../../shared/view/state/colorSchemeForComponent";
 import {
   ColorMapIcon,
   ColorMapParameterItem,
@@ -102,25 +102,25 @@ export const ColorSchemeContent: FC<ColorSchemeContentProps> = ({ values }) => {
 
   const isPlateauTilesetLayer = "isPlateauTilesetLayer" in layer && layer.isPlateauTilesetLayer;
 
-  const colorScheme = useAtomValue(
-    useMemo(
-      () =>
-        isPlateauTilesetLayer ? layer.colorSchemeAtom : makeColorSchemeAtomForComponent([layer]),
-      [layer, isPlateauTilesetLayer],
-    ),
-  );
+  // const colorScheme = useAtomValue(
+  //   useMemo(
+  //     () =>
+  //       isPlateauTilesetLayer ? layer.colorSchemeAtom : makeColorSchemeAtomForComponent([layer]),
+  //     [layer, isPlateauTilesetLayer],
+  //   ),
+  // );
 
-  switch (colorScheme?.type) {
-    case "quantitative":
-      return <QuantitativeContent colorScheme={colorScheme} onClose={handleClose} />;
-    case "qualitative":
-      return (
-        <QualitativeContent
-          colorScheme={colorScheme}
-          continuous={"isPlateauTilesetLayer" in layer && layer.isPlateauTilesetLayer}
-          onClose={handleClose}
-        />
-      );
-  }
+  // switch (colorScheme?.type) {
+  //   case "quantitative":
+  //     return <QuantitativeContent colorScheme={colorScheme} onClose={handleClose} />;
+  //   case "qualitative":
+  //     return (
+  //       <QualitativeContent
+  //         colorScheme={colorScheme}
+  //         continuous={"isPlateauTilesetLayer" in layer && layer.isPlateauTilesetLayer}
+  //         onClose={handleClose}
+  //       />
+  //     );
+  // }
   return null;
 };

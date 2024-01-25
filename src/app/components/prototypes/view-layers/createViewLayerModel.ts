@@ -30,7 +30,7 @@ export function createViewLayerModel(
     titleAtom: atom<LayerTitle | null>(params.title ?? null),
     loadingAtom: atom(false),
     hiddenAtom: atom(false),
-    layerIdAtom: atom<string | null>(null),
+    layerIdAtom: atom<string | null, any[], unknown>(null, null),
     colorSchemeAtom: atom<LayerColorScheme | null>(params.colorScheme ?? null),
     imageSchemeAtom: atom<LayerImageScheme | null>(params.imageScheme ?? null),
   };

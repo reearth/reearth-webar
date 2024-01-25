@@ -1,5 +1,5 @@
 import { useTheme } from "@mui/material";
-import { PrimitiveAtom, useAtom, useSetAtom } from "jotai";
+import { WritableAtom, useAtom, useSetAtom, type SetStateAction } from "jotai";
 import { FC, useCallback } from "react";
 
 import { LayerType } from "../../prototypes/layers";
@@ -17,19 +17,18 @@ import { ComponentAtom } from "../view-layers/component";
 
 import { useEvaluateGeneralAppearance } from "./hooks/useEvaluateGeneralAppearance";
 import { useEvaluateGeneralData } from "./hooks/useEvaluateGeneralData";
-
-import { Atom, WritableAtom } from "jotai";
+import { PlateauTilesetProperties } from "../plateau";
 
 type GeneralContainerProps = Omit<GeneralProps, "appearances" | "appendData"> & {
   id: string;
-  layerIdAtom: WritableAtom<any, [string], any>;
-  propertiesAtom: WritableAtom<any, [string], any>;
+  layerIdAtom: WritableAtom<string, [string], any>;
+  propertiesAtom: WritableAtom<PlateauTilesetProperties, [PlateauTilesetProperties], any>;
   selections?: ScreenSpaceSelectionEntry<typeof GENERAL_FEATURE>[];
   hidden: boolean;
   type: LayerType;
   componentAtoms: ComponentAtom[] | undefined;
   layers?: string[];
-  cameraAtom?: PrimitiveAtom<CameraPosition | undefined>;
+  cameraAtom?: WritableAtom<CameraPosition, [SetStateAction<CameraPosition>], any>;
 };
 
 export const GeneralLayerContainer: FC<GeneralContainerProps> = ({
@@ -44,7 +43,7 @@ export const GeneralLayerContainer: FC<GeneralContainerProps> = ({
   ...props
 }) => {
   const [layerId, setLayerId] = useAtom(layerIdAtom);
-  const [, setCamera] = useAtom(useOptionalPrimitiveAtom(cameraAtom));
+  const [, setCamera] = useAtom(cameraAtom);
 
   useScreenSpaceSelectionResponder({
     type: GENERAL_FEATURE,
@@ -83,7 +82,7 @@ export const GeneralLayerContainer: FC<GeneralContainerProps> = ({
     (layerId: string, camera?: CameraPosition) => {
       onLoad?.(layerId);
       setLayerId(layerId);
-      setProperties(new Properties(layerId));
+      setProperties(new Properties(layerId) as PlateauTilesetProperties);
 
       if (camera) {
         setCamera(camera);

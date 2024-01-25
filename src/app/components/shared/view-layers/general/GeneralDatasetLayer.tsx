@@ -1,4 +1,4 @@
-import { PrimitiveAtom, atom, useAtomValue, useSetAtom } from "jotai";
+import { WritableAtom, atom, useAtomValue, useSetAtom } from "jotai";
 import { FC, useCallback, useEffect, useMemo } from "react";
 
 import type { LayerProps } from "../../../prototypes/layers";
@@ -10,10 +10,10 @@ import { Events } from "../../reearth/types";
 import { Properties } from "../../reearth/utils";
 import { findRootLayerAtom } from "../../states/rootLayer";
 import { LayerModel, LayerModelParams } from "../model";
-import { Atom } from "jotai";
 
 import { GENERAL_FORMAT } from "./format";
 import { GeneralLayerType } from "./types";
+import { PlateauTilesetProperties } from "../../plateau";
 
 export interface GeneralLayerModelParams extends LayerModelParams {
   title: string;
@@ -24,7 +24,7 @@ export interface GeneralLayerModelParams extends LayerModelParams {
 export interface GeneralLayerModel extends LayerModel {
   municipalityCode: string;
   title: string;
-  propertiesAtom: Atom<Properties | null>;
+  propertiesAtom: WritableAtom<PlateauTilesetProperties | null, [PlateauTilesetProperties | null], any>;
 }
 
 export function createGeneralDatasetLayer(
@@ -35,7 +35,7 @@ export function createGeneralDatasetLayer(
     type: params.type,
     municipalityCode: params.municipalityCode,
     title: params.title,
-    propertiesAtom: atom<Properties | null>(null),
+    propertiesAtom: atom<PlateauTilesetProperties | null, any[], unknown>(null, null),
   };
 }
 

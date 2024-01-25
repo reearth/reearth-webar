@@ -1,5 +1,5 @@
 import { useTheme } from "@mui/material";
-import { PrimitiveAtom, useAtom, useAtomValue, useSetAtom } from "jotai";
+import { PrimitiveAtom, WritableAtom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { FC, useCallback, useMemo } from "react";
 
 import { ColorMap } from "../../prototypes/color-maps";
@@ -26,8 +26,8 @@ import { useEvaluateFilter } from "./hooks/useEvaluateFilter";
 type TilesetContainerProps = Omit<TilesetProps, "appearance" | "boxAppearance"> & {
   id: string;
   featureIndexAtom: PrimitiveAtom<TileFeatureIndex | null>;
-  layerIdAtom: PrimitiveAtom<string | null>;
-  propertiesAtom: PrimitiveAtom<PlateauTilesetProperties | null>;
+  layerIdAtom: WritableAtom<string | null, [string | null], any>;
+  propertiesAtom: WritableAtom<PlateauTilesetProperties | null, [PlateauTilesetProperties | null], any>;
   colorPropertyAtom: PrimitiveAtom<string | null>;
   colorMapAtom: PrimitiveAtom<ColorMap>;
   colorRangeAtom: PrimitiveAtom<number[]>;

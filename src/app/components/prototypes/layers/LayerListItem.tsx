@@ -14,8 +14,8 @@ import {
 import { mergeRefs } from "react-merge-refs";
 
 import { MULTIPLE_SELECTABLE_TYPES } from "../../shared/view/hooks";
-import { makeColorSchemeAtomForComponent } from "../../shared/view/state/colorSchemeForComponent";
-import { makeImageSchemeAtomForComponent } from "../../shared/view/state/imageSchemaForComponent";
+// import { makeColorSchemeAtomForComponent } from "../../shared/view/state/colorSchemeForComponent";
+// import { makeImageSchemeAtomForComponent } from "../../shared/view/state/imageSchemaForComponent";
 
 import { addLayerSelectionAtom, layerSelectionAtom } from "./states";
 import { type LayerModel, type LayerProps } from "./types";
@@ -59,15 +59,15 @@ export const LayerListItem = forwardRef<HTMLDivElement, LayerListItemProps>(
       [layer.id, layer.type, setSelection, addSelection],
     );
 
-    const colorSchemeAtom = useMemo(() => {
-      const generalColorScheme = makeColorSchemeAtomForComponent([layer]);
-      return atom(get => get(layer.colorSchemeAtom) || get(generalColorScheme) || null);
-    }, [layer]);
+    // const colorSchemeAtom = useMemo(() => {
+    //   const generalColorScheme = makeColorSchemeAtomForComponent([layer]);
+    //   return atom(get => get(layer.colorSchemeAtom) || get(generalColorScheme) || null);
+    // }, [layer]);
 
-    const imageSchemeAtom = useMemo(() => {
-      const generalImageScheme = makeImageSchemeAtomForComponent([layer]);
-      return atom(get => get(layer.imageSchemeAtom) || get(generalImageScheme) || null);
-    }, [layer]);
+    // const imageSchemeAtom = useMemo(() => {
+    //   const generalImageScheme = makeImageSchemeAtomForComponent([layer]);
+    //   return atom(get => get(layer.imageSchemeAtom) || get(generalImageScheme) || null);
+    // }, [layer]);
 
     const ItemComponent = itemComponent;
     return (
@@ -82,8 +82,8 @@ export const LayerListItem = forwardRef<HTMLDivElement, LayerListItemProps>(
         {...listeners}>
         <ItemComponent
           {...layer}
-          colorSchemeAtom={colorSchemeAtom}
-          imageSchemeAtom={imageSchemeAtom}
+          // colorSchemeAtom={colorSchemeAtom}
+          // imageSchemeAtom={imageSchemeAtom}
           index={index}
           selected={selection.some(s => s.id === layer.id)}
           itemProps={{

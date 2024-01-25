@@ -11,7 +11,7 @@ import {
   GeneralFeatureContent,
   getGeneralFeatureInformation,
 } from "../../../shared/view/selection/GeneralFeatureContent";
-import { LegendDescriptionSection } from "../../../shared/view/selection/LegendDescriptionSection";
+// import { LegendDescriptionSection } from "../../../shared/view/selection/LegendDescriptionSection";
 import { Inspector } from "../../ui-components";
 import { ColorSchemeContent } from "../selection/ColorSchemeContent";
 import { ImageSchemeContent } from "../selection/ImageSchemeContent";
@@ -88,22 +88,22 @@ export const SelectionPanel: FC = () => {
           //   break;
         }
         break;
-      case COLOR_SCHEME_SELECTION:
-        content = (
-          <>
-            <ColorSchemeContent values={selectionGroup.values} />
-            <LegendDescriptionSection values={selectionGroup.values} />
-          </>
-        );
-        break;
-      case IMAGE_SCHEME_SELECTION:
-        content = (
-          <>
-            <ImageSchemeContent values={selectionGroup.values} />
-            <LegendDescriptionSection values={selectionGroup.values} />
-          </>
-        );
-        break;
+      // case COLOR_SCHEME_SELECTION:
+      //   content = (
+      //     <>
+      //       <ColorSchemeContent values={selectionGroup.values} />
+      //       <LegendDescriptionSection values={selectionGroup.values} />
+      //     </>
+      //   );
+      //   break;
+      // case IMAGE_SCHEME_SELECTION:
+      //   content = (
+      //     <>
+      //       <ImageSchemeContent values={selectionGroup.values} />
+      //       <LegendDescriptionSection values={selectionGroup.values} />
+      //     </>
+      //   );
+      //   break;
     }
   } else if (selectionGroups.length > 1) {
     content = null; // TODO: Show mixed content

@@ -1,4 +1,4 @@
-import { PrimitiveAtom, WritableAtom, atom } from "jotai";
+import { PrimitiveAtom, WritableAtom, atom, type SetStateAction } from "jotai";
 import invariant from "tiny-invariant";
 
 import { LayerModel, LayerType } from "../../prototypes/layers";
@@ -151,7 +151,7 @@ const createViewLayerWithComponentGroup = (
     format: data?.format ? REEARTH_DATA_FORMATS[data.format] : undefined,
     url: data?.url,
     layers: data?.layers ?? undefined,
-    cameraAtom: atom<CameraPosition | undefined>(undefined),
+    cameraAtom: atom<CameraPosition, [SetStateAction<CameraPosition>], unknown>(undefined, null),
     componentGroups: (template ?? setting?.fieldComponents)?.groups?.map(
       g => [g.id, g.name] as [id: string, name: string],
     ),
@@ -260,7 +260,7 @@ export const createRootLayerAtom = (params: RootLayerAtomParams): RootLayerConfi
 
   const currentDataIdAtom = atom<string | undefined>(initialCurrentDataId);
 
-  const currentGroupIdAtom = atom<string | undefined>(undefined);
+  const currentGroupIdAtom = atom<string | undefined, any[], unknown>(undefined, null);
 
   const currentDataIdAtomAtom = atom(
     get => get(currentDataIdAtom),

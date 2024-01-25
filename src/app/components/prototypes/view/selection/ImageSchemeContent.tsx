@@ -3,7 +3,7 @@ import { atom, useAtomValue, useSetAtom } from "jotai";
 import { useCallback, useMemo, type FC } from "react";
 import invariant from "tiny-invariant";
 
-import { makeImageSchemeAtomForComponent } from "../../../shared/view/state/imageSchemaForComponent";
+// import { makeImageSchemeAtomForComponent } from "../../../shared/view/state/imageSchemaForComponent";
 import { InspectorHeader } from "../../ui-components";
 import { ImageIconSetIcon } from "../../ui-components/ImageIconSetIcon";
 import { ImageIconSetList } from "../../ui-components/ImageIconSetList";
@@ -52,13 +52,13 @@ export const ImageSchemeContent: FC<ImageSchemeContentProps> = ({ values }) => {
     setSelection([]);
   }, [setSelection]);
 
-  const imageScheme = useAtomValue(
-    useMemo(() => makeImageSchemeAtomForComponent([layer]), [layer]),
-  );
+  // const imageScheme = useAtomValue(
+  //   useMemo(() => makeImageSchemeAtomForComponent([layer]), [layer]),
+  // );
 
-  switch (imageScheme?.type) {
-    case "imageIcon":
-      return <ImageIconContent imageScheme={imageScheme} onClose={handleClose} />;
-  }
+  // switch (imageScheme?.type) {
+  //   case "imageIcon":
+  //     return <ImageIconContent imageScheme={imageScheme} onClose={handleClose} />;
+  // }
   return null;
 };

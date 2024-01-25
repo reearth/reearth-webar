@@ -1,4 +1,4 @@
-import { Atom, PrimitiveAtom } from "jotai";
+import { Atom, PrimitiveAtom, WritableAtom } from "jotai";
 import { type SetOptional } from "type-fest";
 
 import { type LayerModelBase } from "../../prototypes/layers";
@@ -29,7 +29,7 @@ declare module "../layers" {
     loadingAtom: PrimitiveAtom<boolean>;
     hiddenAtom: PrimitiveAtom<boolean>;
     // NOTE: Use layerId instead of boundingSphereAtom for ReEarth
-    layerIdAtom: PrimitiveAtom<string | null>;
+    layerIdAtom: WritableAtom<string | null, [string | null], any>;
     colorSchemeAtom: Atom<LayerColorScheme | null>;
     imageSchemeAtom: Atom<LayerImageScheme | null>;
   }

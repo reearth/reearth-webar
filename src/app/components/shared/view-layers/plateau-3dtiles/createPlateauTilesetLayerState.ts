@@ -5,6 +5,7 @@ import { type ViewLayerModel, type LayerColorScheme } from "../../../prototypes/
 import { type TileFeatureIndex } from "../../plateau";
 import { PlateauTilesetProperties } from "../../plateau/layers";
 import { ComponentIdParams, makeComponentAtomWrapper } from "../component";
+import { Properties } from "../../reearth/utils";
 
 export interface PlateauTilesetLayerStateParams extends Omit<ComponentIdParams, "componentType"> {
   hiddenFeatures?: readonly string[];
@@ -23,7 +24,7 @@ export interface PlateauTilesetLayerState {
   featureIndexAtom: PrimitiveAtom<TileFeatureIndex | null>;
   hiddenFeaturesAtom: PrimitiveAtom<readonly string[] | null>;
   searchedFeaturesAtom: PrimitiveAtom<SearchedFeatures | null>;
-  propertiesAtom: PrimitiveAtom<PlateauTilesetProperties | null>;
+  propertiesAtom: WritableAtom<PlateauTilesetProperties | null, [PlateauTilesetProperties | null], any>;
   colorPropertyAtom: PrimitiveAtom<string | null>;
   colorMapAtom: WritableAtom<ColorMap<ColorMapType>, [SetStateAction<ColorMap>], void>;
   colorRangeAtom: PrimitiveAtom<number[]>;
@@ -33,9 +34,9 @@ export interface PlateauTilesetLayerState {
 export function createPlateauTilesetLayerState(
   params: PlateauTilesetLayerStateParams,
 ): PlateauTilesetLayerState {
-  const propertiesAtom = atom<PlateauTilesetProperties | null>(null);
+  const propertiesAtom = atom<PlateauTilesetProperties | null, any[], unknown>(null, null);
 
-  const colorPropertyAtom = atom<string | null>(null);
+  const colorPropertyAtom = atom<string | null, any[], unknown>(null, null);
 
   const originalColorMapAtom = atom<ColorMap>(colorMapPlateau);
   const wrappedOriginalColorMapAtom = atom(
@@ -115,8 +116,8 @@ export function createPlateauTilesetLayerState(
 
   return {
     isPlateauTilesetLayer: true,
-    featureIndexAtom: atom<TileFeatureIndex | null>(null),
-    searchedFeaturesAtom: atom<SearchedFeatures | null>(null),
+    featureIndexAtom: atom<TileFeatureIndex, any[], unknown>(null, null),
+    searchedFeaturesAtom: atom<SearchedFeatures, any[], unknown>(null, null),
     hiddenFeaturesAtom: atom<readonly string[] | null>(params.hiddenFeatures ?? null),
     propertiesAtom,
     colorPropertyAtom,

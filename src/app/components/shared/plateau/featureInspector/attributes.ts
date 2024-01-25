@@ -7,6 +7,7 @@ import type { FldInfo, Properties } from "./types";
 export const attributesMap = new Map<string, string>();
 const ignoredSuffix = ["_codeSpace"];
 
+// TODO: 必要であれば
 // attributesData
 //   .split("\n")
 //   .map(l => l.split(","))

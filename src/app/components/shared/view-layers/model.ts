@@ -1,4 +1,4 @@
-import { PrimitiveAtom } from "jotai";
+import { WritableAtom , type SetStateAction } from "jotai";
 
 import { ViewLayerModel, ViewLayerModelParams } from "../../prototypes/view-layers";
 import { CameraPosition } from "../reearth/types";
@@ -18,7 +18,7 @@ export type LayerModelBase = {
   componentGroups?: [id: string, name: string][];
   componentAtoms?: ComponentAtom[];
   // This is for MVT basically.
-  cameraAtom?: PrimitiveAtom<CameraPosition | undefined>;
+  cameraAtom?: WritableAtom<CameraPosition, [SetStateAction<CameraPosition>], any>;
 };
 
 export type LayerModel = ViewLayerModel & LayerModelBase;
