@@ -3,6 +3,7 @@
 const viewModel = {
     shouldHideOtherBldgs: false,
     fovPiOver: 1, // π/xのx
+    compassBias: 0, // コンパス手動調整用のバイアス
 };
 
 // view層グローバル変数
@@ -12,6 +13,7 @@ var postProcessStages;
 var occlusionStage;
 var silhouetteStage;
 var selectedFeatures = [];
+var compassBias = 0; // コンパス手動調整用のバイアス
 
 // 前フレームの端末姿勢・位置を保持しておく用 (CesiumのSetViewがこれらを全部同時にセットしないといけない仕様であるために用意している)
 var oldDestination = new Cesium.Cartesian3();
@@ -128,6 +130,8 @@ async function setupCesiumViewer() {
         const plateauTileset = await Cesium.Cesium3DTileset.fromUrl(
             // 港区LOD2
             "https://assets.cms.plateau.reearth.io/assets/df/b95190-23af-4087-9981-430ca798f502/13100_tokyo23-ku_2022_3dtiles%20_1_1_op_bldg_13103_minato-ku_lod2/tileset.json",
+            // 中央区LOD2
+            // "https://assets.cms.plateau.reearth.io/assets/38/9cf378-c397-49bb-a4fb-894ce86647d8/13100_tokyo23-ku_2022_3dtiles_1_1_op_bldg_13102_chuo-ku_lod2/tileset.json",
             // 千代田区LOD2
             // "https://assets.cms.plateau.reearth.io/assets/14/b8f886-921d-46d3-9fd4-4f6e568b27d4/13100_tokyo23-ku_2022_3dtiles%20_1_1_op_bldg_13101_chiyoda-ku_lod2/tileset.json",
             // 川崎市多摩区LOD1
@@ -286,8 +290,8 @@ function gpsTrackingProcess(pos) {
     // Cesiumの指定はlong, lat, altの順であることに注意
     const destination = Cesium.Cartesian3.fromDegrees(139.74530681029205, 35.65807022172221, 60); // 東京タワー前
     // const destination = Cesium.Cartesian3.fromDegrees(140.38804838405298, 37.39840050666605, 400); // 郡山駅前
-    // const destination = Cesium.Cartesian3.fromDegrees(long, lat, alt);
     // const destination = Cesium.Cartesian3.fromDegrees(long, lat, 300);
+    // const destination = Cesium.Cartesian3.fromDegrees(long, lat, alt);
 
     // カメラ座標を更新
     moveCesiumCamera(destination);
@@ -352,6 +356,7 @@ function startOrientationTracking() {
 // デバイスIMUの値をもとにCesiumのカメラ姿勢を更新
 function orientationTrackingProcess(event) {
     // https://www.w3.org/TR/orientation-event/
+    // https://triple-underscore.github.io/deviceorientation-ja.html
     // https://developer.mozilla.org/ja/docs/Web/API/Device_orientation_events/Orientation_and_motion_data_explained
     // https://developer.mozilla.org/ja/docs/Web/API/Device_orientation_events/Detecting_device_orientation
     // https://developer.mozilla.org/en-US/docs/Web/API/Device_orientation_events/Using_device_orientation_with_3D_transforms
@@ -369,35 +374,65 @@ function orientationTrackingProcess(event) {
         isiosHeadingInitialized = true;
     }
 
-    // alphaはデバイスを地面に対して水平にしたとき北を0とし、反時計回りに全周で360までの値を返す。
+    // alphaは画面平面中心と直交する軸z(画面より手前が正)を中心として、デバイスを地面に対して水平にしたとき北向きを0とし、軸を正の方向に見て時計回り(画面を見る者からは反時計回り)に全周で360までの値を返す。
+    // (alphaは画面を見る者からは軸に対して反時計回りで値が増加するように見えるが、他の値と同じく軸を正の方向に見た際には時計回りで値が増加するので一貫している)
     // デバイスにピッチとロールが掛かった場合にはそのままでは方位の値としては使用できず、方位のみの値として扱いたい場合は別途計算が必要。回転行列用の値としてならそのまま使用する。
     // (iOSの場合event.webkitCompassHeadingはalphaとは異なる端末姿勢条件での方位変化の入ってくる仕様なのでそのまま代用にはならなず、初期化専用とする)
     const deviceAlpha = isios ? iosInitialHeading + event.alpha : event.alpha;
-    // betaはデバイスを地面に対して水平にしたときを0とし、機首上げ方向にピッチをとると+180、機首下げ方向にピッチをとると-180までの値を返す
+    // betaは画面平面中心を原点とする妻手方向の軸x(画面右方向が正)を中心として、デバイスを地面に対して水平にしたときを0とし、機首上げ方向(軸を正の方向に見て時計回り)にピッチをとると+180、機首下げ方向(軸を正の方向に見て反時計回り)にピッチをとると-180までの値を返す
     // デバイスの長辺の端Aと端Bのそれぞれの地面からの距離の差が0のときに0となり、AとBの差が大きくなるほど値が大きくなる
     const deviceBeta = event.beta;
-    // gammaはデバイスを地面に対して水平にしたときを0とし、時計回りにロールさせると+90、反時計回りにロールさせると-90までの値を返す (裏返しの場合も同様)
+    // gammaは画面平面中心を原点とする長手方向の軸y(画面上方向が正)を中心として、デバイスを地面に対して水平にしたときを0とし、軸を正の方向に見て時計回りにロールさせると+90、軸を正の方向に見て反時計回りにロールさせると-90までの値を返す (裏返しの場合も同様)
     // デバイスの短辺の端Cと端Dのそれぞれの地面からの距離の差が0のときに0となり、CとDの差が大きくなるほど値が大きくなる
     const deviceGamma = event.gamma;
 
     // alpha/beta/gammaの値を素直にHeading/Pitch/Rollのに変換することはできない。これらを素直に変換できるのは、端末を地面に対して水平にしているときのみ。
     // それ以外の場合は、alpha, betaの性質(それぞれの辺の端点の地面からの距離の差が値になること)が、Heading/Pitch/Rollへの変換には不適切になる。
-    // よって、Heading/Pitch/Rollのorientationではなく、alpha/beta/gammaの値を回転行列に変換してから別の方法でカメラに適用してあげるほうが適切となる。
+    // また、alpha/beta/gammaのオイラー角のままでは、betaの値が90度になるとalpha/gammaが180度飛んでしまうジンバルロックが発生する。
+    // よって、Heading/Pitch/Rollのorientationではなく、alpha/beta/gammaの値を回転行列または四元数に変換してから別の方法でカメラに適用してあげるほうが適切となる。
     // このとき、endTransformを用いて回転行列でカメラの向きを制御する方法もありそうなのだが、うまく動かなかったため今回は使用せず、direction/upベクトルを指定する方法をとる。
     // https://community.cesium.com/t/control-cesium-camera-with-device-orientation/6844
     // https://groups.google.com/g/cesium-dev/c/cr2P2wfOwl4
 
+    // 軸周りのオイラー角を3次元回転行列に変換していく。
+    // W3Cの定義によると、デバイスオリエンテーションの一連のローテーションは、intrinsic Tait-Bryan angles (オイラー角) of type Z-X'-Y" と定められている。
+    // これは、intrinsicなのでデバイスに追従するデバイス座標系であり、X'は最初にZ軸周りの回転を適用した後のX軸、Y"はさらにX'軸周りの回転を適用した後のY軸を表す。
+    // なお右手左手系については、軸の正な方向に向かって眺めたときに、時計回りが軸周りの正な回転であるとするため、右手系とする。
+    // https://www.w3.org/TR/orientation-event/#device-orientation-model
+    // Tait-Bryan angles (オイラー角) から回転行列への変換は、下記のW3Cのドキュメント内でも取り扱われているので、それに従いつつCesiumを使用したバージョンとして以下を実装する。
+    // https://www.w3.org/TR/orientation-event/#worked-example-2
+
+    // TODO: 単純にalphaにバイアスを入れるだけだと、betaの値によっては方位にズレが発生するので、厳密にやるならそれにも対処する
+    // 0-360のalphaに0-360のバイアスを足す計算 (0~360をはみ出た場合は循環させる)
+    var biasedAlpha = 0;
+    const biasedDegree = Number(deviceAlpha) + Number(compassBias); // アノテーションしないとここが文字列の結合になってしまい正しく足せない
+    if (biasedDegree > 360) {
+        biasedAlpha = biasedDegree - 360;
+    } else if (biasedDegree < 0) {
+        biasedAlpha = biasedDegree + 360;
+    } else {
+        biasedAlpha = biasedDegree;
+    }
+    // console.log("===");
+    // console.log("device alpha: ", deviceAlpha);
+    // console.log("bias: ", compassBias);
+    // console.log("biased degree: ", biasedDegree);
+    // console.log("biased alpha: ", biasedAlpha);
+
     // alpha/beta/gammaをそれぞれラジアンに変換
-    const deviceAlphaRad = Cesium.Math.toRadians(180 - deviceAlpha);
+    //const deviceAlphaRad = Cesium.Math.toRadians(180 - deviceAlpha); // 0~360の値をラジアン変換用に-180~180の値に直す(toRadiansは受け取ったdegreeにMath.PI/180.0を掛けるので)
+    const deviceAlphaRad = Cesium.Math.toRadians(180 - biasedAlpha); // ↑に加えてコンパス手動調整用のバイアスを考慮するバージョン
     const deviceBetaRad = Cesium.Math.toRadians(deviceBeta);
     const deviceGammaRad = Cesium.Math.toRadians(deviceGamma);
 
     // 軸毎の回転行列に変換
-    const xRotation = Cesium.Matrix3.fromRotationX(deviceBetaRad);
-    const yRotation = Cesium.Matrix3.fromRotationY(deviceGammaRad);
-    const zRotation = Cesium.Matrix3.fromRotationZ(deviceAlphaRad);
-    
-    // 3次元の回転行列に変換 (multiplyの第三引数は返り値と同値が入るものだが不使用かつoptionalでないためダミーを入れている)
+    const xRotation = Cesium.Matrix3.fromRotationX(deviceBetaRad); // x軸をデバイス画面妻手軸にとった場合の軸周り回転 (==ピッチ)
+    const yRotation = Cesium.Matrix3.fromRotationY(deviceGammaRad); // y軸をデバイス画面長手軸にとった場合の軸周り回転 (==ロール)
+    const zRotation = Cesium.Matrix3.fromRotationZ(deviceAlphaRad); // z軸をデバイス画面直交軸にとった場合の軸周り回転 (==ヨー)
+
+    // 3次元の回転行列に変換
+    // 軸毎の回転行列を、W3Cの定義通りZ-X'-Y"の順に掛ける。
+    // (multiplyの第三引数は返り値と同値が入るものだが不使用かつoptionalでないためダミーを入れている)
     var rotation = Cesium.Matrix3.multiply(yRotation, Cesium.Matrix3.multiply(xRotation, zRotation, new Cesium.Matrix3()), new Cesium.Matrix3());
     // 手構成のgetRotationMatrixで計算した回転行列と、↑の構成方法での回転行列では、構成の仕方で正負が反転している軸があるが同様
     // const rotArray = getRotationMatrix(deviceAlpha, deviceBeta, deviceGamma);
@@ -442,6 +477,7 @@ function orientationTrackingProcess(event) {
     // direction, upに変換 (getRowの第三引数は返り値と同値が入るものだが不使用かつoptionalでないためダミーを入れている)
     // directionベクトルは回転行列からZ軸を取り出し、upベクトルは回転行列からY軸を取り出す
     // http://marupeke296.sakura.ne.jp/DXG_No39_WorldMatrixInformation.html
+    // https://groups.google.com/g/cesium-dev/c/cr2P2wfOwl4
     var direction = Cesium.Cartesian3.negate(Cesium.Matrix3.getRow(rotation, 2, new Cesium.Matrix3()), new Cesium.Cartesian3());
     var up = Cesium.Cartesian3.negate(Cesium.Matrix3.getRow(rotation, 1, new Cesium.Matrix3()), new Cesium.Cartesian3());
 
@@ -511,10 +547,16 @@ function updateFov() {
     cesiumCamera.frustum.fov = Cesium.Math.PI / Number(viewModel.fovPiOver);
 }
 
+// コンパス手動調整用のバイアスを更新
+function updateCompassBias() {
+    compassBias = viewModel.compassBias;
+}
+
 // 双方向バインディング更新
 function updateBindings() {
     updateOcclusion();
     updateFov();
+    updateCompassBias();
 }
 
 // Cesium組込双方向データバインディングのセットアップ

@@ -1,4 +1,3 @@
-import Script from "next/script";
 import React from "react";
 
 export default function ARView() {
@@ -7,8 +6,8 @@ export default function ARView() {
       <video id="device_camera_preview" autoPlay muted playsInline></video>
       <div id="cesium_container"></div>
       <div id="status_container">
-        <div id="geolocation_status"></div>
-        <div id="absolute_orientation_status"></div>
+        {/* <div id="geolocation_status"></div> */}
+        {/* <div id="absolute_orientation_status"></div> */}
         <input
           type="button"
           value="iOSのIMUを許可"
@@ -35,6 +34,18 @@ export default function ARView() {
                     max="10"
                     step="0.1"
                     data-bind="value: fovPiOver, valueUpdate: 'input'"
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td>Compass Bias (Degree)</td>
+                <td>
+                  <input 
+                    type="range" 
+                    min="-180" 
+                    max="180" 
+                    step="1" 
+                    data-bind="value: compassBias, valueUpdate: 'input'"
                   />
                 </td>
               </tr>
