@@ -1,5 +1,3 @@
-"use client";
-
 import { ClickAwayListener, Popper, styled, useTheme, type PopperProps } from "@mui/material";
 import { omit } from "lodash";
 import { useCallback, useState, type FC, type ReactNode } from "react";

@@ -1,5 +1,3 @@
-"use client";
-
 import { Popover, Slider, sliderClasses, styled, type SliderProps } from "@mui/material";
 import { scaleLinear } from "d3";
 import { atom, useAtom, type PrimitiveAtom, type SetStateAction } from "jotai";

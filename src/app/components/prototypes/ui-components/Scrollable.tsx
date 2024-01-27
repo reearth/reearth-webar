@@ -1,5 +1,3 @@
-"use client";
-
 import { styled } from "@mui/material";
 import { useOverlayScrollbars, type UseOverlayScrollbarsParams } from "overlayscrollbars-react";
 import { forwardRef, useEffect, useRef, type ComponentPropsWithRef, type ReactNode } from "react";
