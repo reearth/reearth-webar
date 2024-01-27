@@ -46,6 +46,7 @@
     "react-merge-refs": "^2.1.1",
     "react-use": "^17.4.2",
     "react-window": "^1.8.10",
+    "styled-components": "^6.1.8",
     "tinycolor2": "^1.6.0",
     "xstate": "^4.38.2"
   },
