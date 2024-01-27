@@ -1,3 +1,5 @@
+"use client";
+
 import { IconButton, ListItem, Popover, Stack, styled, Typography } from "@mui/material";
 import { useAtom, type PrimitiveAtom } from "jotai";
 import { bindPopover, bindTrigger, usePopupState } from "material-ui-popup-state/hooks";

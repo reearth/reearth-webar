@@ -1,3 +1,5 @@
+"use client";
+
 import { alpha, Divider, IconButton, Stack, styled } from "@mui/material";
 import {
   forwardRef,

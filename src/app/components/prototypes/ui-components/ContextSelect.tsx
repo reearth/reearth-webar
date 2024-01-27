@@ -1,3 +1,5 @@
+"use client";
+
 import AddIcon from "@mui/icons-material/AddOutlined";
 import {
   filledInputClasses,

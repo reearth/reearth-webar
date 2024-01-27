@@ -1,3 +1,5 @@
+"use client";
+
 import { IconButton, Stack, styled, Tooltip } from "@mui/material";
 import {
   useState,

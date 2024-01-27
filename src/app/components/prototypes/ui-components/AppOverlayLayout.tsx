@@ -1,3 +1,5 @@
+"use client";
+
 import { styled } from "@mui/material";
 import { atom, type Atom, useSetAtom } from "jotai";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
