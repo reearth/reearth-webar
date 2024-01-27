@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import tinycolor from "tinycolor2";
 
@@ -8,7 +10,11 @@ type Props = {
   height: number;
 };
 
-const canvas = document.createElement("canvas");
+//const canvas = document.createElement("canvas");
+var canvas: HTMLCanvasElement;
+if(typeof document !== 'undefined') {
+  canvas = document.createElement("canvas");
+}
 
 const useModifiedImage = ({ imageUrl, blendColor, width, height }: Props) => {
   const [modifiedImageUrl, setModifiedImageUrl] = useState("");

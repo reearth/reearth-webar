@@ -1,3 +1,5 @@
+"use client";
+
 export * from "./AntIcon";
 export * from "./AppBar";
 export * from "./AppBreadcrumbs";
