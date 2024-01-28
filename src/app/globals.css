@@ -22,3 +22,7 @@ html, body, main {
   height: 100vh;
   background-color: black;
 }
+
+.cesium-widget-credits{
+  display:none !important;
+}

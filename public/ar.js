@@ -64,8 +64,17 @@ async function setupCesiumViewer() {
 
     // Initialize the Cesium Viewer in the HTML element with the `cesiumContainer` ID.
     cesiumViewer = new Cesium.Viewer("cesium_container", {
+        animation: false,
         baseLayerPicker: false,
+        fullscreenButton: false,
+        geocoder: false,
+        homeButton: false,
+        infoBox: false,
+        sceneModePicker: false,
+        selectionIndicator: false,
         timeline: false,
+        navigationHelpButton: false,
+        navigationInstructionsInitiallyVisible: false,
         skyBox: false, // スカイボックス無効化
         skyAtmosphere: false, // 空を非表示
         contextOptions: {
