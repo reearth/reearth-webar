@@ -1,10 +1,10 @@
-import { useAtomValue } from "jotai";
 import { type FC } from "react";
 
-import { AppBar, AppIconButton, LayerIcon, RotateAroundIcon, Space, VisibilityOnIcon } from "../../ui-components";
+import { AppBar, AppIconButton, BuildingIcon, LayerIcon, Space, VisibilityOnIcon } from "../../ui-components";
 // import { hideAppOverlayAtom } from "../states/app";
 
 import { MainMenuButton } from "./MainMenuButton";
+import { CompassBiasButton } from "./CompassBiasButton";
 
 export const AppHeader: FC = () => {
   // const hidden = useAtomValue(hideAppOverlayAtom);
@@ -18,10 +18,11 @@ export const AppHeader: FC = () => {
       <AppIconButton title="データセット">
         <LayerIcon />
       </AppIconButton>
-      <AppIconButton title="方位調整">
-        <RotateAroundIcon />
-      </AppIconButton>
+      <CompassBiasButton />
       <AppIconButton title="表示モード">
+        <BuildingIcon />
+      </AppIconButton>
+      <AppIconButton title="視野角選択">
         <VisibilityOnIcon />
       </AppIconButton>
     </AppBar>
