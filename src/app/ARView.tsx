@@ -1,6 +1,14 @@
-import React from "react";
+"use client";
+
+import React, { useEffect } from "react";
+import { ar } from "./ar";
 
 export default function ARView({...props}) {
+  // TODO: jsの時のままKnockoutを使うとapplyBindingsが2回呼ばれるエラーが発生するなど相性が良くないうえに意味もないので、ar.js側でバインディングしたい変数をexportして、ARViewでjotaiのatomをuseEffectで監視して更新してあげるのがよさそう
+  useEffect(() => {
+    ar();
+  }, []);
+
   return (
     <div {...props}>
       <video
@@ -32,7 +40,7 @@ export default function ARView({...props}) {
           value="iOSのIMUを許可"
           id="ios_imu_permission_button"
         />
-        <div id="toolbox">
+        <div id="ar_debug_toolbox">
           <table>
             <tbody>
               <tr>
