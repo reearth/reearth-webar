@@ -6,10 +6,10 @@ import { AppBar, darkTheme } from "./components/prototypes/ui-components"
 export default function Home() {
   return (
     <ThemeProvider theme={darkTheme}>
-      <main>
+      <main className="flex flex-col">
         <Script src="https://cesium.com/downloads/cesiumjs/releases/1.107.1/Build/Cesium/Cesium.js" />
-        <AppBar></AppBar>
-        <ARView />
+        <AppBar className="w-screen"></AppBar>
+        <ARView className="relative w-screen h-full" />
         <Script src="/ar.js" />
       </main>
     </ThemeProvider>

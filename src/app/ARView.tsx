@@ -1,13 +1,32 @@
 import React from "react";
 
-export default function ARView() {
+export default function ARView({...props}) {
   return (
-    <div>
-      <video id="device_camera_preview" autoPlay muted playsInline></video>
-      <div id="cesium_container"></div>
-      <div id="status_container">
-        {/* <div id="geolocation_status"></div> */}
-        {/* <div id="absolute_orientation_status"></div> */}
+    <div {...props}>
+      <video
+        id="device_camera_preview" 
+        autoPlay muted playsInline
+        className="absolute top-0 left-0 w-full h-full object-cover"
+      ></video>
+      <div
+        id="cesium_container"
+        className="absolute top-0 left-0 w-full h-full"
+      ></div>
+      <div
+        id="status_container"
+        className="
+          absolute 
+          top-5 left-5 
+          flex flex-col items-start gap-5 
+          p-5 
+          rounded-3xl
+          text-white
+          bg-black
+          bg-opacity-5
+        "
+      >
+        <div id="geolocation_status"></div>
+        <div id="absolute_orientation_status"></div>
         <input
           type="button"
           value="iOSのIMUを許可"

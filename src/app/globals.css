@@ -20,30 +20,5 @@ html, body, main {
   margin: 0;
   width: 100vw;
   height: 100vh;
-}
-
-#device_camera_preview, #cesium_container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-}
-
-#device_camera_preview {
-    object-fit: cover;
-}
-
-#status_container {
-    position: absolute;
-    left: 20px;
-    top: 20px;
-    display: flex;
-    flex-flow: column;
-    align-items: flex-start;
-    gap: 20px;
-    padding: 20px;
-    border-radius: 20px;
-    color: white;
-    background-color: rgba(0, 0, 0, 0.5);
+  background-color: black;
 }
