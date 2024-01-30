@@ -6,7 +6,7 @@ import invariant from "tiny-invariant";
 
 import { DarkThemeOverride } from "./DarkThemeOverride";
 
-import "overlayscrollbars/overlayscrollbars.css";
+import "overlayscrollbars/styles/overlayscrollbars.css";
 
 const HEADER_HEIGHT = 81;
 
