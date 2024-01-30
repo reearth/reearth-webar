@@ -35,14 +35,7 @@ export class ColorMap<T extends ColorMapType = ColorMapType> {
   }
 
   createImage(): HTMLCanvasElement {
-    var canvas: HTMLCanvasElement;
-    // useEffect(() => {
-    //   canvas = document.createElement("canvas");
-    // }, []);
-    if(typeof document !== 'undefined') {
-      canvas = document.createElement("canvas");
-    }
-    // const canvas = document.createElement("canvas");
+    const canvas = document.createElement("canvas");
     canvas.width = this.lut.length;
     canvas.height = 1;
     const context = canvas.getContext("2d");

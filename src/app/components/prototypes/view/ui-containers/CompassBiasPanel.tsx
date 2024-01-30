@@ -1,5 +1,3 @@
-"use client";
-
 import { styled } from "@mui/material";
 import { type FC } from "react";
 

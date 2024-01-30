@@ -1,5 +1,3 @@
-"use client";
-
 export * from "./ColorMap";
 export * from "./types";
 

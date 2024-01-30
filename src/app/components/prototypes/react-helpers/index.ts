@@ -1,5 +1,3 @@
-"use client";
-
 export * from "./assignForwardedRef";
 export * from "./assignPropertyProps";
 export * from "./useConstant";

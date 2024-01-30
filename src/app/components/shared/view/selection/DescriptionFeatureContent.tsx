@@ -1,5 +1,3 @@
-"use client";
-
 import { styled, useTheme } from "@mui/material";
 import { useAtomValue } from "jotai";
 import React, { useCallback, useContext, useLayoutEffect, useRef } from "react";

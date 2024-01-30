@@ -1,5 +1,3 @@
-"use client";
-
 import { ClickAwayListener, Divider, styled, Tab, tabClasses, Tabs } from "@mui/material";
 import { useAtomValue } from "jotai";
 import {

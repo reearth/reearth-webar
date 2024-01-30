@@ -1,3 +1,5 @@
+"use client";
+
 import { ThemeProvider } from "@mui/material"
 import { darkTheme } from "./components/prototypes/ui-components"
 import { AppHeader } from "./components/prototypes/view/ui-containers/AppHeader"

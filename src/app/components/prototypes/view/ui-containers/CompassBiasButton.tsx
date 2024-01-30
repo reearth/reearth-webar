@@ -1,5 +1,3 @@
-"use client";
-
 import { bindPopover, bindTrigger, usePopupState } from "material-ui-popup-state/hooks";
 import { useId, type FC } from "react";
 
