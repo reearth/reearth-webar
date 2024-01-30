@@ -4,7 +4,8 @@ import React, { useEffect } from "react";
 import { ar } from "./ar";
 
 export default function ARView({...props}) {
-  // TODO: jsの時のままKnockoutを使うとapplyBindingsが2回呼ばれるエラーが発生するなど相性が良くないうえに意味もないので、ar.js側でバインディングしたい変数をexportして、ARViewでjotaiのatomをuseEffectで監視して更新してあげるのがよさそう
+  // TODO: jsの時のままKnockoutを使うとapplyBindingsが2回呼ばれるエラーが発生するなど相性が良くないうえに意味もないので、ar.js側でバインディングしたい変数をexportして、ARViewでjotaiのatomをuseEffectで監視してar.js側の変数を更新してあげるのがよさそう
+  // TODO: また、CDNではなくnpmからCesiumを使用すると、ローカル開発では Not allowed to load local resource になる問題もあるので、View3.0ではどうしているか確認する
   useEffect(() => {
     ar();
   }, []);

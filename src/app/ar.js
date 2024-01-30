@@ -292,11 +292,11 @@ export function ar() {
         // 標高はWGS84楕円体からのメートル高度。ArcGISを使用する手もある
         // GPSのHeadingは更新頻度が激遅なので実質役に立たないため不使用
         const coords = pos.coords;
-        const lat = coords.latitude;
-        const long = coords.longitude;
-        const alt = coords.altitude;
-        const head = coords.heading;
-        const accur = coords.accuracy;
+        const lat = coords.latitude ?? 0;
+        const long = coords.longitude ?? 0;
+        const alt = coords.altitude ?? 0;
+        const head = coords.heading ?? 0;
+        const accur = coords.accuracy ?? 0;
 
         // 緯度経度高度のデカルト座標にまとめる
         // Cesiumの指定はlong, lat, altの順であることに注意
@@ -390,13 +390,13 @@ export function ar() {
         // (alphaは画面を見る者からは軸に対して反時計回りで値が増加するように見えるが、他の値と同じく軸を正の方向に見た際には時計回りで値が増加するので一貫している)
         // デバイスにピッチとロールが掛かった場合にはそのままでは方位の値としては使用できず、方位のみの値として扱いたい場合は別途計算が必要。回転行列用の値としてならそのまま使用する。
         // (iOSの場合event.webkitCompassHeadingはalphaとは異なる端末姿勢条件での方位変化の入ってくる仕様なのでそのまま代用にはならなず、初期化専用とする)
-        const deviceAlpha = isios ? iosInitialHeading + event.alpha : event.alpha;
+        const deviceAlpha = isios ? iosInitialHeading + event.alpha : event.alpha ?? 0;
         // betaは画面平面中心を原点とする妻手方向の軸x(画面右方向が正)を中心として、デバイスを地面に対して水平にしたときを0とし、機首上げ方向(軸を正の方向に見て時計回り)にピッチをとると+180、機首下げ方向(軸を正の方向に見て反時計回り)にピッチをとると-180までの値を返す
         // デバイスの長辺の端Aと端Bのそれぞれの地面からの距離の差が0のときに0となり、AとBの差が大きくなるほど値が大きくなる
-        const deviceBeta = event.beta;
+        const deviceBeta = event.beta ?? 0;
         // gammaは画面平面中心を原点とする長手方向の軸y(画面上方向が正)を中心として、デバイスを地面に対して水平にしたときを0とし、軸を正の方向に見て時計回りにロールさせると+90、軸を正の方向に見て反時計回りにロールさせると-90までの値を返す (裏返しの場合も同様)
         // デバイスの短辺の端Cと端Dのそれぞれの地面からの距離の差が0のときに0となり、CとDの差が大きくなるほど値が大きくなる
-        const deviceGamma = event.gamma;
+        const deviceGamma = event.gamma ?? 0;
 
         // alpha/beta/gammaの値を素直にHeading/Pitch/Rollのに変換することはできない。これらを素直に変換できるのは、端末を地面に対して水平にしているときのみ。
         // それ以外の場合は、alpha, betaの性質(それぞれの辺の端点の地面からの距離の差が値になること)が、Heading/Pitch/Rollへの変換には不適切になる。
@@ -533,8 +533,7 @@ export function ar() {
         // 数値表示
         const absoluteOrientationStatusView = document.getElementById("absolute_orientation_status");
         absoluteOrientationStatusView.innerText = `Your current orientation:
-        is absolute : ${event.absolute}
-        -
+        absolute : ${event.absolute}
         Device Alpha: ${deviceAlpha}
         Device Beta: ${deviceBeta}
         Device Gamma: ${deviceGamma}
@@ -626,6 +625,6 @@ export function ar() {
         startOrientationTracking();
     }
     // 双方向バインディングセットアップ
-    setupBindings();
-    updateBindings();
+    // setupBindings();
+    // updateBindings();
 }
