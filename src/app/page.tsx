@@ -12,8 +12,6 @@ export default function Home() {
       <main className="flex flex-col">
         <Provider>
           <AppHeader />
-        </Provider>
-        <Provider>
           <ARView className="relative w-screen h-full" />
         </Provider>
       </main>
