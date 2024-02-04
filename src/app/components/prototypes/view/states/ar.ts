@@ -6,3 +6,9 @@ export const compassBiasAtom = atomWithStorageValidation({
   initialValue: 0,
   validate: isNumber,
 });
+
+export const fovPiOverAtom = atomWithStorageValidation({
+  key: "fovPiOver",
+  initialValue: 1,
+  validate: isNumber,
+});

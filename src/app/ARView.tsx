@@ -62,18 +62,6 @@ export default function ARView({...props}) {
                   />
                 </td>
               </tr>
-              <tr>
-                <td>FOV (PI over ~)</td>
-                <td>
-                  <input
-                    type="range"
-                    min="1"
-                    max="10"
-                    step="0.1"
-                    data-bind="value: fovPiOver, valueUpdate: 'input'"
-                  />
-                </td>
-              </tr>
             </tbody>
           </table>
         </div>

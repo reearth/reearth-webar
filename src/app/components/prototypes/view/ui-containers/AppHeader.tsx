@@ -5,6 +5,7 @@ import { AppBar, AppIconButton, BuildingIcon, LayerIcon, Space, VisibilityOnIcon
 
 import { MainMenuButton } from "./MainMenuButton";
 import { CompassBiasButton } from "./CompassBiasButton";
+import { FovButton } from "./FovButton";
 
 export const AppHeader: FC = () => {
   // const hidden = useAtomValue(hideAppOverlayAtom);
@@ -22,9 +23,7 @@ export const AppHeader: FC = () => {
       <AppIconButton title="表示モード">
         <BuildingIcon />
       </AppIconButton>
-      <AppIconButton title="視野角選択">
-        <VisibilityOnIcon />
-      </AppIconButton>
+      <FovButton />
     </AppBar>
   );
 };

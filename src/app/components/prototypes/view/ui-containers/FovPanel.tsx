@@ -7,7 +7,7 @@ import {
   SliderParameterItem,
 } from "../../ui-components";
 
-import { compassBiasAtom } from "../states/ar";
+import { fovPiOverAtom } from "../states/ar";
 
 const Root = styled(FloatingPanel)(({ theme }) => ({
   width: 360,
@@ -19,18 +19,18 @@ const Title = styled("div")(({ theme }) => ({
   margin: theme.spacing(1),
 }));
 
-export const CompassBiasPanel: FC = () => {
+export const FovPanel: FC = () => {
   return (
     <Root>
-      <Title>コンパス設定</Title>
+      <Title>視野角設定</Title>
       <ParameterList>
         <SliderParameterItem
-          label="コンパスバイアス"
-          description="方位を微調整します。注目オブジェクトを選択してから使用してください。"
-          min={-180}
-          max={180}
-          step={1}
-          atom={compassBiasAtom}
+          label="PI over X"
+          description="視野角を微調整します。π/xのxを調整してください。"
+          min={1}
+          max={10}
+          step={0.1}
+          atom={fovPiOverAtom}
         />
       </ParameterList>
     </Root>
