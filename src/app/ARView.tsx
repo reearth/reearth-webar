@@ -76,18 +76,6 @@ export default function ARView({...props}) {
                   />
                 </td>
               </tr>
-              <tr>
-                <td>Compass Bias (Degree)</td>
-                <td>
-                  <input 
-                    type="range" 
-                    min="-180" 
-                    max="180" 
-                    step="1" 
-                    data-bind="value: compassBias, valueUpdate: 'input'"
-                  />
-                </td>
-              </tr>
             </tbody>
           </table>
         </div>

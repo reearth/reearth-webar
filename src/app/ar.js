@@ -169,6 +169,11 @@ async function setupCesiumViewer() {
     }
 }
 
+// Cesium Viewer を破棄
+function destroyCesiumViewer() {
+    cesiumViewer.destroy();
+}
+
 // 輪郭表示シェーダーのポストプロセスステージをセットアップ
 function setupSilhouetteStage() {
     const edgeDetectionStage = Cesium.PostProcessStageLibrary.createEdgeDetectionStage();
@@ -215,6 +220,11 @@ function setupCesium() {
     setupCesiumViewer();
     setupSilhouetteStage();
     setupOcclusionStage();
+}
+
+// Cesium系クリーンアップ
+function cleanUpCesium() {
+    destroyCesiumViewer();
 }
 
 // デバイスカメラプレビューのセットアップ
@@ -440,7 +450,7 @@ function orientationTrackingProcess(event) {
     }
     // console.log("===");
     // console.log("device alpha: ", deviceAlpha);
-    console.log("compass bias (VM): ", viewModel.compassBias);
+    // console.log("compass bias: ", viewModel.compassBias);
     // console.log("biased degree: ", biasedDegree);
     // console.log("biased alpha: ", biasedAlpha);
 
@@ -604,6 +614,7 @@ export function startAR() {
 export function stopAR() {
     stopOrientationTracking();
     stopGpsTracking();
+    cleanUpCesium();
 }
 
 // オクルージョン表示を更新
@@ -628,4 +639,5 @@ export function updateFov(fovPiOver) {
 // コンパス手動調整用のバイアスを更新
 export function updateCompassBias(compassBias) {
     viewModel.compassBias = compassBias;
+    console.log("compass bias (VM): ", viewModel.compassBias);
 }
