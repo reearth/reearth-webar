@@ -1,14 +1,26 @@
-"use client";
-
 import React, { useEffect } from "react";
-import { ar } from "./ar";
+import { startAR, stopAR, updateCompassBias } from "./ar";
+import { useAtom } from "jotai";
+import { compassBiasAtom } from "./components/prototypes/view/states/ar";
 
 export default function ARView({...props}) {
-  // TODO: jsの時のままKnockoutを使うとapplyBindingsが2回呼ばれるエラーが発生するなど相性が良くないうえに意味もないので、ar.js側でバインディングしたい変数をexportして、ARViewでjotaiのatomをuseEffectで監視してar.js側の変数を更新してあげるのがよさそう
-  // TODO: また、CDNではなくnpmからCesiumを使用すると、ローカル開発では Not allowed to load local resource になる問題もあるので、View3.0ではどうしているか確認する
   useEffect(() => {
-    ar();
+    startAR();
+    return () => stopAR();
   }, []);
+
+  // UIのステートを取得
+  const [compassBias, setCompassBias] = useAtom(compassBiasAtom);
+
+  // UIのステート変更を監視してVMに反映
+  useEffect(() => {
+    console.log("compass bias (UI): ", compassBias);
+    updateCompassBias(compassBias);
+    return () => {
+      updateCompassBias(0);
+      setCompassBias(0);
+    };
+  }, [compassBias]);
 
   return (
     <div {...props}>
