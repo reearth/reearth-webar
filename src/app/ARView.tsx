@@ -10,15 +10,13 @@ export default function ARView({...props}) {
   }, []);
 
   // UIのステートを取得
+  // TODO: 一旦atomWithStorageを使ってリロードを跨いで値を永続化しているが、リセットされた方がよいかどうか検討する
   const [compassBias] = useAtom(compassBiasAtom);
 
   // UIのステート変更を監視してVMに反映
   useEffect(() => {
     console.log("compass bias (UI): ", compassBias);
     updateCompassBias(compassBias);
-    return () => {
-      updateCompassBias(0);
-    };
   }, [compassBias]);
 
   return (
