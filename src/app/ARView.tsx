@@ -1,14 +1,11 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect } from "react";
 import { startAR, stopAR, updateCompassBias, updateFov } from "./ar";
 import { useAtom } from "jotai";
 import { compassBiasAtom, fovPiOverAtom } from "./components/prototypes/view/states/ar";
 
 export default function ARView({...props}) {
-  const cesiumContainerRef = useRef(null);
-
   useEffect(() => {
-    // TODO: Viewerのセットアップコードは最後まで走っているが、画面に表示されないので調査する
-    startAR(cesiumContainerRef.current);
+    startAR();
     return () => stopAR();
   }, []);
 
@@ -38,7 +35,6 @@ export default function ARView({...props}) {
       <div
         id="cesium_container"
         className="absolute top-0 left-0 w-full h-full"
-        ref={cesiumContainerRef}
       ></div>
       <div
         id="status_container"
