@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
-import { startAR, stopAR, updateCompassBias } from "./ar";
+import { startAR, stopAR, updateCompassBias, updateFov } from "./ar";
 import { useAtom } from "jotai";
-import { compassBiasAtom } from "./components/prototypes/view/states/ar";
+import { compassBiasAtom, fovPiOverAtom } from "./components/prototypes/view/states/ar";
 
 export default function ARView({...props}) {
   useEffect(() => {
@@ -12,12 +12,18 @@ export default function ARView({...props}) {
   // UIのステートを取得
   // TODO: 一旦atomWithStorageを使ってリロードを跨いで値を永続化しているが、リセットされた方がよいかどうか検討する
   const [compassBias] = useAtom(compassBiasAtom);
+  const [fovPiOver] = useAtom(fovPiOverAtom);
 
   // UIのステート変更を監視してVMに反映
   useEffect(() => {
     console.log("compass bias (UI): ", compassBias);
     updateCompassBias(compassBias);
   }, [compassBias]);
+
+  useEffect(() => {
+    console.log("fov pi over (UI): ", fovPiOver);
+    updateFov(fovPiOver);
+  }, [fovPiOver]);
 
   return (
     <div {...props}>

@@ -171,6 +171,7 @@ async function setupCesiumViewer() {
 
 // Cesium Viewer を破棄
 function destroyCesiumViewer() {
+    cesiumViewer.scene.primitives.removeAll();
     cesiumViewer.destroy();
 }
 
