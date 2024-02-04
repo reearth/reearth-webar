@@ -59,12 +59,13 @@ function throttle(fn, delay) {
 }
 
 // Cesiumのセットアップ
-async function setupCesiumViewer() {
+async function setupCesiumViewer(cesiumContainerRef) {
     // Set Tokens
     Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIyYzI5NjUxNS1hOGMyLTRhNzQtYmZhOS1jZTRjMWRlZjgyYjkiLCJpZCI6MTE4NjE3LCJpYXQiOjE2NzEyNjQ3OTZ9.8kWsf2_D2q67-ANppVkQohAVYlNlVEaz1axTHikskMQ";
 
     // Initialize the Cesium Viewer in the HTML element with the `cesiumContainer` ID.
-    cesiumViewer = new Cesium.Viewer("cesium_container", {
+    //cesiumViewer = new Cesium.Viewer("cesium_container", {
+    cesiumViewer = new Cesium.Viewer(cesiumContainerRef, {
         animation: false,
         baseLayerPicker: false,
         fullscreenButton: false,
@@ -217,8 +218,8 @@ function setupOcclusionStage() {
 }
 
 // Cesium系セットアップ
-function setupCesium() {
-    setupCesiumViewer();
+function setupCesium(cesiumContainerRef) {
+    setupCesiumViewer(cesiumContainerRef);
     setupSilhouetteStage();
     setupOcclusionStage();
 }
@@ -587,9 +588,9 @@ function setupUserInput() {
 // Lifecycle
 
 // ARを開始
-export function startAR() {
+export function startAR(cesiumContainerRef) {
     // Viewセットアップ
-    setupCesium();
+    setupCesium(cesiumContainerRef);
     setupUserInput();
     // Repoセットアップ
     startDeviceCameraPreview();
