@@ -5,6 +5,7 @@ import { compassBiasAtom, fovPiOverAtom } from "./components/prototypes/view/sta
 
 export default function ARView({...props}) {
   useEffect(() => {
+    // TODO: Viewerのセットアップコードは最後まで走っているが、画面に表示されないので調査する (Cesiumをnpmで入れるようにしてから。以前CDNの場合は大丈夫だった)
     startAR();
     return () => stopAR();
   }, []);
