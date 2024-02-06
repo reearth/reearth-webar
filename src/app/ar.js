@@ -634,6 +634,7 @@ export function updateOcclusion(shouldHideOtherBldgs) {
 // FOVを更新してパースを変更
 // π/xのx
 export function updateFov(fovPiOver) {
+    fovPiOver = Number(fovPiOver) + 0.0001; // fovPiOverが1だとCesiumがエラーを吐くので0.0001を足す
     cesiumCamera.frustum.fov = Cesium.Math.PI / Number(fovPiOver);
 }
 
