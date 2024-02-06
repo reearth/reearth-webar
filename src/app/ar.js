@@ -27,8 +27,12 @@ var iosInitialHeading = 0;
 
 // iOS判定
 function detectIsIos() {
+    if (typeof window !== "undefined" && typeof navigator !== "undefined") {
+
     const ua = navigator.userAgent.toLowerCase();
     return (ua.indexOf("iphone") !== -1);
+    }
+    return false; // ブラウザ環境でない場合はfalseを返す
 }
 const isios = detectIsIos();
 
@@ -259,6 +263,7 @@ async function startDeviceCameraPreview() {
 
 // Cesiumのカメラ座標を更新
 function moveCesiumCamera(destination) {
+    console.log(`camera moved: ${destination}`);
     cesiumCamera.setView({
         destination: destination,
         // orientation: isios ? oldHeadingPitchRoll : { direction: oldDirection, up: oldUp }
