@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Script from "next/script"
 import { Inter } from 'next/font/google'
 import './globals.css'
 
@@ -19,6 +20,7 @@ export default function RootLayout({
       <head>
         <link href="https://cesium.com/downloads/cesiumjs/releases/1.114/Build/Cesium/Widgets/widgets.css" rel="stylesheet" />
       </head>
+      <Script src="https://cesium.com/downloads/cesiumjs/releases/1.114/Build/Cesium/Cesium.js" />
       <body className={inter.className}>{children}</body>
     </html>
   )

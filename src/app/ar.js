@@ -1,4 +1,6 @@
 
+let Cesium = window.Cesium;
+
 const viewModel = {
     compassBias: 0, // コンパス手動調整用のバイアス
 };
