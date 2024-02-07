@@ -1,5 +1,3 @@
-import * as Cesium from "cesium";
-import "cesium/Build/Cesium/Widgets/widgets.css";
 
 const viewModel = {
     compassBias: 0, // コンパス手動調整用のバイアス
