@@ -214,7 +214,7 @@ export const SearchAutocomplete = forwardRef<HTMLInputElement, SearchAutocomplet
       (params: AutocompleteRenderInputParams) => (
         <SearchField
           inputRef={inputRef}
-          placeholder={placeholder}
+          placeholder={placeholder as string}
           {...params}
           InputProps={{
             ...omit(params.InputProps, ["startAdornment", "endAdornment"]),

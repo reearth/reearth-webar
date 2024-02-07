@@ -1,14 +1,35 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { startAR, stopAR, updateCompassBias, updateFov } from "./ar";
 import { useAtom } from "jotai";
 import { compassBiasAtom, fovPiOverAtom } from "./components/prototypes/view/states/ar";
 
 export default function ARView({...props}) {
+  const [cesiumLoaded, setCesiumLoaded] = useState(false);
+
   useEffect(() => {
-    // TODO: Viewerのセットアップコードは最後まで走っているが、画面に表示されないので調査する (Cesiumをnpmで入れるようにしてから。以前CDNの場合は大丈夫だった)
-    startAR();
-    return () => stopAR();
+    const script = document.createElement('script');
+    script.src = 'https://cesium.com/downloads/cesiumjs/releases/1.114/Build/Cesium/Cesium.js';
+    script.async = true;
+    script.onload = () => setCesiumLoaded(true);
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
   }, []);
+
+  useEffect(() => {
+    if (cesiumLoaded) {
+      startAR();
+    }
+    return () => stopAR();
+  }, [cesiumLoaded]);
+
+  // useEffect(() => {
+  //   // TODO: Viewerのセットアップコードは最後まで走っているが、画面に表示されないので調査する (Cesiumをnpmで入れるようにしてから。以前CDNの場合は大丈夫だった)
+  //   startAR();
+  //   return () => stopAR();
+  // }, []);
 
   // UIのステートを取得
   // TODO: 一旦atomWithStorageを使ってリロードを跨いで値を永続化しているが、リセットされた方がよいかどうか検討する
