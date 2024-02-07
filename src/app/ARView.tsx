@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { startAR, stopAR, updateCompassBias, updateFov } from "./ar";
 import { useAtom } from "jotai";
 import { compassBiasAtom, fovPiOverAtom } from "./components/prototypes/view/states/ar";
 
 export default function ARView({...props}) {
   const [cesiumLoaded, setCesiumLoaded] = useState(false);
+  const { id } = useParams();
 
   useEffect(() => {
     const script = document.createElement('script');
