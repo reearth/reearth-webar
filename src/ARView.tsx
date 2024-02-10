@@ -1,34 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { startAR, stopAR, updateCompassBias, updateFov } from "./ar";
 import { useAtom } from "jotai";
 import { compassBiasAtom, fovPiOverAtom } from "./components/prototypes/view/states/ar";
 
 export default function ARView({...props}) {
-  // const [cesiumLoaded, setCesiumLoaded] = useState(false);
   const { id } = useParams();
 
-  // useEffect(() => {
-  //   const script = document.createElement('script');
-  //   script.src = 'https://cesium.com/downloads/cesiumjs/releases/1.114/Build/Cesium/Cesium.js';
-  //   script.async = true;
-  //   script.onload = () => setCesiumLoaded(true);
-  //   document.body.appendChild(script);
-
-  //   return () => {
-  //     document.body.removeChild(script);
-  //   };
-  // }, []);
-
-  // useEffect(() => {
-  //   if (cesiumLoaded) {
-  //     startAR();
-  //   }
-  //   return () => stopAR();
-  // }, [cesiumLoaded]);
-
   useEffect(() => {
-    // TODO: Viewerのセットアップコードは最後まで走っているが、画面に表示されないので調査する (Cesiumをnpmで入れるようにしてから。以前CDNの場合は大丈夫だった)
     startAR();
     return () => stopAR();
   }, []);
