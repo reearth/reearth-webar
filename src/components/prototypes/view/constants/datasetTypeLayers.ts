@@ -52,6 +52,10 @@ export const datasetTypeLayers = {
   [PlateauDatasetType.TsunamiRisk]: TSUNAMI_RISK_LAYER,
   [PlateauDatasetType.UseCase]: USE_CASE_LAYER,
   [PlateauDatasetType.Vegetation]: VEGETATION_LAYER,
+  [PlateauDatasetType.Sample]: undefined,
+  [PlateauDatasetType.Constructure]: undefined,
+  [PlateauDatasetType.Water]: undefined,
+  [PlateauDatasetType.Traffic]: undefined,
 } as const satisfies Record<PlateauDatasetType, LayerType | undefined>;
 
 export const layerDatasetTypes = {
