@@ -1,5 +1,5 @@
 import { Typography, type SelectChangeEvent } from "@mui/material";
-import { atom, useAtom, useAtomValue, useSetAtom, type Getter, type SetStateAction } from "jotai";
+import { atom, useAtom, useAtomValue, useSetAtom, WritableAtom, type Getter, type SetStateAction } from "jotai";
 import { differenceBy } from "lodash";
 import { memo, useCallback, useMemo, type FC } from "react";
 import invariant from "tiny-invariant";
@@ -16,7 +16,6 @@ import { datasetTypeLayers } from "../constants/datasetTypeLayers";
 import { datasetTypeNames } from "../constants/datasetTypeNames";
 import { PlateauDatasetType } from "../constants/plateau";
 import { showDataFormatsAtom } from "../states/app";
-import { WritableAtom } from "jotai/ts3.8";
 
 interface Params {
   datasetId: string;
