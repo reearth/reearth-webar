@@ -1,6 +1,6 @@
 import { type FC } from "react";
 
-import { AppBar, AppIconButton, BuildingIcon, LayerIcon, Space, VisibilityOnIcon } from "../../ui-components";
+import { AppBar, AppIconButton, BuildingIcon, LayerIcon, Space } from "../../ui-components";
 // import { hideAppOverlayAtom } from "../states/app";
 
 import { MainMenuButton } from "./MainMenuButton";
