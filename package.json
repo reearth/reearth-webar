@@ -47,10 +47,14 @@
     "react-window": "^1.8.10",
     "styled-components": "^6.1.8",
     "tinycolor2": "^1.6.0",
-    "vitest": "^1.2.2",
     "xstate": "^4.38.2"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "5.0.0",
+    "@graphql-codegen/client-preset": "4.1.0",
+    "@graphql-codegen/fragment-matcher": "5.0.0",
+    "@graphql-codegen/typescript": "4.0.1",
+    "@graphql-codegen/typescript-resolvers": "4.0.1",
     "@storybook/addon-essentials": "^7.6.0",
     "@storybook/addon-interactions": "^7.6.0",
     "@storybook/addon-links": "^7.6.0",
@@ -82,6 +86,8 @@
     "symlink-dir": "^5.2.1",
     "tailwindcss": "^3.3.0",
     "typescript": "^5.2.2",
-    "vite": "^5.1.0"
+    "vite": "^5.1.0",
+    "vite-plugin-static-copy": "^1.0.1",
+    "vitest": "^1.2.2"
   }
 }
