@@ -98,7 +98,7 @@ const Item: FC<
   <StyledSelectItem {...props} selected={item === selectedItem}>
     <Image>
       <img 
-        src={environmentItems[item].image.src}
+        src={environmentItems[item].image}
         alt={environmentItems[item].label}
         width="100%"
         height="100%"

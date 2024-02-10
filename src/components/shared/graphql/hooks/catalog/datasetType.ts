@@ -5,13 +5,14 @@ import { DatasetTypesInput } from "../../base/catalog/__gen__/graphql";
 import { DATASET_TYPES } from "../../base/catalog/queries/datasetType";
 
 import { useQuery } from "./base";
+import { DocumentNode } from "graphql";
 
 type Options = {
   skip?: boolean;
 };
 
 export const useDatasetTypes = (input?: DatasetTypesInput, options?: Options) => {
-  const { data, ...rest } = useQuery(DATASET_TYPES, {
+  const { data, ...rest } = useQuery(DATASET_TYPES as DocumentNode, {
     variables: {
       input,
     },

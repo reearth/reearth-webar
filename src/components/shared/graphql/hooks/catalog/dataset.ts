@@ -1,3 +1,4 @@
+import { DocumentNode } from "graphql";
 import { DatasetFragmentFragment, DatasetsInput } from "../../base/catalog/__gen__/graphql";
 import { DATASETS, DATASET_BY_ID, DATASETS_BY_IDS } from "../../base/catalog/queries/dataset";
 
@@ -43,7 +44,7 @@ export const useDatasetById = (id: string, options?: Options) => {
 };
 
 export const useDatasetsByIds = (ids: string[], options?: Options) => {
-  const query = useQuery(DATASETS_BY_IDS, {
+  const query = useQuery(DATASETS_BY_IDS as DocumentNode, {
     variables: {
       ids,
     },
