@@ -1,5 +1,8 @@
-import * as Cesium from "cesium";
-import "cesium/Build/Cesium/Widgets/widgets.css";
+// import * as Cesium from "cesium";
+// import "cesium/Build/Cesium/Widgets/widgets.css";
+
+// CDNの場合はここにwindowオブジェクトからCesiumを入れる
+let Cesium;
 
 const viewModel = {
     compassBias: 0, // コンパス手動調整用のバイアス
@@ -222,6 +225,10 @@ function setupOcclusionStage() {
 
 // Cesium系セットアップ
 function setupCesium() {
+    Cesium = window.Cesium;
+    oldDestination = new Cesium.Cartesian3();
+    oldDirection = new Cesium.Cartesian3();
+    oldUp = new Cesium.Cartesian3();
     setupCesiumViewer();
     setupSilhouetteStage();
     setupOcclusionStage();

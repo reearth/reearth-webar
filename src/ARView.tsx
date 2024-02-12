@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { startAR, stopAR, updateCompassBias, updateFov } from "./ar";
 import { useAtom } from "jotai";
@@ -7,25 +7,48 @@ import { compassBiasAtom, fovPiOverAtom } from "./components/prototypes/view/sta
 export default function ARView({...props}) {
   const { id } = useParams();
 
+  // CDNからCesiumを読み込むバージョン
+  const [cesiumLoaded, setCesiumLoaded] = useState(false);
   useEffect(() => {
-    startAR();
-    return () => stopAR();
+    const script = document.createElement('script');
+    script.src = 'https://cesium.com/downloads/cesiumjs/releases/1.114/Build/Cesium/Cesium.js';
+    script.async = true;
+    script.onload = () => setCesiumLoaded(true);
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
   }, []);
+  useEffect(() => {
+    if (cesiumLoaded) {
+      startAR();
+      return () => stopAR();
+    }
+  }, [cesiumLoaded]);
+
+  // パッケージからCesiumを読込む場合は単にこれでOK
+  // useEffect(() => {
+  //   startAR();
+  //   return () => stopAR();
+  // }, []);
 
   // UIのステートを取得
   // TODO: 一旦atomWithStorageを使ってリロードを跨いで値を永続化しているが、リセットされた方がよいかどうか検討する
   const [compassBias] = useAtom(compassBiasAtom);
   const [fovPiOver] = useAtom(fovPiOverAtom);
-
   // UIのステート変更を監視してVMに反映
   useEffect(() => {
-    console.log("compass bias (UI): ", compassBias);
-    updateCompassBias(compassBias);
+    if (cesiumLoaded) {
+      console.log("compass bias (UI): ", compassBias);
+      updateCompassBias(compassBias);
+    }
   }, [compassBias]);
-
   useEffect(() => {
-    console.log("fov pi over (UI): ", fovPiOver);
-    updateFov(fovPiOver);
+    if (cesiumLoaded) {
+      console.log("fov pi over (UI): ", fovPiOver);
+      updateFov(fovPiOver);
+    }
   }, [fovPiOver]);
 
   return (
