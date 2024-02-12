@@ -6,24 +6,24 @@ const viewModel = {
 };
 
 // view層グローバル変数
-var cesiumViewer;
-var cesiumCamera;
-var postProcessStages;
-var occlusionStage;
-var silhouetteStage;
-var selectedFeatures = [];
+let cesiumViewer;
+let cesiumCamera;
+let postProcessStages;
+let occlusionStage;
+let silhouetteStage;
+let selectedFeatures = [];
 
 // GPSトラッキングのID
-var gpsTrackingWatchId = 0;
+let gpsTrackingWatchId = 0;
 
 // 前フレームの端末姿勢・位置を保持しておく用 (CesiumのSetViewがこれらを全部同時にセットしないといけない仕様であるために用意している)
-var oldDestination = new Cesium.Cartesian3();
-var oldDirection = new Cesium.Cartesian3();
-var oldUp = new Cesium.Cartesian3();
+let oldDestination; // = new Cesium.Cartesian3();
+let oldDirection; // = new Cesium.Cartesian3();
+let oldUp; // = new Cesium.Cartesian3();
 
 // iOS用方位初期値管理
-var isiosHeadingInitialized = false;
-var iosInitialHeading = 0;
+let isiosHeadingInitialized = false;
+let iosInitialHeading = 0;
 
 // iOS判定
 function detectIsIos() {
@@ -284,7 +284,7 @@ function poseCesiumCamera(orientation) {
 
 // デバイス位置のトラッキングを開始
 function startGpsTracking() {
-    var options = {
+    let options = {
         enableHighAccuracy: true,
         timeout: 5000,
         maximumAge: 0
@@ -336,32 +336,32 @@ function gpsTrackingProcess(pos) {
 }
 
 // // 回転行列はW3Cのドキュメントにもあるこちらの方法でで手構成してもよいが、今回はせっかくなのでCesiumの行列系の便利メソッドを使用して構成することとする
-// var degtorad = Math.PI / 180; /*  度° ↔ ラジアン 間の換算用  */
+// let degtorad = Math.PI / 180; /*  度° ↔ ラジアン 間の換算用  */
 // function getRotationMatrix(alpha, beta, gamma) {
-//     var _x = beta  ? beta  * degtorad : 0; // β 値
-//     var _y = gamma ? gamma * degtorad : 0; // γ 値
-//     var _z = alpha ? alpha * degtorad : 0; // α 値
+//     let _x = beta  ? beta  * degtorad : 0; // β 値
+//     let _y = gamma ? gamma * degtorad : 0; // γ 値
+//     let _z = alpha ? alpha * degtorad : 0; // α 値
 
-//     var cX = Math.cos( _x );
-//     var cY = Math.cos( _y );
-//     var cZ = Math.cos( _z );
-//     var sX = Math.sin( _x );
-//     var sY = Math.sin( _y );
-//     var sZ = Math.sin( _z );
+//     let cX = Math.cos( _x );
+//     let cY = Math.cos( _y );
+//     let cZ = Math.cos( _z );
+//     let sX = Math.sin( _x );
+//     let sY = Math.sin( _y );
+//     let sZ = Math.sin( _z );
 
 //     /*  ZXY 回転行列の構築  */
 
-//     var m11 = cZ * cY - sZ * sX * sY;
-//     var m12 = - cX * sZ;
-//     var m13 = cY * sZ * sX + cZ * sY;
+//     let m11 = cZ * cY - sZ * sX * sY;
+//     let m12 = - cX * sZ;
+//     let m13 = cY * sZ * sX + cZ * sY;
 
-//     var m21 = cY * sZ + cZ * sX * sY;
-//     var m22 = cZ * cX;
-//     var m23 = sZ * sY - cZ * cY * sX;
+//     let m21 = cY * sZ + cZ * sX * sY;
+//     let m22 = cZ * cX;
+//     let m23 = sZ * sY - cZ * cY * sX;
 
-//     var m31 = - cX * sY;
-//     var m32 = sX;
-//     var m33 = cX * cY;
+//     let m31 = - cX * sY;
+//     let m32 = sX;
+//     let m33 = cX * cY;
 
 //     return [
 //         m11,    m12,    m13,
@@ -445,7 +445,7 @@ function orientationTrackingProcess(event) {
 
     // TODO: 単純にalphaにバイアスを入れるだけだと、betaの値によっては方位にズレが発生するので、厳密にやるならそれにも対処する
     // 0-360のalphaに0-360のバイアスを足す計算 (0~360をはみ出た場合は循環させる)
-    var biasedAlpha = 0;
+    let biasedAlpha = 0;
     const biasedDegree = Number(deviceAlpha) + Number(viewModel.compassBias); // アノテーションしないとここが文字列の結合になってしまい正しく足せない
     if (biasedDegree > 360) {
         biasedAlpha = biasedDegree - 360;
@@ -474,7 +474,7 @@ function orientationTrackingProcess(event) {
     // 3次元の回転行列に変換
     // 軸毎の回転行列を、W3Cの定義通りZ-X'-Y"の順に掛ける。
     // (multiplyの第三引数は返り値と同値が入るものだが不使用かつoptionalでないためダミーを入れている)
-    var rotation = Cesium.Matrix3.multiply(yRotation, Cesium.Matrix3.multiply(xRotation, zRotation, new Cesium.Matrix3()), new Cesium.Matrix3());
+    let rotation = Cesium.Matrix3.multiply(yRotation, Cesium.Matrix3.multiply(xRotation, zRotation, new Cesium.Matrix3()), new Cesium.Matrix3());
     // 手構成のgetRotationMatrixで計算した回転行列と、↑の構成方法での回転行列では、構成の仕方で正負が反転している軸があるが同様
     // const rotArray = getRotationMatrix(deviceAlpha, deviceBeta, deviceGamma);
     // const rot = Cesium.Matrix3.fromArray(rotArray);
@@ -519,8 +519,8 @@ function orientationTrackingProcess(event) {
     // directionベクトルは回転行列からZ軸を取り出し、upベクトルは回転行列からY軸を取り出す
     // http://marupeke296.sakura.ne.jp/DXG_No39_WorldMatrixInformation.html
     // https://groups.google.com/g/cesium-dev/c/cr2P2wfOwl4
-    var direction = Cesium.Cartesian3.negate(Cesium.Matrix3.getRow(rotation, 2, new Cesium.Matrix3()), new Cesium.Cartesian3());
-    var up = Cesium.Cartesian3.negate(Cesium.Matrix3.getRow(rotation, 1, new Cesium.Matrix3()), new Cesium.Cartesian3());
+    let direction = Cesium.Cartesian3.negate(Cesium.Matrix3.getRow(rotation, 2, new Cesium.Matrix3()), new Cesium.Cartesian3());
+    let up = Cesium.Cartesian3.negate(Cesium.Matrix3.getRow(rotation, 1, new Cesium.Matrix3()), new Cesium.Cartesian3());
 
     // IMUから計算したローカル地平直交座標系における回転を、現在座標のeastNorthUpToFixedFrameで補正する
     direction = Cesium.Matrix3.multiplyByVector(mtx3, direction, new Cesium.Cartesian3());
@@ -537,9 +537,9 @@ function orientationTrackingProcess(event) {
     // if (isios) {
     //     // iOSの場合はalphaが絶対値ではとれないので、webkitCompassHeadingを使用するが、そのせいでalpha/beta/gammaからの回転行列の計算ができないので、heading/pitch/rollを用いた更新にする。
     //     // 最終変換済みのdirection/upにrightも用いて回転行列Matrix3に戻し、QuaternionにしてからHeading/Pitch/Rollにし、headingだけをwebkitCompassHeadingに置き換える
-    //     var right = Cesium.Cartesian3.negate(Cesium.Matrix3.getRow(rotation, 0, new Cesium.Matrix3()), new Cesium.Cartesian3());
+    //     let right = Cesium.Cartesian3.negate(Cesium.Matrix3.getRow(rotation, 0, new Cesium.Matrix3()), new Cesium.Cartesian3());
     //     right = Cesium.Matrix3.multiplyByVector(mtx3, right, new Cesium.Cartesian3());
-    //     var rot = new Cesium.Matrix3();
+    //     let rot = new Cesium.Matrix3();
     //     right = Cesium.Cartesian3.negate(right, new Cesium.Matrix3());
     //     up = Cesium.Cartesian3.negate(up, new Cesium.Matrix3());
     //     direction = Cesium.Cartesian3.negate(direction, new Cesium.Matrix3());
