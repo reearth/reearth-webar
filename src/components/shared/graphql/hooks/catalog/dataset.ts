@@ -8,6 +8,7 @@ type Options = {
   skip?: boolean;
 };
 
+// TODO: 全データセットを取得するマン
 export const useDatasets = (input: DatasetsInput, options?: Options) => {
   return useQuery(DATASETS, {
     variables: {
@@ -26,6 +27,7 @@ export const useLazyDatasets = (input: DatasetsInput, options?: Options) => {
   });
 };
 
+// TODO: 単一ID指定でデータセットを取得するマン
 export const useDatasetById = (id: string, options?: Options) => {
   const query = useQuery(DATASET_BY_ID, {
     variables: {
@@ -43,6 +45,7 @@ export const useDatasetById = (id: string, options?: Options) => {
   };
 };
 
+// TODO: 複数ID指定でデータセットを取得するマン (ARで使う)
 export const useDatasetsByIds = (ids: string[], options?: Options) => {
   const query = useQuery(DATASETS_BY_IDS as DocumentNode, {
     variables: {
