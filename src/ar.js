@@ -169,6 +169,8 @@ async function setupCesiumViewer() {
         // style.color = 'color("aliceblue", 0.8)';
         // plateauTileset.style = style;
 
+        console.log('Success loading tileset');
+
         cesiumViewer.scene.primitives.add(plateauTileset);
         cesiumViewer.flyTo(plateauTileset);
     } catch (error) {
@@ -231,7 +233,7 @@ function setupCesium() {
     oldUp = new Cesium.Cartesian3();
     setupCesiumViewer();
     setupSilhouetteStage();
-    setupOcclusionStage();
+    // setupOcclusionStage();
 }
 
 // Cesium系クリーンアップ
