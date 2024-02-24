@@ -21,7 +21,9 @@ query DatasetById($id: ID!) {
 export const DATASETS_BY_IDS = gql(`
 query DatasetsByIds($ids: [ID!]!) {
   nodes(ids: $ids) {
-    ...DatasetFragment
+    ... on Dataset {
+      ...DatasetFragment
+    }
   }
 }
 `);
