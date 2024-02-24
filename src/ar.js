@@ -66,7 +66,7 @@ function throttle(fn, delay) {
 }
 
 // Cesiumのセットアップ
-async function setupCesiumViewer() {
+async function setupCesiumViewer(tilesetUrl) {
     // Set Tokens
     Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIyYzI5NjUxNS1hOGMyLTRhNzQtYmZhOS1jZTRjMWRlZjgyYjkiLCJpZCI6MTE4NjE3LCJpYXQiOjE2NzEyNjQ3OTZ9.8kWsf2_D2q67-ANppVkQohAVYlNlVEaz1axTHikskMQ";
 
@@ -146,7 +146,7 @@ async function setupCesiumViewer() {
         // オプション一覧はこちら https://cesium.com/learn/cesiumjs/ref-doc/Cesium3DTileset.html#.ConstructorOptions
         const plateauTileset = await Cesium.Cesium3DTileset.fromUrl(
             // 港区LOD2
-            "https://assets.cms.plateau.reearth.io/assets/df/b95190-23af-4087-9981-430ca798f502/13100_tokyo23-ku_2022_3dtiles%20_1_1_op_bldg_13103_minato-ku_lod2/tileset.json",
+            // "https://assets.cms.plateau.reearth.io/assets/df/b95190-23af-4087-9981-430ca798f502/13100_tokyo23-ku_2022_3dtiles%20_1_1_op_bldg_13103_minato-ku_lod2/tileset.json",
             // 中央区LOD2
             // "https://assets.cms.plateau.reearth.io/assets/38/9cf378-c397-49bb-a4fb-894ce86647d8/13100_tokyo23-ku_2022_3dtiles_1_1_op_bldg_13102_chuo-ku_lod2/tileset.json",
             // 千代田区LOD2
@@ -155,6 +155,8 @@ async function setupCesiumViewer() {
             // "https://assets.cms.plateau.reearth.io/assets/f5/9392d2-5974-4df4-bb49-bcd4ebd44ff8/14130_kawasaki-shi_2022_3dtiles_1_op_bldg_14135_tama-ku_lod1/tileset.json",
             // 郡山市LOD2
             // "https://assets.cms.plateau.reearth.io/assets/0b/095119-b1e9-48c0-b5bd-0b18518e5a36/07203_koriyama-shi_2020_3dtiles_6_op_bldg_lod2/tileset.json",
+            // 外から渡す
+            tilesetUrl,
             {
                 //debugShowBoundingVolume: true, // ローカルのファイルシステムから実行している場合はエラーが出る
                 //debugShowContentBoundingVolume: true
@@ -226,12 +228,12 @@ function setupOcclusionStage() {
 }
 
 // Cesium系セットアップ
-function setupCesium() {
+function setupCesium(tilesetUrl) {
     Cesium = window.Cesium;
     oldDestination = new Cesium.Cartesian3();
     oldDirection = new Cesium.Cartesian3();
     oldUp = new Cesium.Cartesian3();
-    setupCesiumViewer();
+    setupCesiumViewer(tilesetUrl);
     setupSilhouetteStage();
     // setupOcclusionStage();
 }
@@ -601,9 +603,9 @@ function setupUserInput() {
 // Lifecycle
 
 // ARを開始
-export function startAR() {
+export function startAR(tilesetUrl) {
     // Viewセットアップ
-    setupCesium();
+    setupCesium(tilesetUrl);
     setupUserInput();
     // Repoセットアップ
     startDeviceCameraPreview();

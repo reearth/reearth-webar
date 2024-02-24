@@ -3,10 +3,9 @@ import { useParams } from "react-router-dom";
 import { startAR, stopAR, updateCompassBias, updateFov } from "./ar";
 import { useAtom } from "jotai";
 import { compassBiasAtom, fovPiOverAtom } from "./components/prototypes/view/states/ar";
+import { useDatasetById } from "./components/shared/graphql";
 
 export default function ARView({...props}) {
-  const { id } = useParams();
-
   // CDNからCesiumを読み込むバージョン
   const [cesiumLoaded, setCesiumLoaded] = useState(false);
   useEffect(() => {
@@ -20,12 +19,6 @@ export default function ARView({...props}) {
       document.body.removeChild(script);
     };
   }, []);
-  useEffect(() => {
-    if (cesiumLoaded) {
-      startAR();
-      return () => stopAR();
-    }
-  }, [cesiumLoaded]);
 
   // パッケージからCesiumを読込む場合は単にこれでOK
   // useEffect(() => {
@@ -33,8 +26,27 @@ export default function ARView({...props}) {
   //   return () => stopAR();
   // }, []);
 
+  // AR View 起動
+  // TODO: ARView起動時にPLATEAU View側からidをもってくる (どういうかたちで渡ってくるか確定してほしい→ URLのクエパラからとる↓)
+  // TODO: useParamsでURLのクエパラからデータセットIDを取る (県境等が判断できないのでViewから複数のid渡ってくる場合もあるため、のちほど複数IDに対応したuseDatasetsByIdを使う)
+  const { id } = useParams();
+  const { data } = useDatasetById("d_13103_bldg");
+  useEffect(() => {
+    if (cesiumLoaded) {
+      // TODO: フォールバックフィルタつくる
+      // DatasetFragmentのitemsにlodとtextureを入れて、LOD2(テクスチャあり)->LOD2(テクスチャなし)->LOD1の順でフォールバックする
+      console.log(data);
+      const tilesetUrl = data.node.items.find( ({ name }) => name == "LOD2" ).url;
+      startAR(tilesetUrl);
+      return () => stopAR();
+    }
+  }, [cesiumLoaded]);
+
+  // TODO: View3.0からdatasetが全く選択されない状態でもAR Viewは起動できるので、ARView側でもデータセット検索機能は必要なのでパネルのフル機能で実装する
+  // 一旦はURLからの表示と検索が動けばSTG出せる。データセットパネルの中での詳細なモデルのプロパティ操作にも追って対応必要
+  // AR View 側でデータセットを変更した際に、リロードしてもそれが再現できるようにURLのクエパラもAR View側で書き換える機能は Nice to Have
+
   // UIのステートを取得
-  // TODO: 一旦atomWithStorageを使ってリロードを跨いで値を永続化しているが、リセットされた方がよいかどうか検討する
   const [compassBias] = useAtom(compassBiasAtom);
   const [fovPiOver] = useAtom(fovPiOverAtom);
   // UIのステート変更を監視してVMに反映
