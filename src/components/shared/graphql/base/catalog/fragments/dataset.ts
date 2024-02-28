@@ -32,16 +32,43 @@ export const DATASET_FRAGMENT = gql(`
       category
       order
     }
-    items {
-      id
-      format
-      name
-      url
-      layers
-    }
+    # items {
+    #   id
+    #   format
+    #   name
+    #   url
+    #   layers
+    # }
     admin
     ... on PlateauDataset {
       subname
+      items {
+        id
+        format
+        name
+        url
+        layers
+        lod
+        texture
+      }
+    }
+    ... on RelatedDataset {
+      items {
+        id
+        format
+        name
+        url
+        layers
+      }
+    }
+    ... on GenericDataset {
+      items {
+        id
+        format
+        name
+        url
+        layers
+      }
     }
   }
 `);
