@@ -32,15 +32,15 @@ export default function ARView({...props}) {
   const { id } = useParams();
   const { data } = useDatasetById("d_13103_bldg");
   useEffect(() => {
-    if (cesiumLoaded) {
-      // TODO: フォールバックフィルタつくる
-      // DatasetFragmentのitemsにlodとtextureを入れて、LOD2(テクスチャあり)->LOD2(テクスチャなし)->LOD1の順でフォールバックする
-      console.log(data);
-      const tilesetUrl = data.node.items.find( ({ name }) => name == "LOD2" ).url;
-      startAR(tilesetUrl);
-      return () => stopAR();
-    }
-  }, [cesiumLoaded]);
+    if (!cesiumLoaded || !data?.node) { return; }
+    // TODO: フォールバックフィルタつくる
+    // DatasetFragmentのitemsにlodとtextureを入れて、LOD2(テクスチャあり)->LOD2(テクスチャなし)->LOD1の順でフォールバックする
+    const node = data.node;
+    console.log(node);
+    const tilesetUrl = data.node.items.find( ({ name }) => name == "LOD2" ).url;
+    startAR(tilesetUrl);
+    return () => stopAR();
+  }, [cesiumLoaded, data]);
 
   // TODO: View3.0からdatasetが全く選択されない状態でもAR Viewは起動できるので、ARView側でもデータセット検索機能は必要なのでパネルのフル機能で実装する
   // 一旦はURLからの表示と検索が動けばSTG出せる。データセットパネルの中での詳細なモデルのプロパティ操作にも追って対応必要

@@ -13,4 +13,6 @@ export const createCatalogClient = (url: string, token?: string) => {
       authorization: token ? `Bearer ${token}` : "",
     },
   });
+
+  return catalogClient;
 };
