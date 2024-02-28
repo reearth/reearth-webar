@@ -37,6 +37,8 @@ export default function ARView({...props}) {
     // DatasetFragmentのitemsにlodとtextureを入れて、LOD2(テクスチャあり)->LOD2(テクスチャなし)->LOD1の順でフォールバックする
     const node = data.node;
     console.log(node);
+    const lods = node.items.map((item) => item.lod);
+    console.log(lods);
     const tilesetUrl = data.node.items.find( ({ name }) => name == "LOD2" ).url;
     startAR(tilesetUrl);
     return () => stopAR();

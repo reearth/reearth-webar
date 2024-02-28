@@ -4,6 +4,7 @@ import { AppBar, AppIconButton, BuildingIcon, LayerIcon, Space } from "../../ui-
 // import { hideAppOverlayAtom } from "../states/app";
 
 import { MainMenuButton } from "./MainMenuButton";
+import { DatasetButton } from "./DatasetButton";
 import { CompassBiasButton } from "./CompassBiasButton";
 import { FovButton } from "./FovButton";
 
@@ -16,9 +17,7 @@ export const AppHeader: FC = () => {
     <AppBar>
       <MainMenuButton />
       <Space flexible />
-      <AppIconButton title="データセット">
-        <LayerIcon />
-      </AppIconButton>
+      <DatasetButton />
       <CompassBiasButton />
       <AppIconButton title="表示モード">
         <BuildingIcon />
