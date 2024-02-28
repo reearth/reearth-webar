@@ -29,6 +29,7 @@ export default function ARView({...props}) {
   // AR View 起動
   // TODO: ARView起動時にPLATEAU View側からidをもってくる (どういうかたちで渡ってくるか確定してほしい→ URLのクエパラからとる↓)
   // TODO: useParamsでURLのクエパラからデータセットIDを取る (県境等が判断できないのでViewから複数のid渡ってくる場合もあるため、のちほど複数IDに対応したuseDatasetsByIdを使う)
+  // → id="カンマ区切りで複数" で来る
   const { id } = useParams();
   const { data } = useDatasetById("d_13103_bldg");
   useEffect(() => {

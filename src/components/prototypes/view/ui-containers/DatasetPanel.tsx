@@ -16,6 +16,7 @@ const Title = styled("div")(({ theme }) => ({
 
 export const DatasetPanel: FC = () => {
   return (
+    // TODO: ここのmaxHeightが設定されていないっぽいのと、都道府県のディスクロージャーを開いた瞬間に無限ループでAPIを叩いちゃうっぽくてUIブロッキングされる&リロードしてもサーバのセッションが閉じてないっぽくてウィンドウを閉じるまで再接続できなくなる
     <MainPanel />
   );
 };
