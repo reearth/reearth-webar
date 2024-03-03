@@ -7,8 +7,10 @@ import { useDatasetById } from "./components/shared/graphql";
 import { PlateauDatasetItem } from "./components/shared/graphql/types/catalog";
 
 export default function ARView({...props}) {
-  // CDNからCesiumを読み込むバージョン
   const [cesiumLoaded, setCesiumLoaded] = useState(false);
+  const [isARStarted, setIsARStarted] = useState(false);
+
+  // CDNからCesiumを読み込むバージョン
   useEffect(() => {
     const script = document.createElement('script');
     script.src = 'https://cesium.com/downloads/cesiumjs/releases/1.114/Build/Cesium/Cesium.js';
@@ -33,7 +35,6 @@ export default function ARView({...props}) {
   // → id="カンマ区切りで複数" で来る
   const { id } = useParams();
   const { data } = useDatasetById("d_13103_bldg");
-  const [isARStarted, setIsARStarted] = useState(false);
   useEffect(() => {
     if (!cesiumLoaded || !data?.node) { return; }
     const plateauDataset = data.node;
