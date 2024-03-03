@@ -32,6 +32,7 @@ export default function ARView({...props}) {
   // → id="カンマ区切りで複数" で来る
   const { id } = useParams();
   const { data } = useDatasetById("d_13103_bldg");
+  const [isARStarted, setIsARStarted] = useState(false);
   useEffect(() => {
     if (!cesiumLoaded || !data?.node) { return; }
     // TODO: フォールバックフィルタつくる
@@ -42,7 +43,11 @@ export default function ARView({...props}) {
     console.log(lods);
     const tilesetUrl = data.node.items.find( ({ name }) => name == "LOD2" ).url;
     startAR(tilesetUrl);
-    return () => stopAR();
+    setIsARStarted(true);
+    return () => {
+      stopAR();
+      setIsARStarted(false);
+    };
   }, [cesiumLoaded, data]);
 
   // TODO: View3.0からdatasetが全く選択されない状態でもAR Viewは起動できるので、ARView側でもデータセット検索機能は必要なのでパネルのフル機能で実装する
@@ -54,16 +59,14 @@ export default function ARView({...props}) {
   const [fovPiOver] = useAtom(fovPiOverAtom);
   // UIのステート変更を監視してVMに反映
   useEffect(() => {
-    if (cesiumLoaded) {
-      console.log("compass bias (UI): ", compassBias);
-      updateCompassBias(compassBias);
-    }
+    if (!isARStarted) { return; }
+    console.log("compass bias (UI): ", compassBias);
+    updateCompassBias(compassBias);
   }, [compassBias]);
   useEffect(() => {
-    if (cesiumLoaded) {
-      console.log("fov pi over (UI): ", fovPiOver);
-      updateFov(fovPiOver);
-    }
+    if (!isARStarted) { return; }
+    console.log("fov pi over (UI): ", fovPiOver);
+    updateFov(fovPiOver);
   }, [fovPiOver]);
 
   return (
