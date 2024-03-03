@@ -4,6 +4,7 @@ import { startAR, stopAR, updateCompassBias, updateFov } from "./ar";
 import { useAtom } from "jotai";
 import { compassBiasAtom, fovPiOverAtom } from "./components/prototypes/view/states/ar";
 import { useDatasetById } from "./components/shared/graphql";
+import { PlateauDatasetItem } from "./components/shared/graphql/types/catalog";
 
 export default function ARView({...props}) {
   // CDNからCesiumを読み込むバージョン
@@ -35,15 +36,29 @@ export default function ARView({...props}) {
   const [isARStarted, setIsARStarted] = useState(false);
   useEffect(() => {
     if (!cesiumLoaded || !data?.node) { return; }
-    // TODO: フォールバックフィルタつくる
-    // DatasetFragmentのitemsにlodとtextureを入れて、LOD2(テクスチャあり)->LOD2(テクスチャなし)->LOD1の順でフォールバックする
-    const node = data.node;
-    console.log(node);
-    const lods = node.items.map((item) => item.lod);
-    console.log(lods);
-    const tilesetUrl = data.node.items.find( ({ name }) => name == "LOD2" ).url;
-    startAR(tilesetUrl);
-    setIsARStarted(true);
+    const plateauDataset = data.node;
+    const plateauDatasetItems = plateauDataset.items as [PlateauDatasetItem];
+    // LOD2(テクスチャあり)->LOD2(テクスチャなし)->LOD1の順でフォールバック
+    const tilesetUrlLod2Tex = plateauDatasetItems.find(({ lod, texture }) => lod == 2 && texture == "TEXTURE").url
+    if (tilesetUrlLod2Tex) {
+      console.log("LOD2 with Texture Tileset Exists: ", tilesetUrlLod2Tex);
+      startAR(tilesetUrlLod2Tex);
+      setIsARStarted(true);
+    } else {
+      const tilesetUrlLod2NoneTex = plateauDatasetItems.find(({ lod, texture }) => lod == 2 && texture == "NONE").url
+      if (tilesetUrlLod2NoneTex) {
+        console.log("LOD2 with No Texture Tileset Exists: ", tilesetUrlLod2NoneTex);
+        startAR(tilesetUrlLod2NoneTex);
+        setIsARStarted(true);
+      } else {
+        const tilesetUrlLod1 = plateauDatasetItems.find(({ lod }) => lod == 1).url
+        if (tilesetUrlLod1) {
+          console.log("LOD1 Tileset Exists: ", tilesetUrlLod1);
+          startAR(tilesetUrlLod1);
+          setIsARStarted(true);
+        }
+      }
+    }
     return () => {
       stopAR();
       setIsARStarted(false);
