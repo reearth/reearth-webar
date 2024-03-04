@@ -612,8 +612,8 @@ export function startAR(tilesetUrl) {
     startGpsTracking();
     // iOSではパーミッション取ってからIMUの値を読む
     if (isios) {
-        const iosImuPermissionButton = document.getElementById("ios_imu_permission_button");
-        iosImuPermissionButton.addEventListener("click", () => {
+        const imuGranted = window.confirm("ジャイロセンサーの使用を許可します")
+        if (imuGranted) {
             DeviceOrientationEvent.requestPermission()
                 .then(response => {
                     if (response === "granted") {
@@ -621,7 +621,7 @@ export function startAR(tilesetUrl) {
                     }
                 })
                 .catch(console.error);
-        });
+        }
     } else {
         startOrientationTracking();
     }
