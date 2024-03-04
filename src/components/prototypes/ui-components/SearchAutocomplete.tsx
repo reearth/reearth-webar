@@ -59,27 +59,30 @@ const PopperRoot = styled("div")({
   flexGrow: 1,
 });
 
-const PopperComponent = forwardRef<HTMLDivElement, PopperProps>(({ children, open }, ref) => {
-  invariant(typeof children !== "function");
-  return open ? (
-    <>
-      <Divider />
-      <PopperRoot ref={ref}>{children}</PopperRoot>
-    </>
-  ) : null;
-});
+const PopperComponent = forwardRef<HTMLDivElement, PopperProps>(
+  ({ children, open }, ref) => {
+    invariant(typeof children !== "function");
+    return open ? (
+      <>
+        <Divider />
+        <PopperRoot ref={ref}>{children}</PopperRoot>
+      </>
+    ) : null;
+  }
+);
 
 const PaperRoot = styled("div")({
   height: "100%",
 });
 
-const PaperComponent = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
-  ({ children, ...props }, ref) => (
-    <PaperRoot ref={ref} {...props}>
-      {children}
-    </PaperRoot>
-  ),
-);
+const PaperComponent = forwardRef<
+  HTMLDivElement,
+  HTMLAttributes<HTMLDivElement>
+>(({ children, ...props }, ref) => (
+  <PaperRoot ref={ref} {...props}>
+    {children}
+  </PaperRoot>
+));
 
 const StyledChip = styled(Chip)(({ theme }) => ({
   ...theme.typography.body2,
@@ -87,13 +90,25 @@ const StyledChip = styled(Chip)(({ theme }) => ({
 
 const CloseIcon = createSvgIcon(
   <path d="M17.6 7.53L16.47 6.4 12 10.87 7.53 6.4 6.4 7.53 10.87 12 6.4 16.47l1.13 1.13L12 13.13l4.47 4.47 1.13-1.13L13.13 12l4.47-4.47z" />,
-  "Close",
+  "Close"
 );
 
-export type SearchOptionType = "filter" | "history" | "dataset" | "building" | "address";
+export type SearchOptionType =
+  | "filter"
+  | "history"
+  | "dataset"
+  | "building"
+  | "area";
 
-function isSearchOptionType(value: unknown): value is Exclude<SearchOptionType, "filter"> {
-  return value === "history" || value === "dataset" || value === "building" || value === "address";
+function isSearchOptionType(
+  value: unknown
+): value is Exclude<SearchOptionType, "filter"> {
+  return (
+    value === "history" ||
+    value === "dataset" ||
+    value === "building" ||
+    value === "area"
+  );
 }
 
 export interface SearchOption {
@@ -103,18 +118,21 @@ export interface SearchOption {
   index?: string;
 }
 
-const iconComponents: Record<Exclude<SearchOptionType, "filter">, ComponentType> = {
+const iconComponents: Record<
+  Exclude<SearchOptionType, "filter">,
+  ComponentType
+> = {
   history: HistoryIcon,
   dataset: DatasetIcon,
   building: BuildingIcon,
-  address: AddressIcon,
+  area: AddressIcon,
 };
 
 const groupNames: Record<Exclude<SearchOptionType, "filter">, string> = {
   history: "最近の検索",
   dataset: "データセット",
   building: "建築物",
-  address: "住所",
+  area: "エリア",
 };
 
 function getOptionLabel(value: string | SearchOption): string {
@@ -124,13 +142,18 @@ function getOptionLabel(value: string | SearchOption): string {
 function renderGroup(params: AutocompleteRenderGroupParams): ReactNode {
   return [
     <ListSubheader component="div">
-      {isSearchOptionType(params.group) ? groupNames[params.group] : params.group}
+      {isSearchOptionType(params.group)
+        ? groupNames[params.group]
+        : params.group}
     </ListSubheader>,
     params.children,
   ];
 }
 
-function renderOption(props: HTMLAttributes<HTMLLIElement>, option: SearchOption): ReactNode {
+function renderOption(
+  props: HTMLAttributes<HTMLLIElement>,
+  option: SearchOption
+): ReactNode {
   return (
     // @ts-expect-error TODO
     <EntityTitleButton
@@ -143,7 +166,7 @@ function renderOption(props: HTMLAttributes<HTMLLIElement>, option: SearchOption
 
 function renderTags(
   values: readonly SearchOption[],
-  getTagProps: AutocompleteGetTagProps,
+  getTagProps: AutocompleteGetTagProps
 ): ReactNode {
   return values.map((value, index) => (
     <StyledChip
@@ -175,7 +198,10 @@ export type SearchAutocompleteProps = Omit<AutocompleteProps, "renderInput"> & {
   children?: ReactNode;
 };
 
-export const SearchAutocomplete = forwardRef<HTMLInputElement, SearchAutocompleteProps>(
+export const SearchAutocomplete = forwardRef<
+  HTMLInputElement,
+  SearchAutocompleteProps
+>(
   (
     {
       inputRef,
@@ -192,7 +218,7 @@ export const SearchAutocomplete = forwardRef<HTMLInputElement, SearchAutocomplet
       onBlur,
       ...props
     },
-    ref,
+    ref
   ) => {
     const [focused, setFocused] = useState(false);
     const handleFocus = useCallback(
@@ -200,14 +226,14 @@ export const SearchAutocomplete = forwardRef<HTMLInputElement, SearchAutocomplet
         setFocused(true);
         onFocus?.(event);
       },
-      [onFocus],
+      [onFocus]
     );
     const handleBlur = useCallback(
       (event: FocusEvent<HTMLInputElement>) => {
         setFocused(false);
         onBlur?.(event);
       },
-      [onBlur],
+      [onBlur]
     );
 
     const renderInput = useCallback(
@@ -227,7 +253,7 @@ export const SearchAutocomplete = forwardRef<HTMLInputElement, SearchAutocomplet
           }}
         />
       ),
-      [inputRef, placeholder, endAdornment, focused],
+      [inputRef, placeholder, endAdornment, focused]
     );
 
     const [value, setValue] = useState<Array<string | SearchOption>>([]);
@@ -235,11 +261,11 @@ export const SearchAutocomplete = forwardRef<HTMLInputElement, SearchAutocomplet
 
     useEffect(() => {
       setValue(
-        filters?.map(filter => ({
+        filters?.map((filter) => ({
           type: "filter" as const,
           id: filter,
           name: groupNames[filter as keyof typeof groupNames],
-        })) ?? [],
+        })) ?? []
       );
     }, [filters]);
 
@@ -248,34 +274,39 @@ export const SearchAutocomplete = forwardRef<HTMLInputElement, SearchAutocomplet
         return options;
       }
       const filters = value
-        .filter((value: string | SearchOption): value is SearchOption => typeof value !== "string")
+        .filter(
+          (value: string | SearchOption): value is SearchOption =>
+            typeof value !== "string"
+        )
         .map(({ id }) => id);
-      return options.filter(option => filters.includes(option.type));
+      return options.filter((option) => filters.includes(option.type));
     }, [options, value]);
 
-    const handleChange: NonNullable<AutocompleteProps["onChange"]> = useCallback(
-      (event, value, reason, details) => {
-        if (reason === "createOption") {
-          return; // Disable free solo here.
-        } else if (reason === "removeOption") {
-          setValue([]);
-        }
-        onChange?.(event, value, reason, details);
-      },
-      [onChange],
-    );
+    const handleChange: NonNullable<AutocompleteProps["onChange"]> =
+      useCallback(
+        (event, value, reason, details) => {
+          if (reason === "createOption") {
+            return; // Disable free solo here.
+          } else if (reason === "removeOption") {
+            setValue([]);
+          }
+          onChange?.(event, value, reason, details);
+        },
+        [onChange]
+      );
 
-    const handleInputChange: NonNullable<AutocompleteProps["onInputChange"]> = useCallback(
-      (event, value, reason) => {
-        if (reason === "reset") {
-          setFocused(false);
-          return; // Disable auto clear
-        }
-        setInputValue(value);
-        onInputChange?.(event, value, reason);
-      },
-      [onInputChange],
-    );
+    const handleInputChange: NonNullable<AutocompleteProps["onInputChange"]> =
+      useCallback(
+        (event, value, reason) => {
+          if (reason === "reset") {
+            setFocused(false);
+            return; // Disable auto clear
+          }
+          setInputValue(value);
+          onInputChange?.(event, value, reason);
+        },
+        [onInputChange]
+      );
 
     const open = openProp || value.length > 0 || (focused && inputValue !== "");
     return (
@@ -312,5 +343,5 @@ export const SearchAutocomplete = forwardRef<HTMLInputElement, SearchAutocomplet
         {!open && children}
       </Root>
     );
-  },
+  }
 );

@@ -1,8 +1,9 @@
 import { atom, useAtomValue, useSetAtom } from "jotai";
+import { debounce } from "lodash-es";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import invariant from "tiny-invariant";
 
-import { useDatasets } from "../../../shared/graphql";
+import { useDatasets, useEstatAreasLazy } from "../../../shared/graphql";
 import { Dataset, DatasetsQuery } from "../../../shared/graphql/types/catalog";
 import { TileFeatureIndex } from "../../../shared/plateau/layers";
 import { areasAtom } from "../../../shared/states/address";
@@ -24,7 +25,8 @@ export interface DatasetSearchOption extends SearchOption {
   dataset: DatasetsQuery["datasets"][number];
 }
 
-export interface BuildingSearchOption extends SearchOption /* , earchableFeatureRecord */ {
+export interface BuildingSearchOption
+  extends SearchOption /* , earchableFeatureRecord */ {
   datasetId: string;
   type: "building";
   featureIndex: TileFeatureIndex;
@@ -32,8 +34,8 @@ export interface BuildingSearchOption extends SearchOption /* , earchableFeature
   long?: number;
 }
 
-export interface AddressSearchOption extends SearchOption {
-  type: "address";
+export interface AreaSearchOption extends SearchOption {
+  type: "area";
 }
 
 export interface SearchOptionsParams {
@@ -48,8 +50,11 @@ function useDatasetSearchOptions({
 }: SearchOptionsParams = {}): readonly DatasetSearchOption[] {
   const areas = useAtomValue(areasAtom);
   const municipalityCodes = useMemo(
-    () => areas?.filter(area => area.type === "municipality").map(area => area.code) ?? [],
-    [areas],
+    () =>
+      areas
+        ?.filter((area) => area.type === "municipality")
+        .map((area) => area.code) ?? [],
+    [areas]
   );
   const tokens = useMemo(() => inputValue?.split(/ |\u3000/), [inputValue]);
   const query = useDatasets(
@@ -58,11 +63,11 @@ function useDatasetSearchOptions({
           searchTokens: tokens,
         }
       : municipalityCodes.length > 0
-      ? {
-          areaCodes: municipalityCodes,
-        }
-      : {},
-    { skip: skip || (!inputValue && !municipalityCodes.length) },
+        ? {
+            areaCodes: municipalityCodes,
+          }
+        : {},
+    { skip: skip || (!inputValue && !municipalityCodes.length) }
   );
 
   const layers = useAtomValue(rootLayersLayersAtom);
@@ -74,8 +79,9 @@ function useDatasetSearchOptions({
     }
     return (
       query.data?.datasets
-        .filter(dataset => {
-          const layerType = datasetTypeLayers[dataset.type.code as PlateauDatasetType];
+        .filter((dataset) => {
+          const layerType =
+            datasetTypeLayers[dataset.type.code as PlateauDatasetType];
           return (
             !layerType ||
             findLayer(layers, {
@@ -83,7 +89,7 @@ function useDatasetSearchOptions({
             }) == null
           );
         })
-        .map(dataset => ({
+        .map((dataset) => ({
           type: "dataset" as const,
           name: dataset.name,
           index: `${dataset.name}${dataset.prefecture?.name ?? ""}${dataset.city?.name ?? ""}${
@@ -103,20 +109,21 @@ function useBuildingSearchOption({
   const featureIndices = useAtomValue(
     useMemo(
       () =>
-        atom(get =>
+        atom((get) =>
           layers
             .filter(
-              (layer): layer is LayerModel<typeof BUILDING_LAYER> => layer.type === BUILDING_LAYER,
+              (layer): layer is LayerModel<typeof BUILDING_LAYER> =>
+                layer.type === BUILDING_LAYER
             )
-            .map(layer => [layer.id, get(layer.featureIndexAtom)] as const)
-            .filter((v): v is [string, TileFeatureIndex] => !!v[1]),
+            .map((layer) => [layer.id, get(layer.featureIndexAtom)] as const)
+            .filter((v): v is [string, TileFeatureIndex] => !!v[1])
         ),
-      [layers],
-    ),
+      [layers]
+    )
   );
   const [featureIndicesKey, setFeatureIndicesKey] = useState(0);
   useEffect(() => {
-    setFeatureIndicesKey(value => value + 1);
+    setFeatureIndicesKey((value) => value + 1);
   }, [featureIndices, inputValue]);
 
   return useMemo(
@@ -128,7 +135,7 @@ function useBuildingSearchOption({
         const fs =
           window.reearth?.layers?.findFeaturesByIds?.(
             featureIndex.layerId,
-            featureIndex.featureIds,
+            featureIndex.featureIds
           ) ?? [];
         const addedIds: string[] = [];
         return fs.reduce<BuildingSearchOption[]>((res, f) => {
@@ -147,20 +154,87 @@ function useBuildingSearchOption({
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [skip, featureIndices, featureIndicesKey],
+    [skip, featureIndices, featureIndicesKey]
   );
+}
+
+function useAreaSearchOptions({
+  inputValue,
+  skip = false,
+}: SearchOptionsParams = {}): readonly AreaSearchOption[] {
+  const [fetch, query] = useEstatAreasLazy();
+  const debouncedFetch = useMemo(
+    () =>
+      debounce(
+        async (...args: Parameters<typeof fetch>) => await fetch(...args),
+        200
+      ),
+    [fetch]
+  );
+
+  const [areas, setAreas] = useState(query.data?.estatAreas);
+  useEffect(() => {
+    if (!query.loading) {
+      setAreas(query.data?.estatAreas);
+    }
+  }, [query]);
+
+  const currentAreas = useAtomValue(areasAtom);
+  useEffect(() => {
+    if (skip) {
+      return;
+    }
+    let searchTokens =
+      inputValue?.split(/\s+/).filter((value) => value.length > 0) ?? [];
+    if (
+      searchTokens.length === 0 &&
+      currentAreas != null &&
+      currentAreas.length > 0
+    ) {
+      searchTokens = currentAreas
+        // Tokyo 23 wards is the only area which is not a municipality.
+        .filter((area) => area.name !== "東京都23区")
+        .map((area) => area.name);
+    }
+    if (searchTokens.length > 0) {
+      debouncedFetch({
+        variables: {
+          searchTokens,
+        },
+      })?.catch((error) => {
+        console.error(error);
+      });
+    } else {
+      setAreas([]);
+    }
+  }, [inputValue, skip, debouncedFetch, currentAreas]);
+
+  return useMemo(() => {
+    if (skip) {
+      return [];
+    }
+    return (
+      areas?.map((area) => ({
+        type: "area" as const,
+        id: area.id,
+        name: area.address,
+        bbox: area.bbox as [number, number, number, number],
+      })) ?? []
+    );
+  }, [skip, areas]);
 }
 
 export interface SearchOptions {
   datasets: readonly DatasetSearchOption[];
   buildings: readonly BuildingSearchOption[];
-  addresses: readonly AddressSearchOption[];
+  areas: readonly AreaSearchOption[];
   select: (option: SearchOption) => void;
 }
 
 export function useSearchOptions(options?: SearchOptionsParams): SearchOptions {
   const datasets = useDatasetSearchOptions(options);
   const buildings = useBuildingSearchOption(options);
+  const areas = useAreaSearchOptions(options);
   const settings = useAtomValue(settingsAtom);
   const templates = useAtomValue(templatesAtom);
 
@@ -172,12 +246,15 @@ export function useSearchOptions(options?: SearchOptionsParams): SearchOptions {
         case "dataset": {
           const datasetOption = option as DatasetSearchOption;
           const dataset = datasetOption.dataset as Dataset;
-          const type = datasetTypeLayers[dataset.type.code as PlateauDatasetType];
+          const type =
+            datasetTypeLayers[dataset.type.code as PlateauDatasetType];
           const municipalityCode = datasetOption.dataset.wardCode;
           if (type == null) {
             return;
           }
-          const filteredSettings = settings.filter(s => s.datasetId === dataset.id);
+          const filteredSettings = settings.filter(
+            (s) => s.datasetId === dataset.id
+          );
           if (type === BUILDING_LAYER) {
             addLayer(
               createRootLayerAtom({
@@ -186,7 +263,7 @@ export function useSearchOptions(options?: SearchOptionsParams): SearchOptions {
                 templates,
                 areaCode: municipalityCode,
                 currentDataId: datasetOption.dataset.items[0].id,
-              }),
+              })
             );
           } else {
             addLayer(
@@ -196,7 +273,7 @@ export function useSearchOptions(options?: SearchOptionsParams): SearchOptions {
                 templates,
                 areaCode: municipalityCode,
                 currentDataId: datasetOption.dataset.items[0].id,
-              }),
+              })
             );
           }
           break;
@@ -220,13 +297,13 @@ export function useSearchOptions(options?: SearchOptionsParams): SearchOptions {
         }
       }
     },
-    [setScreenSpaceSelection, addLayer, settings, templates],
+    [setScreenSpaceSelection, addLayer, settings, templates]
   );
 
   return {
     datasets,
     buildings,
-    addresses: [],
+    areas,
     select,
   };
 }

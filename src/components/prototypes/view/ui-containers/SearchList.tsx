@@ -1,4 +1,9 @@
-import { Button, ListItemSecondaryAction, ListSubheader, MenuList } from "@mui/material";
+import {
+  Button,
+  ListItemSecondaryAction,
+  ListSubheader,
+  MenuList,
+} from "@mui/material";
 import { useCallback, type FC, type MouseEvent } from "react";
 
 import {
@@ -10,7 +15,7 @@ import {
   type SearchOption,
 } from "../..//ui-components";
 import {
-  type AddressSearchOption,
+  type AreaSearchOption,
   type BuildingSearchOption,
   type DatasetSearchOption,
 } from "../hooks/useSearchOptions";
@@ -24,10 +29,14 @@ const OptionItem: FC<{
     (event: MouseEvent) => {
       onClick?.(event, option);
     },
-    [option, onClick],
+    [option, onClick]
   );
   return (
-    <EntityTitleButton iconComponent={iconComponent} title={option.name} onClick={handleClick} />
+    <EntityTitleButton
+      iconComponent={iconComponent}
+      title={option.name}
+      onClick={handleClick}
+    />
   );
 };
 
@@ -39,7 +48,7 @@ const FilterButton: FC<{
     (event: MouseEvent) => {
       onClick?.(event, filter);
     },
-    [filter, onClick],
+    [filter, onClick]
   );
   return (
     <Button variant="text" size="small" onClick={handleClick}>
@@ -51,7 +60,7 @@ const FilterButton: FC<{
 export interface SearchListProps {
   datasets: readonly DatasetSearchOption[];
   buildings: readonly BuildingSearchOption[];
-  addresses: readonly AddressSearchOption[];
+  areas: readonly AreaSearchOption[];
   onOptionSelect?: (event: MouseEvent, option: SearchOption) => void;
   onFiltersChange?: (event: MouseEvent, filters: string[]) => void;
 }
@@ -59,7 +68,7 @@ export interface SearchListProps {
 export const SearchList: FC<SearchListProps> = ({
   datasets,
   buildings,
-  addresses,
+  areas,
   onOptionSelect,
   onFiltersChange,
 }) => {
@@ -67,7 +76,7 @@ export const SearchList: FC<SearchListProps> = ({
     (event: MouseEvent, filter: string) => {
       onFiltersChange?.(event, [filter]);
     },
-    [onFiltersChange],
+    [onFiltersChange]
   );
 
   return (
@@ -108,14 +117,14 @@ export const SearchList: FC<SearchListProps> = ({
             />
           )),
       ]}
-      {addresses.length > 0 && [
+      {areas.length > 0 && [
         <ListSubheader key="addresses">
           周辺の住所
           <ListItemSecondaryAction>
             <FilterButton filter="address" onClick={handleClickFilter} />
           </ListItemSecondaryAction>
         </ListSubheader>,
-        ...addresses
+        ...areas
           .slice(0, 4)
           .map((option, index) => (
             <OptionItem

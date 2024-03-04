@@ -38,7 +38,7 @@ const options = [
     name: `Building ${index}`,
   })),
   ...[...Array(1000)].map((_, index) => ({
-    type: "address" as const,
+    type: "area" as const,
     name: `Address ${index}`,
   })),
 ];
@@ -63,7 +63,8 @@ const Component: FC = () => {
           placeholder="データ、エリア、場所を検索"
           options={options}
           maxHeight={maxMainHeight}
-          onFocus={handleFocus}>
+          onFocus={handleFocus}
+        >
           <Box>
             <Divider />
             {!focused ? (
@@ -84,9 +85,18 @@ const Component: FC = () => {
                     </Button>
                   </ListItemSecondaryAction>
                 </ListSubheader>
-                <EntityTitleButton iconComponent={DatasetIcon} title="Dataset" />
-                <EntityTitleButton iconComponent={DatasetIcon} title="Dataset" />
-                <EntityTitleButton iconComponent={DatasetIcon} title="Dataset" />
+                <EntityTitleButton
+                  iconComponent={DatasetIcon}
+                  title="Dataset"
+                />
+                <EntityTitleButton
+                  iconComponent={DatasetIcon}
+                  title="Dataset"
+                />
+                <EntityTitleButton
+                  iconComponent={DatasetIcon}
+                  title="Dataset"
+                />
                 <ListSubheader>
                   このエリアの建築物
                   <ListItemSecondaryAction>
@@ -95,9 +105,18 @@ const Component: FC = () => {
                     </Button>
                   </ListItemSecondaryAction>
                 </ListSubheader>
-                <EntityTitleButton iconComponent={BuildingIcon} title="Building" />
-                <EntityTitleButton iconComponent={BuildingIcon} title="Building" />
-                <EntityTitleButton iconComponent={BuildingIcon} title="Building" />
+                <EntityTitleButton
+                  iconComponent={BuildingIcon}
+                  title="Building"
+                />
+                <EntityTitleButton
+                  iconComponent={BuildingIcon}
+                  title="Building"
+                />
+                <EntityTitleButton
+                  iconComponent={BuildingIcon}
+                  title="Building"
+                />
                 <ListSubheader>
                   このエリアの住所
                   <ListItemSecondaryAction>
@@ -106,9 +125,18 @@ const Component: FC = () => {
                     </Button>
                   </ListItemSecondaryAction>
                 </ListSubheader>
-                <EntityTitleButton iconComponent={LocationIcon} title="Address" />
-                <EntityTitleButton iconComponent={LocationIcon} title="Address" />
-                <EntityTitleButton iconComponent={LocationIcon} title="Address" />
+                <EntityTitleButton
+                  iconComponent={LocationIcon}
+                  title="Address"
+                />
+                <EntityTitleButton
+                  iconComponent={LocationIcon}
+                  title="Address"
+                />
+                <EntityTitleButton
+                  iconComponent={LocationIcon}
+                  title="Address"
+                />
               </List>
             )}
           </Box>
