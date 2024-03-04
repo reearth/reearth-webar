@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
 import { startAR, stopAR, updateCompassBias, updateFov } from "./ar";
 import { useAtom } from "jotai";
 import { compassBiasAtom, fovPiOverAtom } from "./components/prototypes/view/states/ar";
 import { useDatasetById } from "./components/shared/graphql";
 import { PlateauDatasetItem } from "./components/shared/graphql/types/catalog";
+import queryString from "query-string";
 
 export default function ARView({...props}) {
   const [cesiumLoaded, setCesiumLoaded] = useState(false);
@@ -33,7 +33,8 @@ export default function ARView({...props}) {
   // TODO: ARView起動時にPLATEAU View側からidをもってくる (どういうかたちで渡ってくるか確定してほしい→ URLのクエパラからとる↓)
   // TODO: useParamsでURLのクエパラからデータセットIDを取る (県境等が判断できないのでViewから複数のid渡ってくる場合もあるため、のちほど複数IDに対応したuseDatasetsByIdを使う)
   // → id="カンマ区切りで複数" で来る
-  const { id } = useParams();
+  const searchQueryParams = queryString.parse(location.search, {arrayFormat: 'comma'});
+  console.log(searchQueryParams);
   const { data } = useDatasetById("d_13103_bldg");
   useEffect(() => {
     if (!cesiumLoaded || !data?.node) { return; }
