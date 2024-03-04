@@ -1,4 +1,11 @@
-import { ClickAwayListener, Divider, styled, Tab, tabClasses, Tabs } from "@mui/material";
+import {
+  ClickAwayListener,
+  Divider,
+  styled,
+  Tab,
+  tabClasses,
+  Tabs,
+} from "@mui/material";
 import { useAtomValue } from "jotai";
 import {
   useCallback,
@@ -36,7 +43,7 @@ const StyledScrollable = styled(Scrollable)(({ theme }) => {
   const searchHeaderHeight = "70px";
   return {
     maxHeight: `calc(${canvas?.clientHeight}px - ${theme.spacing(
-      6,
+      6
     )} - 1px - ${searchHeaderHeight})`,
   };
 });
@@ -56,7 +63,9 @@ export interface SearchAutocompletePanelProps {
   children?: ReactNode;
 }
 
-export const SearchAutocompletePanel: FC<SearchAutocompletePanelProps> = ({ children }) => {
+export const SearchAutocompletePanel: FC<SearchAutocompletePanelProps> = ({
+  children,
+}) => {
   const textFieldRef = useRef<HTMLInputElement>(null);
   const [focused, setFocused] = useState(false);
   const handleFocus = useCallback(() => {
@@ -64,12 +73,11 @@ export const SearchAutocompletePanel: FC<SearchAutocompletePanelProps> = ({ chil
   }, []);
 
   const [inputValue, setInputValue] = useState("");
-  const handleInputChange: NonNullable<SearchAutocompleteProps["onInputChange"]> = useCallback(
-    (_event, value, _reason) => {
-      setInputValue(value);
-    },
-    [],
-  );
+  const handleInputChange: NonNullable<
+    SearchAutocompleteProps["onInputChange"]
+  > = useCallback((_event, value, _reason) => {
+    setInputValue(value);
+  }, []);
 
   const deferredInputValue = useDeferredValue(inputValue);
 
@@ -79,8 +87,12 @@ export const SearchAutocompletePanel: FC<SearchAutocompletePanelProps> = ({ chil
     skip: !focused,
   });
   const options = useMemo(
-    () => [...searchOptions.datasets, ...searchOptions.buildings, ...searchOptions.addresses],
-    [searchOptions.datasets, searchOptions.buildings, searchOptions.addresses],
+    () => [
+      ...searchOptions.datasets,
+      ...searchOptions.buildings,
+      ...searchOptions.addresses,
+    ],
+    [searchOptions.datasets, searchOptions.buildings, searchOptions.addresses]
   );
 
   const selectOption = searchOptions.select;
@@ -88,35 +100,39 @@ export const SearchAutocompletePanel: FC<SearchAutocompletePanelProps> = ({ chil
     (_event: MouseEvent, option: SearchOption) => {
       selectOption(option);
     },
-    [selectOption],
+    [selectOption]
   );
 
   const [filters, setFilters] = useState<string[]>();
-  const handleFiltersChange = useCallback((_event: MouseEvent, filters: string[]) => {
-    setFilters(filters);
-  }, []);
-
-  const handleChange: NonNullable<SearchAutocompleteProps["onChange"]> = useCallback(
-    (_event, values, reason, _details) => {
-      if (reason === "removeOption") {
-        setFilters([]);
-        return;
-      }
-      const [value] = values.filter(
-        (value: SearchOption | string): value is SearchOption =>
-          typeof value !== "string" && value.type !== "filter",
-      );
-      if (value == null) {
-        return;
-      }
-      selectOption(value);
-      textFieldRef.current?.blur();
-      setFocused(false);
+  const handleFiltersChange = useCallback(
+    (_event: MouseEvent, filters: string[]) => {
+      setFilters(filters);
     },
-    [selectOption],
+    []
   );
 
-  useWindowEvent("keydown", event => {
+  const handleChange: NonNullable<SearchAutocompleteProps["onChange"]> =
+    useCallback(
+      (_event, values, reason, _details) => {
+        if (reason === "removeOption") {
+          setFilters([]);
+          return;
+        }
+        const [value] = values.filter(
+          (value: SearchOption | string): value is SearchOption =>
+            typeof value !== "string" && value.type !== "filter"
+        );
+        if (value == null) {
+          return;
+        }
+        selectOption(value);
+        textFieldRef.current?.blur();
+        setFocused(false);
+      },
+      [selectOption]
+    );
+
+  useWindowEvent("keydown", (event) => {
     // TODO: Manage shortcut globally
     if (textFieldRef.current == null) {
       return;
@@ -166,8 +182,14 @@ export const SearchAutocompletePanel: FC<SearchAutocompletePanelProps> = ({ chil
           onChange={handleChange}
           onInputChange={handleInputChange}
           endAdornment={
-            <Shortcut variant="outlined" platform={platform} shortcutKey="K" commandKey />
-          }>
+            <Shortcut
+              variant="outlined"
+              platform={platform}
+              shortcutKey="K"
+              commandKey
+            />
+          }
+        >
           <Divider />
           {!focused ? (
             children

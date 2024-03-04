@@ -8,7 +8,7 @@ export const AutoHeight = styled("div", {
   flexDirection: "column",
   width,
   height: "100%",
-  minHeight: 80,
+  minHeight: 0,
 }));
 
 export type AutoHeightProps = ComponentPropsWithRef<typeof AutoHeight>;

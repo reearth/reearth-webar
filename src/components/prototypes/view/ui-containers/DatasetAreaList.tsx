@@ -1,12 +1,24 @@
-import { useAtom, useAtomValue } from "jotai";
+import { useAtom } from "jotai";
 import { atomWithReset } from "jotai/utils";
 import { groupBy } from "lodash";
 import { useCallback, useMemo, type FC, useContext } from "react";
 import invariant from "tiny-invariant";
+import { getCesiumCanvas } from "../../../shared/reearth/utils";
 
-import { useAreaDatasets, useAreas, useDatasets } from "../../../shared/graphql";
-import { AreasQuery, DatasetFragmentFragment } from "../../../shared/graphql/types/catalog";
-import { AppOverlayLayoutContext, DatasetTreeItem, DatasetTreeView } from "../../ui-components";
+import {
+  useAreaDatasets,
+  useAreas,
+  useDatasets,
+} from "../../../shared/graphql";
+import {
+  AreasQuery,
+  DatasetFragmentFragment,
+} from "../../../shared/graphql/types/catalog";
+import {
+  AppOverlayLayoutContext,
+  DatasetTreeItem,
+  DatasetTreeView,
+} from "../../ui-components";
 import { datasetTypeNames } from "../constants/datasetTypeNames";
 import { datasetTypeOrder } from "../constants/datasetTypeOrder";
 import { PlateauDatasetType } from "../constants/plateau";
@@ -26,10 +38,12 @@ const DatasetGroup: FC<{
   if (datasets.length > 1) {
     return (
       <DatasetTreeItem nodeId={groupId} label={datasets[0].type.name}>
-        {datasets.map(dataset => (
+        {datasets.map((dataset) => (
           <DatasetListItem
             key={dataset.id}
-            municipalityCode={dataset.wardCode ?? dataset.cityCode ?? dataset.prefectureCode}
+            municipalityCode={
+              dataset.wardCode ?? dataset.cityCode ?? dataset.prefectureCode
+            }
             dataset={dataset}
             label={dataset.name}
           />
@@ -40,7 +54,11 @@ const DatasetGroup: FC<{
   return (
     <DatasetListItem
       dataset={datasets[0]}
-      municipalityCode={datasets[0].wardCode ?? datasets[0].cityCode ?? datasets[0].prefectureCode}
+      municipalityCode={
+        datasets[0].wardCode ??
+        datasets[0].cityCode ??
+        datasets[0].prefectureCode
+      }
       label={datasets[0].type.name}
     />
   );
@@ -51,12 +69,18 @@ const GlobalItem: FC<{}> = () => {
     includeTypes: ["global"],
   });
   return (
-    <DatasetTreeItem nodeId="global" label={datasetTypeNames.global} loading={query.loading}>
-      {query.data?.datasets?.map(dataset => (
+    <DatasetTreeItem
+      nodeId="global"
+      label={datasetTypeNames.global}
+      loading={query.loading}
+    >
+      {query.data?.datasets?.map((dataset) => (
         <DatasetListItem
           key={dataset.id}
           dataset={dataset}
-          municipalityCode={dataset.wardCode ?? dataset.cityCode ?? dataset.prefectureCode}
+          municipalityCode={
+            dataset.wardCode ?? dataset.cityCode ?? dataset.prefectureCode
+          }
           label={dataset.name}
         />
       ))}
@@ -69,32 +93,34 @@ const MunicipalityItem: FC<{
   parents?: string[];
 }> = ({ municipality, parents = [] }) => {
   const query = useAreaDatasets(
-    municipality.code,
+    municipality.code
     // excludeTypes: [PlateauDatasetType.UseCase, PlateauDatasetType.GenericCityObject],
   );
   const groups = useMemo(
     () =>
       query.data?.area?.datasets != null
-        ? Object.entries(groupBy(query.data.area.datasets, d => d.type.code))
+        ? Object.entries(groupBy(query.data.area.datasets, (d) => d.type.code))
             .map(([, value]) => value)
             .sort(
               (a, b) =>
                 datasetTypeOrder.indexOf(a[0].type.code as PlateauDatasetType) -
-                datasetTypeOrder.indexOf(b[0].type.code as PlateauDatasetType),
+                datasetTypeOrder.indexOf(b[0].type.code as PlateauDatasetType)
             )
-            .map(value => ({
+            .map((value) => ({
               groupId: value.map(({ id }) => id).join(":"),
               datasets: value,
             }))
         : undefined,
-    [query.data?.area?.datasets],
+    [query.data?.area?.datasets]
   );
   if (query.data?.area?.datasets.length === 1) {
     const dataset = query.data.area?.datasets[0];
     return (
       <DatasetListItem
         dataset={dataset}
-        municipalityCode={dataset.wardCode ?? dataset.cityCode ?? dataset.prefectureCode}
+        municipalityCode={
+          dataset.wardCode ?? dataset.cityCode ?? dataset.prefectureCode
+        }
         label={joinPath([...parents, municipality.name, dataset.type.name])}
       />
     );
@@ -103,10 +129,13 @@ const MunicipalityItem: FC<{
     <DatasetTreeItem
       nodeId={municipality.code}
       label={joinPath([...parents, municipality.name])}
-      loading={query.loading}>
+      loading={query.loading}
+    >
       {groups?.map(({ groupId, datasets }) => {
         invariant(query.data?.area?.code != null);
-        return <DatasetGroup key={groupId} groupId={groupId} datasets={datasets} />;
+        return (
+          <DatasetGroup key={groupId} groupId={groupId} datasets={datasets} />
+        );
       })}
     </DatasetTreeItem>
   );
@@ -119,11 +148,20 @@ const PrefectureItem: FC<{
     parentCode: prefecture.code,
   });
   if (query.data?.areas.length === 1) {
-    return <MunicipalityItem municipality={query.data.areas[0]} parents={[prefecture.name]} />;
+    return (
+      <MunicipalityItem
+        municipality={query.data.areas[0]}
+        parents={[prefecture.name]}
+      />
+    );
   }
   return (
-    <DatasetTreeItem nodeId={prefecture.code} label={prefecture.name} loading={query.loading}>
-      {query.data?.areas.map(municipality => (
+    <DatasetTreeItem
+      nodeId={prefecture.code}
+      label={prefecture.name}
+      loading={query.loading}
+    >
+      {query.data?.areas.map((municipality) => (
         <MunicipalityItem key={municipality.code} municipality={municipality} />
       ))}
     </DatasetTreeItem>
@@ -154,24 +192,27 @@ export const DatasetAreaList: FC = () => {
     (_event: unknown, nodeIds: string[]) => {
       setExpanded(nodeIds);
     },
-    [setExpanded],
+    [setExpanded]
   );
-  const { gridHeightAtom, searchHeaderHeight } = useContext(AppOverlayLayoutContext);
-  const gridHeight = useAtomValue(gridHeightAtom);
+  const { searchHeaderHeight } = useContext(AppOverlayLayoutContext);
+  // const gridHeight = useAtomValue(gridHeightAtom);
+  const canvas = getCesiumCanvas();
 
   return (
     <DatasetTreeView
       expanded={expanded}
       onNodeToggle={handleNodeToggle}
-      maxHeight={gridHeight - searchHeaderHeight}>
+      // maxHeight={gridHeight - searchHeaderHeight}>
+      maxHeight={canvas.clientHeight - searchHeaderHeight}
+    >
       {/* TODO: Suport heat-map */}
       {/* <RegionalMeshItem /> */}
       <GlobalItem />
       {query.data?.areas.map(
-        prefecture =>
+        (prefecture) =>
           prefecture.__typename === "Prefecture" && (
             <PrefectureItem key={prefecture.code} prefecture={prefecture} />
-          ),
+          )
       )}
     </DatasetTreeView>
   );
