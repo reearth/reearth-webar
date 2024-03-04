@@ -14,7 +14,7 @@ export function useReverseGeocoder(): ReverseGeocoderResult | undefined {
 
   const viewSize = useRef<number>();
 
-  const [getAreas, { data }] = useCameraAreas({
+  const { data, refetch } = useCameraAreas({
     longitude: croods.longitude ?? 0,
     latitude: croods.latitude ?? 0,
     includeRadii: true,
@@ -26,18 +26,21 @@ export function useReverseGeocoder(): ReverseGeocoderResult | undefined {
       const areas = { ...data.areas };
       if (viewSize.current) {
         const threshold = viewSize.current * 0.5;
-        areas.areas = areas.areas.filter(area => area.radius > threshold);
+        areas.areas = areas.areas.filter((area) => area.radius > threshold);
       }
       setResult(areas as ReverseGeocoderResult);
     }
   }, [data]);
 
   useEffect(() => {
-    getAreas();
-  }, [croods, getAreas]);
+    refetch();
+  }, [croods, refetch]);
 
   const updateFovInfo = useCallback(() => {
-    const fovInfo = window.reearth?.camera?.getFovInfo({ withTerrain: true, calcViewSize: true });
+    const fovInfo = window.reearth?.camera?.getFovInfo({
+      withTerrain: true,
+      calcViewSize: true,
+    });
     setCroods({
       longitude: fovInfo?.center?.lng,
       latitude: fovInfo?.center?.lat,
