@@ -5,8 +5,9 @@ import { FloatingPanel } from "../../ui-components";
 import { MainPanel } from "./MainPanel";
 
 const Root = styled(FloatingPanel)(({ theme }) => ({
-  width: 360,
-  padding: theme.spacing(1),
+  width: 300,
+  maxHeight: 300,
+  // padding: theme.spacing(1),
 }));
 
 const Title = styled("div")(({ theme }) => ({
@@ -17,6 +18,8 @@ const Title = styled("div")(({ theme }) => ({
 export const DatasetPanel: FC = () => {
   return (
     // TODO: ここのmaxHeightが設定されていないっぽいのと、都道府県のディスクロージャーを開いた瞬間に無限ループでAPIを叩いちゃうっぽくてUIブロッキングされる&リロードしてもサーバのセッションが閉じてないっぽくてウィンドウを閉じるまで再接続できなくなる
-    <MainPanel />
+    <Root>
+      <MainPanel />
+    </Root>
   );
 };
