@@ -108,6 +108,7 @@ export default function ARView({...props}) {
           text-white
           bg-black
           bg-opacity-50
+          hidden
         "
       >
         <div id="geolocation_status"></div>
