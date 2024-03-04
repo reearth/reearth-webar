@@ -10,4 +10,6 @@ export const createGeoClient = (url: string) => {
       possibleTypes: fragmentMatcher.possibleTypes,
     }),
   });
+
+  return geoClient;
 };

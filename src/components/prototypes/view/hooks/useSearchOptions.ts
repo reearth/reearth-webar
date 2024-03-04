@@ -17,8 +17,6 @@ import { type SearchOption } from "../../ui-components";
 import { BUILDING_LAYER } from "../../view-layers";
 import { datasetTypeLayers } from "../constants/datasetTypeLayers";
 import { PlateauDatasetType } from "../constants/plateau";
-// import { datasetTypeLayers } from "../constants/datasetTypeLayers";
-// import { areasAtom } from "../states/address";
 
 export interface DatasetSearchOption extends SearchOption {
   type: "dataset";

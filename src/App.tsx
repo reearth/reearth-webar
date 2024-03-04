@@ -7,18 +7,21 @@ import { ApolloProvider } from "@apollo/client";
 import { createCatalogClient } from "./components/shared/graphql/clients";
 
 function App() {
-  const url = 'https://api.plateau.reearth.io/datacatalog/graphql';
+  const catalogUrl = 'https://api.plateau.reearth.io/datacatalog/graphql';
+  const geoUrl = 'https://api.plateau.reearth.io/geo/graphql';
 
   return (
-    <ApolloProvider client={createCatalogClient(url)}>
-      <ThemeProvider theme={darkTheme}>
-        <main className="flex flex-col">
-          <Provider>
-            <AppHeader />
-            <ARView className="relative w-screen h-full" />
-          </Provider>
-        </main>
-      </ThemeProvider>
+    <ApolloProvider client={createCatalogClient(catalogUrl)}>
+      <ApolloProvider client={createCatalogClient(geoUrl)}>
+        <ThemeProvider theme={darkTheme}>
+          <main className="flex flex-col">
+            <Provider>
+              <AppHeader />
+              <ARView className="relative w-screen h-full" />
+            </Provider>
+          </main>
+        </ThemeProvider>
+      </ApolloProvider>
     </ApolloProvider>
   )
 }
