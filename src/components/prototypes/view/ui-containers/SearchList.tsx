@@ -65,6 +65,7 @@ export interface SearchListProps {
   onFiltersChange?: (event: MouseEvent, filters: string[]) => void;
 }
 
+// 検索タブを選択した際のリスト
 export const SearchList: FC<SearchListProps> = ({
   datasets,
   buildings,

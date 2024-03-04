@@ -122,6 +122,7 @@ const DatasetTypeItem: FC<{ datasetType: PlateauDatasetType }> = ({ datasetType 
   );
 };
 
+// カテゴリータブを選択した際のリスト
 export const DatasetTypeList: FC = () => {
   const [expanded, setExpanded] = useAtom(expandedAtom);
   const handleNodeToggle = useCallback(

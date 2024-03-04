@@ -185,6 +185,7 @@ const PrefectureItem: FC<{
 //   );
 // };
 
+// 都道府県タブを選択した際のリスト
 export const DatasetAreaList: FC = () => {
   const query = useAreas();
   const [expanded, setExpanded] = useAtom(expandedAtom);

@@ -42,6 +42,7 @@ export const DatasetListItem: FC<DatasetListItemProps> = ({
   // TODO: Separate into hook
   const layer = useAtomValue(
     useMemo(
+      // レイヤーのIDはデータセットIDが使用されている模様
       () => atom(get => get(rootLayersLayersAtom).find(layer => layer.id === dataset.id)),
       [dataset],
     ),
@@ -55,12 +56,17 @@ export const DatasetListItem: FC<DatasetListItemProps> = ({
   const removeLayer = useSetAtom(removeLayerAtom);
   const theme = useTheme();
   const smDown = useMediaQuery(theme.breakpoints.down("sm"));
+  // データセット行が選択された際のコールバック
+  // TODO: ここで当該のデータセットが渡ってくるので、ARViewの場合はデータセットのIDだけ使用して表示非表示を切り替えるとよさそう
   const handleClick = useCallback(() => {
     if (layerType == null) {
       return;
     }
     if (layer == null) {
       const filteredSettings = settings.filter(s => s.datasetId === dataset.id);
+      // ここでaddLayerAtomを経由してlayerAtomsAtom(rootLayersAtomのsplit)にレイヤーを追加している
+      // TODO: レイヤー機能は使用しないので、こことelseで、自前のatomにdatasetのID群を持つのが簡単そう → やっぱりレイヤー機能はUIにかなり密結合なので、今回剥がすより乗っかって使う方向でいくのがよさそう
+      // (ARViewのCesiumで表示するデータセットIDを管理するだけなら自前のIDリストで十分なのだが、追加中のレイヤー一覧からレイヤーを選択した際などに表出する、レイヤー詳細パネルをARViewでも使用したいはずなので、レイヤー機能に乗っかるしかなさそう)
       addLayer(
         createRootLayerAtom({
           dataset,
@@ -71,6 +77,7 @@ export const DatasetListItem: FC<DatasetListItemProps> = ({
         { autoSelect: !smDown },
       );
     } else {
+      // ここでremoveLayerAtomを経由してlayerAtomsAtom(rootLayersAtomのsplit)からレイヤーを削除している
       removeLayer(layer.id);
     }
   }, [
