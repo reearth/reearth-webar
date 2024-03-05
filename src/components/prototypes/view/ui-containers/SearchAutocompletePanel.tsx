@@ -90,9 +90,9 @@ export const SearchAutocompletePanel: FC<SearchAutocompletePanelProps> = ({
     () => [
       ...searchOptions.datasets,
       ...searchOptions.buildings,
-      ...searchOptions.areas,
+      ...searchOptions.addresses,
     ],
-    [searchOptions.datasets, searchOptions.buildings, searchOptions.areas]
+    [searchOptions.datasets, searchOptions.buildings, searchOptions.addresses]
   );
 
   const selectOption = searchOptions.select;
@@ -204,7 +204,7 @@ export const SearchAutocompletePanel: FC<SearchAutocompletePanelProps> = ({
                 <SearchList
                   datasets={searchOptions.datasets}
                   buildings={searchOptions.buildings}
-                  areas={searchOptions.areas}
+                  areas={searchOptions.addresses}
                   onOptionSelect={handleOptionSelect}
                   onFiltersChange={handleFiltersChange}
                 />
