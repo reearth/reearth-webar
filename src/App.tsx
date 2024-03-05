@@ -4,15 +4,15 @@ import { AppHeader } from "./components/prototypes/view/ui-containers/AppHeader"
 import ARView from "./ARView";
 import { Provider } from "jotai";
 import { ApolloProvider } from "@apollo/client";
-import { createCatalogClient } from "./components/shared/graphql/clients";
+import { createCatalogClient, createGeoClient } from "./components/shared/graphql/clients";
 
 function App() {
   const catalogUrl = 'https://api.plateau.reearth.io/datacatalog/graphql';
-  const geoUrl = 'https://api.plateau.reearth.io/geo/graphql';
+  const geoUrl = 'https://geo.plateau.reearth.io/';
 
   return (
     <ApolloProvider client={createCatalogClient(catalogUrl)}>
-      <ApolloProvider client={createCatalogClient(geoUrl)}>
+      <ApolloProvider client={createGeoClient(geoUrl)}>
         <ThemeProvider theme={darkTheme}>
           <main className="flex flex-col">
             <Provider>
