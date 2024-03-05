@@ -1,9 +1,8 @@
 import { atom, useAtomValue, useSetAtom } from "jotai";
-import { debounce } from "lodash-es";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import invariant from "tiny-invariant";
 
-import { useDatasets, useEstatAreasLazy } from "../../../shared/graphql";
+import { useDatasets } from "../../../shared/graphql";
 import { Dataset, DatasetsQuery } from "../../../shared/graphql/types/catalog";
 import { TileFeatureIndex } from "../../../shared/plateau/layers";
 import { areasAtom } from "../../../shared/states/address";
@@ -32,8 +31,8 @@ export interface BuildingSearchOption
   long?: number;
 }
 
-export interface AreaSearchOption extends SearchOption {
-  type: "area";
+export interface AddressSearchOption extends SearchOption {
+  type: "address";
 }
 
 export interface SearchOptionsParams {
@@ -50,8 +49,8 @@ function useDatasetSearchOptions({
   const municipalityCodes = useMemo(
     () =>
       areas
-        ?.filter((area) => area.type === "municipality")
-        .map((area) => area.code) ?? [],
+        ?.filter((address) => address.type === "municipality")
+        .map((address) => address.code) ?? [],
     [areas]
   );
   const tokens = useMemo(() => inputValue?.split(/ |\u3000/), [inputValue]);
@@ -156,83 +155,16 @@ function useBuildingSearchOption({
   );
 }
 
-function useAreaSearchOptions({
-  inputValue,
-  skip = false,
-}: SearchOptionsParams = {}): readonly AreaSearchOption[] {
-  const [fetch, query] = useEstatAreasLazy();
-  const debouncedFetch = useMemo(
-    () =>
-      debounce(
-        async (...args: Parameters<typeof fetch>) => await fetch(...args),
-        200
-      ),
-    [fetch]
-  );
-
-  const [areas, setAreas] = useState(query.data?.estatAreas);
-  useEffect(() => {
-    if (!query.loading) {
-      setAreas(query.data?.estatAreas);
-    }
-  }, [query]);
-
-  const currentAreas = useAtomValue(areasAtom);
-  useEffect(() => {
-    if (skip) {
-      return;
-    }
-    let searchTokens =
-      inputValue?.split(/\s+/).filter((value) => value.length > 0) ?? [];
-    if (
-      searchTokens.length === 0 &&
-      currentAreas != null &&
-      currentAreas.length > 0
-    ) {
-      searchTokens = currentAreas
-        // Tokyo 23 wards is the only area which is not a municipality.
-        .filter((area) => area.name !== "東京都23区")
-        .map((area) => area.name);
-    }
-    if (searchTokens.length > 0) {
-      debouncedFetch({
-        variables: {
-          searchTokens,
-        },
-      })?.catch((error) => {
-        console.error(error);
-      });
-    } else {
-      setAreas([]);
-    }
-  }, [inputValue, skip, debouncedFetch, currentAreas]);
-
-  return useMemo(() => {
-    if (skip) {
-      return [];
-    }
-    return (
-      areas?.map((area) => ({
-        type: "area" as const,
-        id: area.id,
-        name: area.address,
-        bbox: area.bbox as [number, number, number, number],
-      })) ?? []
-    );
-  }, [skip, areas]);
-}
-
 export interface SearchOptions {
   datasets: readonly DatasetSearchOption[];
   buildings: readonly BuildingSearchOption[];
-  areas: readonly AreaSearchOption[];
+  addresses: readonly AddressSearchOption[];
   select: (option: SearchOption) => void;
 }
 
 export function useSearchOptions(options?: SearchOptionsParams): SearchOptions {
   const datasets = useDatasetSearchOptions(options);
   const buildings = useBuildingSearchOption(options);
-  const areas = useAreaSearchOptions(options);
   const settings = useAtomValue(settingsAtom);
   const templates = useAtomValue(templatesAtom);
 
@@ -301,7 +233,7 @@ export function useSearchOptions(options?: SearchOptionsParams): SearchOptions {
   return {
     datasets,
     buildings,
-    areas,
+    addresses: [],
     select,
   };
 }

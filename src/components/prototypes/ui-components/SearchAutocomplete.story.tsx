@@ -38,7 +38,7 @@ const options = [
     name: `Building ${index}`,
   })),
   ...[...Array(1000)].map((_, index) => ({
-    type: "area" as const,
+    type: "address" as const,
     name: `Address ${index}`,
   })),
 ];

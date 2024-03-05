@@ -98,7 +98,7 @@ export type SearchOptionType =
   | "history"
   | "dataset"
   | "building"
-  | "area";
+  | "address";
 
 function isSearchOptionType(
   value: unknown
@@ -107,7 +107,7 @@ function isSearchOptionType(
     value === "history" ||
     value === "dataset" ||
     value === "building" ||
-    value === "area"
+    value === "address"
   );
 }
 
@@ -125,14 +125,14 @@ const iconComponents: Record<
   history: HistoryIcon,
   dataset: DatasetIcon,
   building: BuildingIcon,
-  area: AddressIcon,
+  address: AddressIcon,
 };
 
 const groupNames: Record<Exclude<SearchOptionType, "filter">, string> = {
   history: "最近の検索",
   dataset: "データセット",
   building: "建築物",
-  area: "エリア",
+  address: "住所",
 };
 
 function getOptionLabel(value: string | SearchOption): string {
