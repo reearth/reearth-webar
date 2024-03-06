@@ -39,7 +39,7 @@ import {
 import { LayerModel } from "../../view-layers";
 import { ComponentAtom } from "../../view-layers/component";
 import { useIsMultipleSelectableField } from "../hooks/useIsMultipleSelectableField";
-// import { BuildingFilterSection } from "../selection/BuildingFilterSection";
+import { BuildingFilterSection } from "../selection/BuildingFilterSection";
 
 import { LayerTilesetClippingField } from "./3dtiles/LayerTilesetClippingField";
 // import { LayerTilesetFillColorConditionField } from "./3dtiles/LayerTilesetFillColorConditionField";
@@ -229,36 +229,36 @@ export const Fields: FC<Props> = ({ layers, type, atoms }) => {
       );
       break;
     }
-    // case TILESET_BUILDING_MODEL_FILTER: {
-    //   component = (
-    //     <BuildingFilterSection
-    //       type="number"
-    //       label="フィルター（建物モデル）"
-    //       layers={layers}
-    //       atoms={
-    //         atoms as ComponentAtom<
-    //           "TILESET_BUILDING_MODEL_FILTER" | "TILESET_FLOOD_MODEL_FILTER"
-    //         >["atom"][]
-    //       }
-    //     />
-    //   );
-    //   break;
-    // }
-    // case TILESET_FLOOD_MODEL_FILTER: {
-    //   component = (
-    //     <BuildingFilterSection
-    //       type="qualitative"
-    //       label="フィルター（浸水想定区域）"
-    //       layers={layers}
-    //       atoms={
-    //         atoms as ComponentAtom<
-    //           "TILESET_BUILDING_MODEL_FILTER" | "TILESET_FLOOD_MODEL_FILTER"
-    //         >["atom"][]
-    //       }
-    //     />
-    //   );
-    //   break;
-    // }
+    case TILESET_BUILDING_MODEL_FILTER: {
+      component = (
+        <BuildingFilterSection
+          type="number"
+          label="フィルター（建物モデル）"
+          layers={layers}
+          atoms={
+            atoms as ComponentAtom<
+              "TILESET_BUILDING_MODEL_FILTER" | "TILESET_FLOOD_MODEL_FILTER"
+            >["atom"][]
+          }
+        />
+      );
+      break;
+    }
+    case TILESET_FLOOD_MODEL_FILTER: {
+      component = (
+        <BuildingFilterSection
+          type="qualitative"
+          label="フィルター（浸水想定区域）"
+          layers={layers}
+          atoms={
+            atoms as ComponentAtom<
+              "TILESET_BUILDING_MODEL_FILTER" | "TILESET_FLOOD_MODEL_FILTER"
+            >["atom"][]
+          }
+        />
+      );
+      break;
+    }
   }
 
   if (!component) return null;
