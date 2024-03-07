@@ -1,14 +1,21 @@
 import { useEffect, useState } from "react";
-import { startAR, stopAR, updateCompassBias, updateFov } from "./ar";
-import { useAtom } from "jotai";
-import { compassBiasAtom, fovPiOverAtom } from "./components/prototypes/view/states/ar";
-import { useDatasetById } from "./components/shared/graphql";
-import { PlateauDatasetItem } from "./components/shared/graphql/types/catalog";
+import { startAR, stopAR, resetTileset, updateCompassBias, updateFov } from "./ar";
+import { useAtom, useAtomValue } from "jotai";
 import queryString from "query-string";
+import { useDatasetById, useDatasetsByIds } from "./components/shared/graphql";
+import { PlateauDatasetItem } from "./components/shared/graphql/types/catalog";
+import { rootLayersAtom } from "./components/shared/states/rootLayer";
+import { compassBiasAtom, fovPiOverAtom } from "./components/prototypes/view/states/ar";
 
 export default function ARView({...props}) {
+  // 初期化フラグ
   const [cesiumLoaded, setCesiumLoaded] = useState(false);
   const [isARStarted, setIsARStarted] = useState(false);
+  // データセットパネルに追加されたレイヤー群
+  const rootLayers = useAtomValue(rootLayersAtom);
+  // UIのステート
+  const [compassBias] = useAtom(compassBiasAtom);
+  const [fovPiOver] = useAtom(fovPiOverAtom);
 
   // CDNからCesiumを読み込むバージョン
   useEffect(() => {
@@ -71,9 +78,15 @@ export default function ARView({...props}) {
   // 一旦はURLからの表示と検索が動けばSTG出せる。データセットパネルの中での詳細なモデルのプロパティ操作にも追って対応必要
   // AR View 側でデータセットを変更した際に、リロードしてもそれが再現できるようにURLのクエパラもAR View側で書き換える機能は Nice to Have
 
-  // UIのステートを取得
-  const [compassBias] = useAtom(compassBiasAtom);
-  const [fovPiOver] = useAtom(fovPiOverAtom);
+  // データセットパネルに追加されたレイヤーをもとにARViewで表示するTilesetをリセット
+  useEffect(() => {
+    if (!isARStarted) { return; }
+    const datasetIds = rootLayers.map(rootLayer => rootLayer.rawDataset.id);
+    const { data } = useDatasetsByIds(datasetIds);
+    const tilesetUrls = data.nodes.flatMap(node => node.items.map(item => item.url));
+    resetTileset(tilesetUrls);
+  }, [rootLayers]);
+
   // UIのステート変更を監視してVMに反映
   useEffect(() => {
     if (!isARStarted) { return; }
