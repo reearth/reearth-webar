@@ -616,6 +616,13 @@ function setupUserInput() {
   const handler = new Cesium.ScreenSpaceEventHandler(cesiumViewer.scene.canvas);
   handler.setInputAction(function onLeftClick(movement) {
     const pickedFeature = cesiumViewer.scene.pick(movement.position);
+    console.log("pickedFeature: ", pickedFeature);
+    if (pickedFeature instanceof Cesium.Cesium3DTileFeature) {
+
+      console.log("pickedFeature is 3DTiles: ", pickedFeature.tileset.properties);
+    } else {
+      console.log("pickedFeature: its not a 3DTileFeature");
+    }
     if (Cesium.defined(pickedFeature)) {
       // selectedには3DTilesのFeatureをそのまま突っ込めるのでprimitiveにはアクセスしなくてよい
       selectedFeatures = [pickedFeature];
