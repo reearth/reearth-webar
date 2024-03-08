@@ -668,6 +668,20 @@ export function stopAR() {
   cleanUpCesium();
 }
 
+// ARViewで表示するTilesetをリセット
+export async function resetTileset(tilesetUrls) {
+  cesiumViewer.scene.primitives.removeAll();
+  const plateauTilesets = tilesetUrls.map(tilesetUrl => Cesium.Cesium3DTileset.fromUrl(tilesetUrl));
+  await plateauTilesets.map(tileset => cesiumViewer.scene.primitives.add(tileset));
+  // try {
+  //   const plateauTileset = await Cesium.Cesium3DTileset.fromUrl(tilesetUrl);
+  //   console.log("Success loading tileset");
+  //   cesiumViewer.scene.primitives.add(plateauTileset);
+  // } catch (error) {
+  //   console.log(`Error loading tileset: ${error}`);
+  // }
+}
+
 // オクルージョン表示を更新
 export function updateOcclusion(shouldHideOtherBldgs) {
   if (Boolean(shouldHideOtherBldgs)) {

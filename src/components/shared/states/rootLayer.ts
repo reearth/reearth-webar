@@ -15,7 +15,7 @@ export const addedDatasetIdList = sharedStoreAtom(
 );
 
 export const rootLayersBaseAtom = atomWithReset<RootLayerConfig[]>([]);
-// 今回は使用しないが、追加中のレイヤーの一覧はここで持っているっぽい
+// 追加中のレイヤーの一覧はここで持っているっぽい
 // RootLayerConfigの配列となっていて、RootLayerConfigは rawDataset: DatasetFragmentFragment を持っている
 // よって、一応ARViewでもrootLayersAtomを利用してあげることもできるが、ARViewではレイヤー機能?は使用しないと思われるので、自前で管理しても良さそうではある
 export const rootLayersAtom = sharedStoreAtomWrapper("ROOT_LAYERS", rootLayersBaseAtom);
