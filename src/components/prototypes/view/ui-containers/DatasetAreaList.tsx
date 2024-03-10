@@ -3,7 +3,6 @@ import { atomWithReset } from "jotai/utils";
 import { groupBy } from "lodash";
 import { useCallback, useMemo, type FC, useContext } from "react";
 import invariant from "tiny-invariant";
-import { getCesiumCanvas } from "../../../shared/reearth/utils";
 
 import {
   useAreaDatasets,
@@ -218,15 +217,12 @@ export const DatasetAreaList: FC = () => {
     [setExpanded]
   );
   const { searchHeaderHeight } = useContext(AppOverlayLayoutContext);
-  // const gridHeight = useAtomValue(gridHeightAtom);
-  const canvas = getCesiumCanvas();
 
   return (
     <DatasetTreeView
       expanded={expanded}
       onNodeToggle={handleNodeToggle}
-      // maxHeight={gridHeight - searchHeaderHeight}>
-      maxHeight={canvas.clientHeight - searchHeaderHeight}
+      maxheight={window.innerHeight - searchHeaderHeight}
     >
       {/* TODO: Suport heat-map */}
       {/* <RegionalMeshItem /> */}
