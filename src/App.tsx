@@ -1,3 +1,4 @@
+import { BrowserRouter } from "react-router-dom";
 import { ThemeProvider } from "@mui/material";
 import { darkTheme } from "./components/prototypes/ui-components";
 import { AppHeader } from "./components/prototypes/view/ui-containers/AppHeader";
@@ -11,18 +12,20 @@ function App() {
   const geoUrl = 'https://geo.plateau.reearth.io/';
 
   return (
-    <ApolloProvider client={createCatalogClient(catalogUrl)}>
-      <ApolloProvider client={createGeoClient(geoUrl)}>
-        <ThemeProvider theme={darkTheme}>
-          <main className="flex flex-col">
-            <Provider>
-              <AppHeader />
-              <ARView className="relative w-screen h-full" />
-            </Provider>
-          </main>
-        </ThemeProvider>
+    <BrowserRouter>
+      <ApolloProvider client={createCatalogClient(catalogUrl)}>
+        <ApolloProvider client={createGeoClient(geoUrl)}>
+          <ThemeProvider theme={darkTheme}>
+            <main className="flex flex-col">
+              <Provider>
+                <AppHeader />
+                <ARView className="relative w-screen h-full" />
+              </Provider>
+            </main>
+          </ThemeProvider>
+        </ApolloProvider>
       </ApolloProvider>
-    </ApolloProvider>
+    </BrowserRouter>
   )
 }
 
