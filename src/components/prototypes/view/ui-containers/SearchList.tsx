@@ -15,7 +15,7 @@ import {
   type SearchOption,
 } from "../..//ui-components";
 import {
-  type AreaSearchOption,
+  type AddressSearchOption,
   type BuildingSearchOption,
   type DatasetSearchOption,
 } from "../hooks/useSearchOptions";
@@ -60,7 +60,7 @@ const FilterButton: FC<{
 export interface SearchListProps {
   datasets: readonly DatasetSearchOption[];
   buildings: readonly BuildingSearchOption[];
-  areas: readonly AreaSearchOption[];
+  areas: readonly AddressSearchOption[];
   onOptionSelect?: (event: MouseEvent, option: SearchOption) => void;
   onFiltersChange?: (event: MouseEvent, filters: string[]) => void;
 }

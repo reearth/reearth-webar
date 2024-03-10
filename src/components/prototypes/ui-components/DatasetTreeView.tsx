@@ -11,7 +11,7 @@ const StyledTreeView = styled(TreeView)<{ maxHeight?: number }>(({ theme, maxHei
   maxHeight,
 }));
 
-export type DatasetTreeViewProps = TreeViewProps & { maxHeight?: number };
+export type DatasetTreeViewProps = TreeViewProps & { maxheight?: number };
 
 export const DatasetTreeView: FC<DatasetTreeViewProps> = props => (
   <StyledTreeView
