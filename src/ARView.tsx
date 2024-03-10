@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { startAR, stopAR, resetTileset, updateCompassBias, updateFov } from "./ar";
 import { useAtom, useAtomValue } from "jotai";
+import { useSearchParams } from "react-router-dom";
 import queryString from "query-string";
 import { useDatasetById, useDatasetsByIds } from "./components/shared/graphql";
 import { PlateauDataset, PlateauDatasetItem } from "./components/shared/graphql/types/catalog";
@@ -38,14 +39,15 @@ export default function ARView({...props}) {
   // 一旦はURLからの表示と検索が動けばSTG出せる。データセットパネルの中での詳細なモデルのプロパティ操作にも追って対応必要
   // AR View 側でデータセットを変更した際に、リロードしてもそれが再現できるようにURLのクエパラもAR View側で書き換える機能は Nice to Have
 
-  // 開始時にクエパラでデータセットIDを指定された場合にARViewの初期化に使用するtilesetURL
+  // 開始時にクエパラでデータセットIDを指定された場合にARViewの初期化に使用するtilesetURL (レンダリング毎に忘却したいのでStateにはしない)
   let initialTilesetUrls: string[];
   // クエパラを見てPLATEAU ViewからのデータセットID群の初期値が来ていれば取得し、tilesetURL群に変換
   const searchQueryParams = queryString.parse(location.search, {arrayFormat: 'comma'});
-  let initialDatasetIds = searchQueryParams.id;
+  let initialDatasetIds = searchQueryParams.id ?? [];
   if (typeof initialDatasetIds === 'string') { initialDatasetIds = [initialDatasetIds]; }
-  if (initialDatasetIds) {
-    const { data } = useDatasetsByIds(initialDatasetIds);
+  // フックの数を変えないためにもしクエパラがundefinedでも空配列で必ずクエリを呼び出す
+  const { data } = useDatasetsByIds(initialDatasetIds);
+  if (data) {
     const initialPlateauDatasets = data.nodes as [PlateauDataset];
     // useDatasetsByIdsクエリが中身のあるデータを返してくるまでは待機
     if (initialPlateauDatasets) {
@@ -87,12 +89,15 @@ export default function ARView({...props}) {
   }, [cesiumLoaded, initialTilesetUrls]);
 
   // データセットパネルに追加されたレイヤー群
-  const [rootLayers, setRootLayers] = useAtom(rootLayersAtom);
-  // データセットパネルのレイヤー群が変化したらARViewを再レンダリング
-  // useEffect(() => {
-  //   const datasetIds = rootLayers.map(rootLayer => rootLayer.rawDataset.id);
-  //   setDatasetIds(datasetIds);
-  // }, [rootLayers]);
+  const rootLayers = useAtomValue(rootLayersAtom);
+  // クエパラの逆セットに使用
+  let [searchParams, setSearchParams] = useSearchParams();
+  // データセットパネルのレイヤー群が変化したらクエパラを更新してARViewを再レンダリング
+  useEffect(() => {
+    if (!rootLayers.length) { return; }
+    const datasetIds = rootLayers.map(rootLayer => rootLayer.rawDataset.id);
+    setSearchParams({id: datasetIds.join()});
+  }, [rootLayers]);
 
   // UIのステート変更を監視してVMに反映
   const [compassBias] = useAtom(compassBiasAtom);
