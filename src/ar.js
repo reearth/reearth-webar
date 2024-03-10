@@ -615,14 +615,7 @@ function orientationTrackingProcess(event) {
 function setupUserInput() {
   const handler = new Cesium.ScreenSpaceEventHandler(cesiumViewer.scene.canvas);
   handler.setInputAction(function onLeftClick(movement) {
-    const pickedFeature = cesiumViewer.scene.pick(movement.position);
-    console.log("pickedFeature: ", pickedFeature);
-    if (pickedFeature instanceof Cesium.Cesium3DTileFeature) {
-
-      console.log("pickedFeature is 3DTiles: ", pickedFeature.tileset.properties);
-    } else {
-      console.log("pickedFeature: its not a 3DTileFeature");
-    }
+    const pickedFeature = cesiumViewer.scene.pick(movement.position);    
     if (Cesium.defined(pickedFeature)) {
       // selectedには3DTilesのFeatureをそのまま突っ込めるのでprimitiveにはアクセスしなくてよい
       selectedFeatures = [pickedFeature];
@@ -634,6 +627,22 @@ function setupUserInput() {
   }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 }
 
+let pickedFeatureCallback = null;
+export function pickUpFeature(callback) {
+  pickedFeatureCallback = callback;
+  const handler = new Cesium.ScreenSpaceEventHandler(cesiumViewer.scene.canvas);
+  let pickedFeature;
+
+  handler.setInputAction(function onLeftClick(movement) {
+    pickedFeature = cesiumViewer.scene.pick(movement.position);
+    console.log("pickedFeature: ", pickedFeature);
+
+    // pickedFeatureの値が更新されたら、コールバック関数を呼び出す
+    if (pickedFeatureCallback) {
+      pickedFeatureCallback(pickedFeature);
+    }
+  }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+}
 // Lifecycle
 
 // ARを開始

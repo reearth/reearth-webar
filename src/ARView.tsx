@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { startAR, stopAR, resetTileset, updateCompassBias, updateFov } from "./ar";
+import { startAR, stopAR, resetTileset, updateCompassBias, updateFov, pickUpFeature } from "./ar";
 import { useAtom, useAtomValue } from "jotai";
 import queryString from "query-string";
 import { useDatasetById, useDatasetsByIds } from "./components/shared/graphql";
@@ -17,6 +17,8 @@ export default function ARView({...props}) {
   const [compassBias] = useAtom(compassBiasAtom);
   const [fovPiOver] = useAtom(fovPiOverAtom);
 
+  // 選択したCesium上のオブジェクトのステート
+  const [selectedFeature, setSelectedFeature] = useState(null);
   // CDNからCesiumを読み込むバージョン
   useEffect(() => {
     const script = document.createElement('script');
@@ -68,6 +70,14 @@ export default function ARView({...props}) {
         }
       }
     }
+
+    // ar.jsからFeatureをクリックした際のpropertiesを取得
+    const handlePickedFeature = (pickedFeature) => {
+      console.log('pickedFeature updated:', pickedFeature);
+      setSelectedFeature(pickedFeature);
+    };
+    pickUpFeature(handlePickedFeature);
+
     return () => {
       stopAR();
       setIsARStarted(false);
