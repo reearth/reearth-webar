@@ -139,7 +139,7 @@ export const DatasetTypeList: FC = () => {
     <DatasetTreeView
       expanded={expanded}
       onNodeToggle={handleNodeToggle}
-      maxHeight={gridHeight - searchHeaderHeight}>
+      maxheight={gridHeight - searchHeaderHeight}>
       {datasetTypeOrder.map(datasetType => (
         <DatasetTypeItem key={datasetType} datasetType={datasetType} />
       ))}
