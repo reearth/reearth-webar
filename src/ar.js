@@ -667,11 +667,14 @@ export function startAR(tilesetUrls) {
           if (response === "granted") {
             window.alert("ジャイロセンサーの使用を許可しました");
             startOrientationTracking();
+          } else {
+            window.alert(response);
           }
         })
-        .catch(console.error);
-    } else {
-      window.alert("ジャイロセンサーの使用を許可しないとARが正常に動作しません");
+        .catch(e =>{
+          console.error(e);
+          window.alert("ジャイロセンサーの使用を許可しないとARが正常に動作しません");
+        });
     }
   } else {
     startOrientationTracking();
