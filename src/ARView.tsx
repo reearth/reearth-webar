@@ -59,15 +59,15 @@ export default function ARView({...props}) {
 
   // CDNからCesiumを読み込むバージョン
   const [cesiumLoaded, setCesiumLoaded] = useState(false);
-  const [, setCesiumLoadedAtom] = useAtom(cesiumLoadedAtom);
+  // const [, setCesiumLoadedAtom] = useAtom(cesiumLoadedAtom);
   useEffect(() => {
-    setCesiumLoadedAtom(false);
+    // setCesiumLoadedAtom(false);
     const script = document.createElement('script');
     script.src = 'https://cesium.com/downloads/cesiumjs/releases/1.114/Build/Cesium/Cesium.js';
     script.async = true;
     script.onload = () => {
       setCesiumLoaded(true);
-      setCesiumLoadedAtom(true);
+      // setCesiumLoadedAtom(true);
     }
     document.body.appendChild(script);
 
