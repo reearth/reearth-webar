@@ -344,8 +344,8 @@ function gpsTrackingProcess(pos) {
   //   60
   // ); // 東京タワー前
   // const destination = Cesium.Cartesian3.fromDegrees(140.38804838405298, 37.39840050666605, 400); // 郡山駅前
-  // const destination = Cesium.Cartesian3.fromDegrees(long, lat, 300);
-  const destination = Cesium.Cartesian3.fromDegrees(long, lat, alt);
+  const destination = Cesium.Cartesian3.fromDegrees(long, lat, 300);
+  // const destination = Cesium.Cartesian3.fromDegrees(long, lat, alt);
 
   // カメラ座標を更新
   moveCesiumCamera(destination);
