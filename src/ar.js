@@ -670,6 +670,8 @@ export function startAR(tilesetUrls) {
           }
         })
         .catch(console.error);
+    } else {
+      window.alert("ジャイロセンサーの使用を許可しないとARが正常に動作しません");
     }
   } else {
     startOrientationTracking();
