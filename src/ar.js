@@ -526,7 +526,7 @@ function orientationTrackingProcess(event) {
   //   - https://en.wikipedia.org/wiki/Local_tangent_plane_coordinates
   // - WGS84の楕円体の中心を基準とした3次元直交座標
 
-  // IMUによるセンサ値は地面に対して水平を基準とした値であるため、これをもとに構成した回転行列は、ローカル地平直交座標系における回転行列である。
+  // によるセンサ値は地面に対して水平を基準とした値であるため、これをもとに構成した回転行列は、ローカル地平直交座標系における回転行列である。
   // よって、ローカル地平直交座標系における回転を、WGS84の固定参照フレームにおける回転に変換してやる必要がある。
   // https://en.wikipedia.org/wiki/Axes_conventions
   // https://en.wikipedia.org/wiki/Geographic_coordinate_conversion
@@ -665,6 +665,7 @@ export function startAR(tilesetUrls) {
       DeviceOrientationEvent.requestPermission()
         .then((response) => {
           if (response === "granted") {
+            window.alert("ジャイロセンサーの使用を許可しました");
             startOrientationTracking();
           }
         })
