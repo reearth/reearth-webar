@@ -637,11 +637,14 @@ export function pickUpFeature(callback) {
 
   handler.setInputAction(function onLeftClick(movement) {
     pickedFeature = cesiumViewer.scene.pick(movement.position);
-    console.log("pickedFeature: ", pickedFeature);
+    if (Cesium.defined(pickedFeature)) {
 
-    // pickedFeatureの値が更新されたら、コールバック関数を呼び出す
-    if (pickedFeatureCallback) {
-      pickedFeatureCallback(pickedFeature);
+      console.log("pickedFeature: ", pickedFeature);
+
+      // pickedFeatureの値が更新されたら、コールバック関数を呼び出す
+      if (pickedFeatureCallback) {
+        pickedFeatureCallback(pickedFeature);
+      }
     }
   }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 }
@@ -711,3 +714,4 @@ export function updateCompassBias(compassBias) {
   viewModel.compassBias = compassBias;
   console.log("compass bias (VM): ", viewModel.compassBias);
 }
+

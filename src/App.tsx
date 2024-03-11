@@ -3,6 +3,7 @@ import { ThemeProvider } from "@mui/material";
 import { darkTheme } from "./components/prototypes/ui-components";
 import { AppHeader } from "./components/prototypes/view/ui-containers/AppHeader";
 import ARView from "./ARView";
+import AROverlayView from "./AROverlayView";
 import { Provider } from "jotai";
 import { ApolloProvider } from "@apollo/client";
 import { createCatalogClient, createGeoClient } from "./components/shared/graphql/clients";
@@ -19,6 +20,7 @@ function App() {
             <main className="flex flex-col">
               <Provider>
                 <AppHeader />
+                {/* <AROverlayView /> */}
                 <ARView className="relative w-screen h-full" />
               </Provider>
             </main>

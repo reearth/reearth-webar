@@ -7,7 +7,7 @@ import queryString from "query-string";
 import { useDatasetById, useDatasetsByIds } from "./components/shared/graphql";
 import { PlateauDataset, PlateauDatasetItem } from "./components/shared/graphql/types/catalog";
 import { rootLayersAtom } from "./components/shared/states/rootLayer";
-import { compassBiasAtom, fovPiOverAtom } from "./components/prototypes/view/states/ar";
+import { compassBiasAtom, fovPiOverAtom, cesiumLoadedAtom } from "./components/prototypes/view/states/ar";
 
 function tilesetUrls(plateauDatasets: [PlateauDataset]): string[] {
   return plateauDatasets.map(plateauDataset => {
@@ -53,19 +53,22 @@ export default function ARView({...props}) {
     // useDatasetsByIdsクエリが中身のあるデータを返してくるまでは待機
     if (initialPlateauDatasets) {
       initialTilesetUrls = tilesetUrls(initialPlateauDatasets);
-      console.log(initialTilesetUrls);
+      console.log("initialTilesetUrls: ", initialTilesetUrls);
     }
   }
 
-  // 選択したCesium上のオブジェクトのステート
-  const [selectedFeature, setSelectedFeature] = useState(null);
   // CDNからCesiumを読み込むバージョン
   const [cesiumLoaded, setCesiumLoaded] = useState(false);
+  const [, setCesiumLoadedAtom] = useAtom(cesiumLoadedAtom);
   useEffect(() => {
+    setCesiumLoadedAtom(false);
     const script = document.createElement('script');
     script.src = 'https://cesium.com/downloads/cesiumjs/releases/1.114/Build/Cesium/Cesium.js';
     script.async = true;
-    script.onload = () => setCesiumLoaded(true);
+    script.onload = () => {
+      setCesiumLoaded(true);
+      setCesiumLoadedAtom(true);
+    }
     document.body.appendChild(script);
 
     return () => {
@@ -82,17 +85,11 @@ export default function ARView({...props}) {
   const [isARStarted, setIsARStarted] = useState(false);
   useEffect(() => {
 
-    // ar.jsからFeatureをクリックした際のpropertiesを取得
-    const handlePickedFeature = (pickedFeature) => {
-      console.log('pickedFeature updated:', pickedFeature);
-      setSelectedFeature(pickedFeature);
-    };
-    pickUpFeature(handlePickedFeature);
-
     if (!cesiumLoaded || !initialTilesetUrls) { return; }
     startAR(initialTilesetUrls);
     setIsARStarted(true);
-  
+    
+
     return () => {
       stopAR();
       setIsARStarted(false);
@@ -113,6 +110,8 @@ export default function ARView({...props}) {
   // UIのステート変更を監視してVMに反映
   const [compassBias] = useAtom(compassBiasAtom);
   const [fovPiOver] = useAtom(fovPiOverAtom);
+  // const [selectedFeature, setSelectedFeature] = useAtom(selectedFeatureAtom);
+
   useEffect(() => {
     if (!isARStarted) { return; }
     console.log("compass bias (UI): ", compassBias);
@@ -123,6 +122,7 @@ export default function ARView({...props}) {
     console.log("fov pi over (UI): ", fovPiOver);
     updateFov(fovPiOver);
   }, [fovPiOver]);
+
 
   return (
     <div {...props}>
@@ -156,6 +156,7 @@ export default function ARView({...props}) {
           value="iOSのIMUを許可"
           id="ios_imu_permission_button"
         />
+        
         <div id="ar_debug_toolbox">
           <table>
             <tbody>
