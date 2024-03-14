@@ -19,10 +19,10 @@ export const AppHeader: FC = () => {
       <Space flexible />
       <DatasetButton />
       <CompassBiasButton />
+      <FovButton />
       <AppIconButton title="表示モード">
         <BuildingIcon />
       </AppIconButton>
-      <FovButton />
     </AppBar>
   );
 };

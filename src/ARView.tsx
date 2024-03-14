@@ -1,4 +1,3 @@
-
 import { useEffect, useMemo, useState } from "react";
 import { startAR, stopAR, resetTileset, updateCompassBias, updateFov, pickUpFeature } from "./ar";
 import { useAtom, useAtomValue } from "jotai";
