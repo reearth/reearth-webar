@@ -13,20 +13,20 @@ function tilesetUrls(plateauDatasets: [PlateauDataset]): string[] {
   return plateauDatasets.map(plateauDataset => {
     const plateauDatasetItems = plateauDataset.items as [PlateauDatasetItem];
     // LOD2(テクスチャあり)->LOD2(テクスチャなし)->LOD1の順でフォールバック
-    const tilesetUrlLod2Tex = plateauDatasetItems.find(({ lod, texture }) => lod == 2 && texture == "TEXTURE").url
-    if (tilesetUrlLod2Tex) {
+    const tilesetUrlLod2TexItem = plateauDatasetItems.find(({ lod, texture }) => lod == 2 && texture == "TEXTURE")
+    if (tilesetUrlLod2TexItem && tilesetUrlLod2TexItem.url) {
       // console.log("LOD2 with Texture Tileset Exists: ", tilesetUrlLod2Tex);
-      return tilesetUrlLod2Tex;
+      return tilesetUrlLod2TexItem.url;
     } else {
-      const tilesetUrlLod2NoneTex = plateauDatasetItems.find(({ lod, texture }) => lod == 2 && texture == "NONE").url
-      if (tilesetUrlLod2NoneTex) {
+      const tilesetUrlLod2NoneTexItem = plateauDatasetItems.find(({ lod, texture }) => lod == 2 && texture == "NONE")
+      if (tilesetUrlLod2NoneTexItem && tilesetUrlLod2NoneTexItem.url) {
         // console.log("LOD2 with No Texture Tileset Exists: ", tilesetUrlLod2NoneTex);
-        return tilesetUrlLod2NoneTex;
+        return tilesetUrlLod2NoneTexItem.url;
       } else {
-        const tilesetUrlLod1 = plateauDatasetItems.find(({ lod }) => lod == 1).url
-        if (tilesetUrlLod1) {
+        const tilesetUrlLod1Item = plateauDatasetItems.find(({ lod }) => lod == 1)
+        if (tilesetUrlLod1Item && tilesetUrlLod1Item.url) {
           // console.log("LOD1 Tileset Exists: ", tilesetUrlLod1);
-          return tilesetUrlLod1;
+          return tilesetUrlLod1Item.url;
         } else {
           return null;
         }
