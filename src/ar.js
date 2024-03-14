@@ -282,7 +282,7 @@ async function startDeviceCameraPreview() {
 
 // Cesiumのカメラ座標を更新
 function moveCesiumCamera(destination) {
-  console.log(`camera moved: ${destination}`);
+  // console.log(`camera moved: ${destination}`);
   cesiumCamera.setView({
     destination: destination,
     // orientation: isios ? oldHeadingPitchRoll : { direction: oldDirection, up: oldUp }
@@ -293,10 +293,15 @@ function moveCesiumCamera(destination) {
 
 // Cesiumのカメラ姿勢を更新
 function poseCesiumCamera(orientation) {
-  cesiumCamera.setView({
-    destination: oldDestination,
-    orientation: orientation,
-  });
+  // destinationが初期化時のCartesian3(0,0,0)の場合はCesium.CameraのsetViewが内部で高度を算出できずエラーとなり、
+  // その際の迂回処理がCesiumで提供されておらず、Cesiumがそのままエラーを吐いて止まるだけの仕様のため、その間はsetViewしない
+  const cartographic = Cesium.Cartographic.fromCartesian(oldDestination);
+  if (cartographic && cartographic.height) {
+    cesiumCamera.setView({
+      destination: oldDestination,
+      orientation: orientation,
+    });
+  }
   oldDirection = orientation.direction;
   oldUp = orientation.up;
 }
