@@ -7,6 +7,10 @@ import queryString from "query-string";
 import { useDatasetById, useDatasetsByIds } from "./components/shared/graphql";
 import { PlateauDataset, PlateauDatasetItem } from "./components/shared/graphql/types/catalog";
 import { rootLayersAtom } from "./components/shared/states/rootLayer";
+import { createRootLayerAtom } from "./components/shared/view-layers";
+import { settingsAtom } from "./components/shared/states/setting";
+import { templatesAtom } from "./components/shared/states/template";
+import { removeLayerAtom, useAddLayer } from "./components/prototypes/layers";
 import { compassBiasAtom, fovPiOverAtom, cesiumLoadedAtom } from "./components/prototypes/view/states/ar";
 
 function tilesetUrls(plateauDatasets: [PlateauDataset]): string[] {
@@ -33,10 +37,8 @@ function tilesetUrls(plateauDatasets: [PlateauDataset]): string[] {
 }
 
 export default function ARView({...props}) {
-  // TODO: View3.0からdatasetが全く選択されない状態でもAR Viewは起動できるので、ARView側でもデータセット検索機能は必要なのでパネルのフル機能で実装する
-  // 一旦はURLからの表示と検索が動けばSTG出せる。データセットパネルの中での詳細なモデルのプロパティ操作にも追って対応必要
-  // AR View 側でデータセットを変更した際に、リロードしてもそれが再現できるようにURLのクエパラもAR View側で書き換える機能は Nice to Have
-
+  // 開始時にクエパラでデータセットIDを指定された場合にデータセットパネルの初期化に使用するデータセット群 (レンダリング毎に忘却したいのでStateにはしない)
+  let initialPlateauDatasets: [PlateauDataset];
   // 開始時にクエパラでデータセットIDを指定された場合にARViewの初期化に使用するtilesetURL (レンダリング毎に忘却したいのでStateにはしない)
   let initialTilesetUrls: string[];
   // クエパラを見てPLATEAU ViewからのデータセットID群の初期値が来ていれば取得し、tilesetURL群に変換
@@ -46,7 +48,7 @@ export default function ARView({...props}) {
   // フックの数を変えないためにもしクエパラがundefinedでも空配列で必ずクエリを呼び出す
   const { data } = useDatasetsByIds(initialDatasetIds);
   if (data) {
-    const initialPlateauDatasets = data.nodes as [PlateauDataset];
+    initialPlateauDatasets = data.nodes as [PlateauDataset];
     // useDatasetsByIdsクエリが中身のあるデータを返してくるまでは待機
     if (initialPlateauDatasets) {
       initialTilesetUrls = tilesetUrls(initialPlateauDatasets);
@@ -54,7 +56,49 @@ export default function ARView({...props}) {
     }
   }
 
-  // CDNからCesiumを読み込むバージョン
+  // データセットパネルに追加されたレイヤー群と関連フック
+  const rootLayers = useAtomValue(rootLayersAtom);
+  const addLayer = useAddLayer();
+  const settings = useAtomValue(settingsAtom);
+  const templates = useAtomValue(templatesAtom);
+
+  // クエパラから来たデータセットID群をデータセットパネルに同期
+  useEffect(() => {
+    if (!initialPlateauDatasets || !initialPlateauDatasets.length) { return; }
+    initialPlateauDatasets.map(dataset => {
+      const datasetId = dataset.id;
+      const rootLayersDatasetIds = rootLayers.map(rootLayer => rootLayer.rawDataset.id);
+      if (rootLayersDatasetIds.includes(datasetId)) { return; }
+      const filteredSettings = settings.filter(s => s.datasetId === datasetId);
+      addLayer(
+        createRootLayerAtom({
+          dataset,
+          settings: filteredSettings,
+          templates,
+          areaCode: dataset.wardCode,
+        }),
+        // { autoSelect: !smDown }, // TODO: ここの挙動追う
+      );
+    });
+
+    return () => {
+      // TODO: クリーンアップ
+    };
+  }, [initialPlateauDatasets]);
+
+  // データセットパネルのレイヤー群が変化したらクエパラを更新してARViewを再レンダリング
+  let [searchParams, setSearchParams] = useSearchParams();
+  useEffect(() => {
+    if (!rootLayers.length) { return; }
+    const datasetIds = rootLayers.map(rootLayer => rootLayer.rawDataset.id);
+    setSearchParams({id: datasetIds.join()});
+
+    return () => {
+      setSearchParams({});
+    };
+  }, [rootLayers]);
+
+  // CDNからCesiumを読み込む
   const [cesiumLoaded, setCesiumLoaded] = useState(false);
   // const [, setCesiumLoadedAtom] = useAtom(cesiumLoadedAtom);
   useEffect(() => {
@@ -91,22 +135,10 @@ export default function ARView({...props}) {
     };
   }, [cesiumLoaded, initialTilesetUrls]);
 
-  // データセットパネルに追加されたレイヤー群
-  const rootLayers = useAtomValue(rootLayersAtom);
-  // クエパラの逆セットに使用
-  let [searchParams, setSearchParams] = useSearchParams();
-  // データセットパネルのレイヤー群が変化したらクエパラを更新してARViewを再レンダリング
-  useEffect(() => {
-    if (!rootLayers.length) { return; }
-    const datasetIds = rootLayers.map(rootLayer => rootLayer.rawDataset.id);
-    setSearchParams({id: datasetIds.join()});
-  }, [rootLayers]);
-
   // UIのステート変更を監視してVMに反映
   const [compassBias] = useAtom(compassBiasAtom);
   const [fovPiOver] = useAtom(fovPiOverAtom);
   // const [selectedFeature, setSelectedFeature] = useAtom(selectedFeatureAtom);
-
   useEffect(() => {
     if (!isARStarted) { return; }
     console.log("compass bias (UI): ", compassBias);
