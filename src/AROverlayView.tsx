@@ -5,6 +5,7 @@ import { compassBiasAtom, fovPiOverAtom, cesiumLoadedAtom, arStartedAtom } from 
 
 export default function AROverlayView({...props}) {
   // const cesiumLoaded = useAtomValue(cesiumLoadedAtom);
+  // const [selectedFeature, setSelectedFeature] = useAtom(selectedFeatureAtom);
   // useEffect(() => {
   //   if (!cesiumLoaded) { return; }
   //   console.log('cesiumLoaded:', cesiumLoaded);
@@ -20,7 +21,6 @@ export default function AROverlayView({...props}) {
   const arStarted = useAtomValue(arStartedAtom);
   const compassBias = useAtomValue(compassBiasAtom);
   const fovPiOver = useAtomValue(fovPiOverAtom);
-  // const [selectedFeature, setSelectedFeature] = useAtom(selectedFeatureAtom);
   useEffect(() => {
     if (!arStarted) { return; }
     console.log("compass bias (UI): ", compassBias);
