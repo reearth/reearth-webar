@@ -20,7 +20,7 @@ function App() {
             <main className="flex flex-col">
               <Provider>
                 <AppHeader />
-                {/* <AROverlayView /> */}
+                <AROverlayView />
                 <ARView className="relative w-screen h-full" />
               </Provider>
             </main>

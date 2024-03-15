@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { startAR, stopAR, resetTileset, updateCompassBias, updateFov, pickUpFeature } from "./ar";
-import { useAtom, useAtomValue } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useSearchParams } from "react-router-dom";
 import queryString from "query-string";
 import { useDatasetById, useDatasetsByIds } from "./components/shared/graphql";
@@ -10,7 +10,7 @@ import { createRootLayerAtom } from "./components/shared/view-layers";
 import { settingsAtom } from "./components/shared/states/setting";
 import { templatesAtom } from "./components/shared/states/template";
 import { removeLayerAtom, useAddLayer } from "./components/prototypes/layers";
-import { compassBiasAtom, fovPiOverAtom, cesiumLoadedAtom } from "./components/prototypes/view/states/ar";
+import { cesiumLoadedAtom, arStartedAtom } from "./components/prototypes/view/states/ar";
 
 function tilesetUrls(plateauDatasets: [PlateauDataset]): string[] {
   return plateauDatasets.map(plateauDataset => {
@@ -98,21 +98,19 @@ export default function ARView({...props}) {
   }, [rootLayers]);
 
   // CDNからCesiumを読み込む
-  const [cesiumLoaded, setCesiumLoaded] = useState(false);
-  // const [, setCesiumLoadedAtom] = useAtom(cesiumLoadedAtom);
+  const [cesiumLoaded, setCesiumLoaded] = useAtom(cesiumLoadedAtom);
   useEffect(() => {
-    // setCesiumLoadedAtom(false);
     const script = document.createElement('script');
     script.src = 'https://cesium.com/downloads/cesiumjs/releases/1.114/Build/Cesium/Cesium.js';
     script.async = true;
     script.onload = () => {
       setCesiumLoaded(true);
-      // setCesiumLoadedAtom(true);
     }
     document.body.appendChild(script);
 
     return () => {
       document.body.removeChild(script);
+      setCesiumLoaded(false);
     };
   }, []);
   // パッケージからCesiumを読込む場合は単にこれでOK
@@ -122,32 +120,17 @@ export default function ARView({...props}) {
   // }, []);
 
   // AR View 起動
-  const [isARStarted, setIsARStarted] = useState(false);
+  const setArStarted = useSetAtom(arStartedAtom);
   useEffect(() => {
     if (!cesiumLoaded || !initialTilesetUrls) { return; }
     startAR(initialTilesetUrls);
-    setIsARStarted(true);
+    setArStarted(true);
 
     return () => {
       stopAR();
-      setIsARStarted(false);
+      setArStarted(false);
     };
   }, [cesiumLoaded, initialTilesetUrls]);
-
-  // UIのステート変更を監視してVMに反映
-  const [compassBias] = useAtom(compassBiasAtom);
-  const [fovPiOver] = useAtom(fovPiOverAtom);
-  // const [selectedFeature, setSelectedFeature] = useAtom(selectedFeatureAtom);
-  useEffect(() => {
-    if (!isARStarted) { return; }
-    console.log("compass bias (UI): ", compassBias);
-    updateCompassBias(compassBias);
-  }, [compassBias]);
-  useEffect(() => {
-    if (!isARStarted) { return; }
-    console.log("fov pi over (UI): ", fovPiOver);
-    updateFov(fovPiOver);
-  }, [fovPiOver]);
 
   return (
     <div {...props}>
