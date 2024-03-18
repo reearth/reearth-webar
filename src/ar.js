@@ -40,7 +40,7 @@ function detectIsIos() {
   }
   return false; // ブラウザ環境でない場合はfalseを返す
 }
-const isios = detectIsIos();
+export const isios = detectIsIos();
 
 // スロットリング
 function throttle(fn, delay) {
@@ -276,6 +276,8 @@ async function startDeviceCameraPreview() {
     devicCameraPreview.srcObject =
       await navigator.mediaDevices.getUserMedia(constraints);
   } catch (err) {
+    // window.alert(window.isSecurityContext);
+    // window.alert(err.toString());
     console.log(err.toString());
   }
 }
@@ -629,6 +631,25 @@ function setupUserInput() {
   }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 }
 
+export let isImuPermissionGranted = false;
+export function requestImuPermission() {
+  DeviceOrientationEvent.requestPermission()
+    .then((response) => {
+      if (response === "granted") {
+        isImuPermissionGranted = true;
+        startOrientationTracking();
+      } else {
+        window.alert(response);
+        window.alert("ジャイロセンサーの使用を許可しないとARが正常に動作しません");
+        isImuPermissionGranted = false;
+        // requestImuPermission();
+      }
+    })
+    .catch(e =>{
+      window.alert(e);
+    });
+}
+
 let pickedFeatureCallback = null;
 export function pickUpFeature(callback) {
   pickedFeatureCallback = callback;
@@ -648,6 +669,7 @@ export function pickUpFeature(callback) {
     }
   }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 }
+
 // Lifecycle
 
 // ARを開始
@@ -660,21 +682,10 @@ export function startAR(tilesetUrls) {
   startGpsTracking();
   // iOSではパーミッション取ってからIMUの値を読む
   if (isios) {
-    const imuGranted = window.confirm("ジャイロセンサーの使用を許可します");
-    if (imuGranted) {
-      DeviceOrientationEvent.requestPermission()
-        .then((response) => {
-          if (response === "granted") {
-            window.alert("ジャイロセンサーの使用を許可しました");
-            startOrientationTracking();
-          } else {
-            window.alert(response);
-          }
-        })
-        .catch(e =>{
-          console.error(e);
-          window.alert("ジャイロセンサーの使用を許可しないとARが正常に動作しません");
-        });
+    if (!isImuPermissionGranted) {
+      window.alert("ARを正常に動作させるためジャイロセンサーの使用を許可してください");
+      // 直接ユーザータップのイベントでrequestしないと無効になるため、ARView側のボタンで発動させる
+      // requestImuPermission();
     }
   } else {
     startOrientationTracking();

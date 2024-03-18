@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
-import { startAR, stopAR, resetTileset, updateCompassBias, updateFov, pickUpFeature } from "./ar";
+import { startAR, stopAR, isios, isImuPermissionGranted, requestImuPermission, resetTileset, updateCompassBias, updateFov, pickUpFeature } from "./ar";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useSearchParams } from "react-router-dom";
 import queryString from "query-string";
+import { FloatingButton } from "./components/prototypes/ui-components";
 import { useDatasetById, useDatasetsByIds } from "./components/shared/graphql";
 import { PlateauDataset, PlateauDatasetItem } from "./components/shared/graphql/types/catalog";
 import { rootLayersAtom } from "./components/shared/states/rootLayer";
@@ -144,6 +145,16 @@ export default function ARView({...props}) {
         id="cesium_container"
         className="absolute top-0 left-0 w-full h-full"
       ></div>
+      {isios && !isImuPermissionGranted &&
+        // <div className="absolute top-2 right-2">
+        //   <input type="button" value="iOSのジャイロセンサを許可" onClick={requestImuPermission} />
+        // </div>
+        <div className="absolute top-2 right-2">
+          <FloatingButton onClick={requestImuPermission}>
+            iOSのジャイロセンサを許可
+          </FloatingButton>
+        </div>
+      }
       <div
         id="status_container"
         className="
