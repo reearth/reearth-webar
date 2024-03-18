@@ -41,6 +41,7 @@ export default function ARView({...props}) {
   // 開始時にクエパラでデータセットIDを指定された場合にARViewの初期化に使用するtilesetURL (レンダリング毎に忘却したいのでStateにはしない)
   let initialTilesetUrls: string[];
   // クエパラを見てPLATEAU ViewからのデータセットID群の初期値が来ていれば取得し、tilesetURL群に変換
+  // クエパラはこんな感じで来る ?dataList=[{"datasetId":"d_13101_bldg","dataId":"di_13101_bldg_LOD1"}]
   const searchQueryParams = queryString.parse(location.search, {arrayFormat: 'comma'});
   let initialDatasetIds = searchQueryParams.id ?? [];
   if (typeof initialDatasetIds === 'string') { initialDatasetIds = [initialDatasetIds]; }
