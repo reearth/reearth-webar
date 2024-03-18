@@ -236,7 +236,7 @@ export const SliderParameterItem = forwardRef<HTMLDivElement, InternalSliderPara
           }
           {...bindTrigger(popupState)}
         />
-        <Popover
+        {/* <Popover
           {...bindPopover(popupState)}
           anchorOrigin={{
             horizontal: "center",
@@ -246,7 +246,7 @@ export const SliderParameterItem = forwardRef<HTMLDivElement, InternalSliderPara
             horizontal: "center",
             vertical: "top",
           }}
-          marginThreshold={8}>
+          marginThreshold={8}> */}
           <PopoverContent sx={{ width }}>
             <StyledSlider
               size="small"
@@ -261,7 +261,7 @@ export const SliderParameterItem = forwardRef<HTMLDivElement, InternalSliderPara
               mixed={value === MIXED}
             />
           </PopoverContent>
-        </Popover>
+        {/* </Popover> */}
       </>
     );
   },
