@@ -72,7 +72,7 @@ function throttle(fn, delay) {
 async function setupCesiumViewer(tilesetUrls) {
   // Set Tokens
   Cesium.Ion.defaultAccessToken =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIyYzI5NjUxNS1hOGMyLTRhNzQtYmZhOS1jZTRjMWRlZjgyYjkiLCJpZCI6MTE4NjE3LCJpYXQiOjE2NzEyNjQ3OTZ9.8kWsf2_D2q67-ANppVkQohAVYlNlVEaz1axTHikskMQ";
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJlY2EyZTg0NS04Y2VlLTRjNmEtYTIxZS0zODdlNjlkZWE2OGQiLCJpZCI6MTQ5ODk3LCJpYXQiOjE2OTEwNTU3OTV9.LJmPN5Q_QDbxCHxtWVBOB9Y13E-VySEmyiauA6BllwU";
 
   // Initialize the Cesium Viewer in the HTML element with the `cesiumContainer` ID.
   cesiumViewer = new Cesium.Viewer("cesium_container", {
