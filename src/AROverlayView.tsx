@@ -32,5 +32,5 @@ export default function AROverlayView({...props}) {
     updateFov(fovPiOver);
   }, [fovPiOver]);
 
-  return <div>AROverlayView</div>;
+  return <div {...props}>AROverlayView</div>;
 }
