@@ -93,6 +93,10 @@ export type AreasInput = {
 /** 市区町村 */
 export type City = Area & Node & {
   __typename?: 'City';
+  /** CityGMLデータセット。 */
+  citygml?: Maybe<CityGmlDataset>;
+  /** CityGMLデータセットのID。 */
+  citygmlId?: Maybe<Scalars['ID']['output']>;
   /** 市区町村コード。先頭に都道府県コードを含む5桁の数字から成る文字列です。 */
   code: Scalars['AreaCode']['output'];
   /** 市区町村に属するデータセット（DatasetInput内のareasCodeの指定は無視されます）。 */
@@ -124,6 +128,38 @@ export type CityDatasetsArgs = {
   input?: InputMaybe<DatasetsInput>;
 };
 
+/** PLATEAU標準製品仕様書に基づくCityGMLのデータセット。 */
+export type CityGmlDataset = Node & {
+  __typename?: 'CityGMLDataset';
+  /** 管理者用 */
+  admin?: Maybe<Scalars['Any']['output']>;
+  /** データセットが属する市。 */
+  city: City;
+  /** データセットが属する市コード。先頭に都道府県コードを含む5桁の数字から成る文字列です。 */
+  cityCode: Scalars['AreaCode']['output'];
+  /** データセットが属する市のID。 */
+  cityId: Scalars['ID']['output'];
+  /** CityGMLが含む地物型コードのリスト。 */
+  featureTypes: Array<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  /** データセットが準拠するPLATEAU都市モデルの仕様。 */
+  plateauSpecMinor: PlateauSpecMinor;
+  /** データセットが準拠するPLATEAU都市モデルの仕様のマイナーバージョンへのID。 */
+  plateauSpecMinorId: Scalars['ID']['output'];
+  /** データセットが属する都道府県。 */
+  prefecture: Prefecture;
+  /** データセットが属する都道府県コード。2桁の数字から成る文字列です。 */
+  prefectureCode: Scalars['AreaCode']['output'];
+  /** データセットが属する都道府県のID。 */
+  prefectureId: Scalars['ID']['output'];
+  /** データセットの登録年度（西暦）。 */
+  registrationYear: Scalars['Int']['output'];
+  /** CityGMLのzip形式のファイルのURL。 */
+  url: Scalars['String']['output'];
+  /** データセットの整備年度（西暦）。 */
+  year: Scalars['Int']['output'];
+};
+
 /** データセット。 */
 export type Dataset = {
   /** 管理者用 */
@@ -143,12 +179,16 @@ export type Dataset = {
   items: Array<DatasetItem>;
   /** データセット名 */
   name: Scalars['String']['output'];
+  /** データセットの公開データのURL。 */
+  openDataUrl?: Maybe<Scalars['String']['output']>;
   /** データセットが属する都道府県。 */
   prefecture?: Maybe<Prefecture>;
   /** データセットが属する都道府県コード。2桁の数字から成る文字列です。 */
   prefectureCode?: Maybe<Scalars['AreaCode']['output']>;
   /** データセットが属する都道府県のID。 */
   prefectureId?: Maybe<Scalars['ID']['output']>;
+  /** データセットの登録年度（西暦） */
+  registerationYear: Scalars['Int']['output'];
   /** データセットの種類。 */
   type: DatasetType;
   /** データセットの種類コード。 */
@@ -161,7 +201,7 @@ export type Dataset = {
   wardCode?: Maybe<Scalars['AreaCode']['output']>;
   /** データセットが属する区のID。 */
   wardId?: Maybe<Scalars['ID']['output']>;
-  /** データセットの公開年度（西暦） */
+  /** データセットの整備年度（西暦） */
   year: Scalars['Int']['output'];
 };
 
@@ -260,6 +300,8 @@ export type DatasetsInput = {
   includeTypes?: InputMaybe<Array<Scalars['String']['input']>>;
   /** 仕様書のバージョン。「第2.3版」「2.3」「2」などの文字列が使用可能です。 */
   plateauSpec?: InputMaybe<Scalars['String']['input']>;
+  /** データの公開年度（西暦）。 */
+  registrationYear?: InputMaybe<Scalars['Int']['input']>;
   /** 検索文字列。複数指定するとAND条件で絞り込み検索が行えます。 */
   searchTokens?: InputMaybe<Array<Scalars['String']['input']>>;
   /**
@@ -268,7 +310,7 @@ export type DatasetsInput = {
    * 例えば、札幌市を対象にした場合、札幌市には中央区や北区といった区のデータセットも存在しますが、trueにすると札幌市のデータセットのみを返します。
    */
   shallow?: InputMaybe<Scalars['Boolean']['input']>;
-  /** データの整備年度または公開年度（西暦）。 */
+  /** データの整備年度（西暦）。 */
   year?: InputMaybe<Scalars['Int']['input']>;
 };
 
@@ -300,12 +342,16 @@ export type GenericDataset = Dataset & Node & {
   items: Array<GenericDatasetItem>;
   /** データセット名 */
   name: Scalars['String']['output'];
+  /** データセットの公開データのURL。 */
+  openDataUrl?: Maybe<Scalars['String']['output']>;
   /** データセットが属する都道府県。 */
   prefecture?: Maybe<Prefecture>;
   /** データセットが属する都道府県コード。2桁の数字から成る文字列です。 */
   prefectureCode?: Maybe<Scalars['AreaCode']['output']>;
   /** データセットが属する都道府県のID。 */
   prefectureId?: Maybe<Scalars['ID']['output']>;
+  /** データセットの公開年度（西暦） */
+  registerationYear: Scalars['Int']['output'];
   /** データセットの種類。 */
   type: GenericDatasetType;
   /** データセットの種類コード。 */
@@ -318,7 +364,7 @@ export type GenericDataset = Dataset & Node & {
   wardCode?: Maybe<Scalars['AreaCode']['output']>;
   /** データセットが属する区のID。 */
   wardId?: Maybe<Scalars['ID']['output']>;
-  /** データセットの公開年度（西暦） */
+  /** データセットの整備年度（西暦） */
   year: Scalars['Int']['output'];
 };
 
@@ -391,6 +437,8 @@ export type PlateauDataset = Dataset & Node & {
   items: Array<PlateauDatasetItem>;
   /** データセット名 */
   name: Scalars['String']['output'];
+  /** データセットの公開データのURL。 */
+  openDataUrl?: Maybe<Scalars['String']['output']>;
   /** データセットが準拠するPLATEAU都市モデルの仕様。 */
   plateauSpecMinor: PlateauSpecMinor;
   /** データセットが準拠するPLATEAU都市モデルの仕様のマイナーバージョンへのID。 */
@@ -401,6 +449,8 @@ export type PlateauDataset = Dataset & Node & {
   prefectureCode?: Maybe<Scalars['AreaCode']['output']>;
   /** データセットが属する都道府県のID。 */
   prefectureId?: Maybe<Scalars['ID']['output']>;
+  /** データセットの公開年度（西暦） */
+  registerationYear: Scalars['Int']['output'];
   /** 河川。地物型が洪水浸水想定区域モデル（fld）の場合のみ存在します。 */
   river?: Maybe<River>;
   /** データセットのサブコード。都市計画決定情報の○○区域や洪水浸水想定区域の河川名などのコード表現が含まれます。 */
@@ -421,7 +471,7 @@ export type PlateauDataset = Dataset & Node & {
   wardCode?: Maybe<Scalars['AreaCode']['output']>;
   /** データセットが属する区のID。 */
   wardId?: Maybe<Scalars['ID']['output']>;
-  /** データセットの公開年度（西暦） */
+  /** データセットの整備年度（西暦） */
   year: Scalars['Int']['output'];
 };
 
@@ -630,12 +680,16 @@ export type RelatedDataset = Dataset & Node & {
   items: Array<RelatedDatasetItem>;
   /** データセット名 */
   name: Scalars['String']['output'];
+  /** データセットの公開データのURL。 */
+  openDataUrl?: Maybe<Scalars['String']['output']>;
   /** データセットが属する都道府県。 */
   prefecture?: Maybe<Prefecture>;
   /** データセットが属する都道府県コード。2桁の数字から成る文字列です。 */
   prefectureCode?: Maybe<Scalars['AreaCode']['output']>;
   /** データセットが属する都道府県のID。 */
   prefectureId?: Maybe<Scalars['ID']['output']>;
+  /** データセットの公開年度（西暦） */
+  registerationYear: Scalars['Int']['output'];
   /** データセットの種類。 */
   type: RelatedDatasetType;
   /** データセットの種類コード。 */
@@ -648,7 +702,7 @@ export type RelatedDataset = Dataset & Node & {
   wardCode?: Maybe<Scalars['AreaCode']['output']>;
   /** データセットが属する区のID。 */
   wardId?: Maybe<Scalars['ID']['output']>;
-  /** データセットの公開年度（西暦） */
+  /** データセットの整備年度（西暦） */
   year: Scalars['Int']['output'];
 };
 
@@ -801,14 +855,14 @@ export type DatasetByIdQueryVariables = Exact<{
 }>;
 
 
-export type DatasetByIdQuery = { __typename?: 'Query', node?: { __typename?: 'City' } | { __typename?: 'GenericDataset', id: string, name: string, description?: string | null, year: number, groups?: Array<string> | null, prefectureId?: string | null, prefectureCode?: any | null, cityId?: string | null, cityCode?: any | null, wardId?: string | null, wardCode?: any | null, admin?: any | null, items: Array<{ __typename?: 'GenericDatasetItem', id: string, format: DatasetFormat, name: string, url: string, layers?: Array<string> | null }>, prefecture?: { __typename?: 'Prefecture', name: string, code: any } | null, city?: { __typename?: 'City', name: string, code: any } | null, ward?: { __typename?: 'Ward', name: string, code: any } | null, type: { __typename?: 'GenericDatasetType', id: string, code: string, name: string, category: DatasetTypeCategory, order: number } } | { __typename?: 'GenericDatasetItem' } | { __typename?: 'GenericDatasetType' } | { __typename?: 'PlateauDataset', subname?: string | null, id: string, name: string, description?: string | null, year: number, groups?: Array<string> | null, prefectureId?: string | null, prefectureCode?: any | null, cityId?: string | null, cityCode?: any | null, wardId?: string | null, wardCode?: any | null, admin?: any | null, items: Array<{ __typename?: 'PlateauDatasetItem', id: string, format: DatasetFormat, name: string, url: string, layers?: Array<string> | null, lod?: number | null, texture?: Texture | null }>, prefecture?: { __typename?: 'Prefecture', name: string, code: any } | null, city?: { __typename?: 'City', name: string, code: any } | null, ward?: { __typename?: 'Ward', name: string, code: any } | null, type: { __typename?: 'PlateauDatasetType', id: string, code: string, name: string, category: DatasetTypeCategory, order: number } } | { __typename?: 'PlateauDatasetItem' } | { __typename?: 'PlateauDatasetType' } | { __typename?: 'PlateauSpec' } | { __typename?: 'PlateauSpecMinor' } | { __typename?: 'Prefecture' } | { __typename?: 'RelatedDataset', id: string, name: string, description?: string | null, year: number, groups?: Array<string> | null, prefectureId?: string | null, prefectureCode?: any | null, cityId?: string | null, cityCode?: any | null, wardId?: string | null, wardCode?: any | null, admin?: any | null, items: Array<{ __typename?: 'RelatedDatasetItem', id: string, format: DatasetFormat, name: string, url: string, layers?: Array<string> | null }>, prefecture?: { __typename?: 'Prefecture', name: string, code: any } | null, city?: { __typename?: 'City', name: string, code: any } | null, ward?: { __typename?: 'Ward', name: string, code: any } | null, type: { __typename?: 'RelatedDatasetType', id: string, code: string, name: string, category: DatasetTypeCategory, order: number } } | { __typename?: 'RelatedDatasetItem' } | { __typename?: 'RelatedDatasetType' } | { __typename?: 'Ward' } | null };
+export type DatasetByIdQuery = { __typename?: 'Query', node?: { __typename?: 'City' } | { __typename?: 'CityGMLDataset' } | { __typename?: 'GenericDataset', id: string, name: string, description?: string | null, year: number, groups?: Array<string> | null, prefectureId?: string | null, prefectureCode?: any | null, cityId?: string | null, cityCode?: any | null, wardId?: string | null, wardCode?: any | null, admin?: any | null, items: Array<{ __typename?: 'GenericDatasetItem', id: string, format: DatasetFormat, name: string, url: string, layers?: Array<string> | null }>, prefecture?: { __typename?: 'Prefecture', name: string, code: any } | null, city?: { __typename?: 'City', name: string, code: any } | null, ward?: { __typename?: 'Ward', name: string, code: any } | null, type: { __typename?: 'GenericDatasetType', id: string, code: string, name: string, category: DatasetTypeCategory, order: number } } | { __typename?: 'GenericDatasetItem' } | { __typename?: 'GenericDatasetType' } | { __typename?: 'PlateauDataset', subname?: string | null, id: string, name: string, description?: string | null, year: number, groups?: Array<string> | null, prefectureId?: string | null, prefectureCode?: any | null, cityId?: string | null, cityCode?: any | null, wardId?: string | null, wardCode?: any | null, admin?: any | null, items: Array<{ __typename?: 'PlateauDatasetItem', id: string, format: DatasetFormat, name: string, url: string, layers?: Array<string> | null, lod?: number | null, texture?: Texture | null }>, prefecture?: { __typename?: 'Prefecture', name: string, code: any } | null, city?: { __typename?: 'City', name: string, code: any } | null, ward?: { __typename?: 'Ward', name: string, code: any } | null, type: { __typename?: 'PlateauDatasetType', id: string, code: string, name: string, category: DatasetTypeCategory, order: number } } | { __typename?: 'PlateauDatasetItem' } | { __typename?: 'PlateauDatasetType' } | { __typename?: 'PlateauSpec' } | { __typename?: 'PlateauSpecMinor' } | { __typename?: 'Prefecture' } | { __typename?: 'RelatedDataset', id: string, name: string, description?: string | null, year: number, groups?: Array<string> | null, prefectureId?: string | null, prefectureCode?: any | null, cityId?: string | null, cityCode?: any | null, wardId?: string | null, wardCode?: any | null, admin?: any | null, items: Array<{ __typename?: 'RelatedDatasetItem', id: string, format: DatasetFormat, name: string, url: string, layers?: Array<string> | null }>, prefecture?: { __typename?: 'Prefecture', name: string, code: any } | null, city?: { __typename?: 'City', name: string, code: any } | null, ward?: { __typename?: 'Ward', name: string, code: any } | null, type: { __typename?: 'RelatedDatasetType', id: string, code: string, name: string, category: DatasetTypeCategory, order: number } } | { __typename?: 'RelatedDatasetItem' } | { __typename?: 'RelatedDatasetType' } | { __typename?: 'Ward' } | null };
 
 export type DatasetsByIdsQueryVariables = Exact<{
   ids: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
 }>;
 
 
-export type DatasetsByIdsQuery = { __typename?: 'Query', nodes: Array<{ __typename?: 'City' } | { __typename?: 'GenericDataset', id: string, name: string, description?: string | null, year: number, groups?: Array<string> | null, prefectureId?: string | null, prefectureCode?: any | null, cityId?: string | null, cityCode?: any | null, wardId?: string | null, wardCode?: any | null, admin?: any | null, items: Array<{ __typename?: 'GenericDatasetItem', id: string, format: DatasetFormat, name: string, url: string, layers?: Array<string> | null }>, prefecture?: { __typename?: 'Prefecture', name: string, code: any } | null, city?: { __typename?: 'City', name: string, code: any } | null, ward?: { __typename?: 'Ward', name: string, code: any } | null, type: { __typename?: 'GenericDatasetType', id: string, code: string, name: string, category: DatasetTypeCategory, order: number } } | { __typename?: 'GenericDatasetItem' } | { __typename?: 'GenericDatasetType' } | { __typename?: 'PlateauDataset', subname?: string | null, id: string, name: string, description?: string | null, year: number, groups?: Array<string> | null, prefectureId?: string | null, prefectureCode?: any | null, cityId?: string | null, cityCode?: any | null, wardId?: string | null, wardCode?: any | null, admin?: any | null, items: Array<{ __typename?: 'PlateauDatasetItem', id: string, format: DatasetFormat, name: string, url: string, layers?: Array<string> | null, lod?: number | null, texture?: Texture | null }>, prefecture?: { __typename?: 'Prefecture', name: string, code: any } | null, city?: { __typename?: 'City', name: string, code: any } | null, ward?: { __typename?: 'Ward', name: string, code: any } | null, type: { __typename?: 'PlateauDatasetType', id: string, code: string, name: string, category: DatasetTypeCategory, order: number } } | { __typename?: 'PlateauDatasetItem' } | { __typename?: 'PlateauDatasetType' } | { __typename?: 'PlateauSpec' } | { __typename?: 'PlateauSpecMinor' } | { __typename?: 'Prefecture' } | { __typename?: 'RelatedDataset', id: string, name: string, description?: string | null, year: number, groups?: Array<string> | null, prefectureId?: string | null, prefectureCode?: any | null, cityId?: string | null, cityCode?: any | null, wardId?: string | null, wardCode?: any | null, admin?: any | null, items: Array<{ __typename?: 'RelatedDatasetItem', id: string, format: DatasetFormat, name: string, url: string, layers?: Array<string> | null }>, prefecture?: { __typename?: 'Prefecture', name: string, code: any } | null, city?: { __typename?: 'City', name: string, code: any } | null, ward?: { __typename?: 'Ward', name: string, code: any } | null, type: { __typename?: 'RelatedDatasetType', id: string, code: string, name: string, category: DatasetTypeCategory, order: number } } | { __typename?: 'RelatedDatasetItem' } | { __typename?: 'RelatedDatasetType' } | { __typename?: 'Ward' } | null> };
+export type DatasetsByIdsQuery = { __typename?: 'Query', nodes: Array<{ __typename?: 'City' } | { __typename?: 'CityGMLDataset' } | { __typename?: 'GenericDataset', id: string, name: string, description?: string | null, year: number, groups?: Array<string> | null, prefectureId?: string | null, prefectureCode?: any | null, cityId?: string | null, cityCode?: any | null, wardId?: string | null, wardCode?: any | null, admin?: any | null, items: Array<{ __typename?: 'GenericDatasetItem', id: string, format: DatasetFormat, name: string, url: string, layers?: Array<string> | null }>, prefecture?: { __typename?: 'Prefecture', name: string, code: any } | null, city?: { __typename?: 'City', name: string, code: any } | null, ward?: { __typename?: 'Ward', name: string, code: any } | null, type: { __typename?: 'GenericDatasetType', id: string, code: string, name: string, category: DatasetTypeCategory, order: number } } | { __typename?: 'GenericDatasetItem' } | { __typename?: 'GenericDatasetType' } | { __typename?: 'PlateauDataset', subname?: string | null, id: string, name: string, description?: string | null, year: number, groups?: Array<string> | null, prefectureId?: string | null, prefectureCode?: any | null, cityId?: string | null, cityCode?: any | null, wardId?: string | null, wardCode?: any | null, admin?: any | null, items: Array<{ __typename?: 'PlateauDatasetItem', id: string, format: DatasetFormat, name: string, url: string, layers?: Array<string> | null, lod?: number | null, texture?: Texture | null }>, prefecture?: { __typename?: 'Prefecture', name: string, code: any } | null, city?: { __typename?: 'City', name: string, code: any } | null, ward?: { __typename?: 'Ward', name: string, code: any } | null, type: { __typename?: 'PlateauDatasetType', id: string, code: string, name: string, category: DatasetTypeCategory, order: number } } | { __typename?: 'PlateauDatasetItem' } | { __typename?: 'PlateauDatasetType' } | { __typename?: 'PlateauSpec' } | { __typename?: 'PlateauSpecMinor' } | { __typename?: 'Prefecture' } | { __typename?: 'RelatedDataset', id: string, name: string, description?: string | null, year: number, groups?: Array<string> | null, prefectureId?: string | null, prefectureCode?: any | null, cityId?: string | null, cityCode?: any | null, wardId?: string | null, wardCode?: any | null, admin?: any | null, items: Array<{ __typename?: 'RelatedDatasetItem', id: string, format: DatasetFormat, name: string, url: string, layers?: Array<string> | null }>, prefecture?: { __typename?: 'Prefecture', name: string, code: any } | null, city?: { __typename?: 'City', name: string, code: any } | null, ward?: { __typename?: 'Ward', name: string, code: any } | null, type: { __typename?: 'RelatedDatasetType', id: string, code: string, name: string, category: DatasetTypeCategory, order: number } } | { __typename?: 'RelatedDatasetItem' } | { __typename?: 'RelatedDatasetType' } | { __typename?: 'Ward' } | null> };
 
 export type DatasetTypesQueryVariables = Exact<{
   input?: InputMaybe<DatasetTypesInput>;
