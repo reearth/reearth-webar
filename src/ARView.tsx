@@ -39,15 +39,36 @@ function tilesetUrls(plateauDatasets: [PlateauDataset]): string[] {
 export default function ARView({...props}) {
   // 開始時にクエパラでデータセットIDを指定された場合にデータセットパネルの初期化に使用するデータセット群 (レンダリング毎に忘却したいのでStateにはしない)
   let initialPlateauDatasets: [PlateauDataset];
+  let initialDatasetIds: string[] = [];
   // 開始時にクエパラでデータセットIDを指定された場合にARViewの初期化に使用するtilesetURL (レンダリング毎に忘却したいのでStateにはしない)
-  let initialTilesetUrls: string[];
+  let initialTilesetUrls: string[] = [];
   // クエパラを見てPLATEAU ViewからのデータセットID群の初期値が来ていれば取得し、tilesetURL群に変換
   // クエパラはこんな感じで来る ?dataList=[{"datasetId":"d_13101_bldg","dataId":"di_13101_bldg_LOD1"}]
-  const searchQueryParams = queryString.parse(location.search, {arrayFormat: 'comma'});
-  let initialDatasetIds = searchQueryParams.id ?? [];
-  if (typeof initialDatasetIds === 'string') { initialDatasetIds = [initialDatasetIds]; }
+  // データセットIDのみ使用する。複数来る場合はこんな感じ ?dataList=[{"datasetId":"d_14136_bldg"},{"datasetId":"d_14135_bldg"}]
+  // const searchQueryParams = queryString.parse(location.search, {arrayFormat: 'comma'});
+  const searchQueryParams = queryString.parse(location.search);
+  const dataList = searchQueryParams.dataList;
+  // console.log(dataList);
+  try {
+    if (typeof dataList === 'string') {
+      const evaled: any[] = eval(dataList);
+      // console.log(evaled);
+      if (evaled) {
+        initialDatasetIds = evaled.map(x => x.datasetId);
+        // console.log(initialDatasetIds);
+      } else {
+        throw "単一のパラメータが評価できません";
+      }
+    } else {
+      throw "指定のキーを持つ単一のパラメータではありません";
+    }
+  } catch(e) {
+    console.log("クエリパラメータが取得できません");
+    console.log(e);
+  }
   // フックの数を変えないためにもしクエパラがundefinedでも空配列で必ずクエリを呼び出す
   const { data } = useDatasetsByIds(initialDatasetIds);
+  // console.log(data);
   if (data) {
     initialPlateauDatasets = data.nodes as [PlateauDataset];
     // useDatasetsByIdsクエリが中身のあるデータを返してくるまでは待機
@@ -92,7 +113,13 @@ export default function ARView({...props}) {
   useEffect(() => {
     if (!rootLayers.length) { return; }
     const datasetIds = rootLayers.map(rootLayer => rootLayer.rawDataset.id);
-    setSearchParams({id: datasetIds.join()});
+    const objs = datasetIds.map(id => {
+      const mapped = new Map([["datasetId", id]]);
+      const obj = Object.fromEntries(mapped);
+      return obj;
+    });
+    const datasetIdsObjsStr = JSON.stringify(objs);
+    setSearchParams({dataList: datasetIdsObjsStr});
 
     return () => {
       setSearchParams({});
@@ -124,7 +151,7 @@ export default function ARView({...props}) {
   // AR View 起動
   const setArStarted = useSetAtom(arStartedAtom);
   useEffect(() => {
-    if (!cesiumLoaded || !initialTilesetUrls) { return; }
+    if (!cesiumLoaded) { return; }
     startAR(initialTilesetUrls);
     setArStarted(true);
 
