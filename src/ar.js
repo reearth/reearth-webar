@@ -637,7 +637,6 @@ export function requestImuPermission() {
     .then((response) => {
       if (response === "granted") {
         isImuPermissionGranted = true;
-        window.alert("ジャイロセンサーの使用を許可しました");
 
         startOrientationTracking();
       } else {
@@ -684,7 +683,7 @@ export function startAR(tilesetUrls) {
   // iOSではパーミッション取ってからIMUの値を読む
   if (isios) {
     if (!isImuPermissionGranted) {
-      window.alert("ARを正常に動作させるためジャイロセンサーの使用を許可してください");
+      // window.alert("ARを正常に動作させるためジャイロセンサーの使用を許可してください");
       // 直接ユーザータップのイベントでrequestしないと無効になるため、ARView側のボタンで発動させる
       // requestImuPermission();
     }
