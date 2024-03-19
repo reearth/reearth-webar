@@ -637,6 +637,8 @@ export function requestImuPermission() {
     .then((response) => {
       if (response === "granted") {
         isImuPermissionGranted = true;
+        window.alert("ジャイロセンサーの使用を許可しました");
+
         startOrientationTracking();
       } else {
         window.alert("ジャイロセンサーの使用を許可しないとARが正常に動作しません" + response);
