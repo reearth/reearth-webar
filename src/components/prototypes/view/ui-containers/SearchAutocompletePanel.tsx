@@ -195,12 +195,12 @@ export const SearchAutocompletePanel: FC<SearchAutocompletePanelProps> = ({
             children
           ) : (
             <StyledScrollable>
-              <StyledTabs value={deferredTab} onChange={handleTabChange}>
-                <Tab label="検索" />
+              <StyledTabs value={deferredTab} onChange={handleTabChange} variant="fullWidth">
+                {/* <Tab label="検索" /> */}
                 <Tab label="都道府県" />
                 <Tab label="カテゴリー" />
               </StyledTabs>
-              {tab === 0 && (
+              {/* {tab === 0 && (
                 <SearchList
                   datasets={searchOptions.datasets}
                   buildings={searchOptions.buildings}
@@ -208,9 +208,9 @@ export const SearchAutocompletePanel: FC<SearchAutocompletePanelProps> = ({
                   onOptionSelect={handleOptionSelect}
                   onFiltersChange={handleFiltersChange}
                 />
-              )}
-              {tab === 1 && <DatasetAreaList />}
-              {tab === 2 && <DatasetTypeList />}
+              )} */}
+              {tab === 0 && <DatasetAreaList />}
+              {tab === 1 && <DatasetTypeList />}
             </StyledScrollable>
           )}
         </SearchAutocomplete>
