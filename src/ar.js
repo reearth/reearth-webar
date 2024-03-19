@@ -639,8 +639,7 @@ export function requestImuPermission() {
         isImuPermissionGranted = true;
         startOrientationTracking();
       } else {
-        window.alert(response);
-        window.alert("ジャイロセンサーの使用を許可しないとARが正常に動作しません");
+        window.alert("ジャイロセンサーの使用を許可しないとARが正常に動作しません" + response);
         isImuPermissionGranted = false;
         // requestImuPermission();
       }
