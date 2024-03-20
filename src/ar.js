@@ -69,7 +69,7 @@ function throttle(fn, delay) {
 }
 
 // Cesiumのセットアップ
-async function setupCesiumViewer(tilesetUrls) {
+function setupCesiumViewer() {
   // Set Tokens
   Cesium.Ion.defaultAccessToken =
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJlY2EyZTg0NS04Y2VlLTRjNmEtYTIxZS0zODdlNjlkZWE2OGQiLCJpZCI6MTQ5ODk3LCJpYXQiOjE2OTEwNTU3OTV9.LJmPN5Q_QDbxCHxtWVBOB9Y13E-VySEmyiauA6BllwU";
@@ -141,53 +141,11 @@ async function setupCesiumViewer(tilesetUrls) {
   //         }
   //     `,
   // });
-
-  // PLATEAUのテクスチャ付き3DTilesを表示
-  // PLATEAUのデータはここから取得
-  // https://github.com/Project-PLATEAU/plateau-streaming-tutorial/blob/main/3d-tiles/plateau-3dtiles-streaming.md
-  // 港区LOD2
-  // "https://assets.cms.plateau.reearth.io/assets/df/b95190-23af-4087-9981-430ca798f502/13100_tokyo23-ku_2022_3dtiles%20_1_1_op_bldg_13103_minato-ku_lod2/tileset.json",
-  // 中央区LOD2
-  // "https://assets.cms.plateau.reearth.io/assets/38/9cf378-c397-49bb-a4fb-894ce86647d8/13100_tokyo23-ku_2022_3dtiles_1_1_op_bldg_13102_chuo-ku_lod2/tileset.json",
-  // 千代田区LOD2
-  // "https://assets.cms.plateau.reearth.io/assets/14/b8f886-921d-46d3-9fd4-4f6e568b27d4/13100_tokyo23-ku_2022_3dtiles%20_1_1_op_bldg_13101_chiyoda-ku_lod2/tileset.json",
-  // 川崎市多摩区LOD1
-  // "https://assets.cms.plateau.reearth.io/assets/f5/9392d2-5974-4df4-bb49-bcd4ebd44ff8/14130_kawasaki-shi_2022_3dtiles_1_op_bldg_14135_tama-ku_lod1/tileset.json",
-  // 郡山市LOD2
-  // "https://assets.cms.plateau.reearth.io/assets/0b/095119-b1e9-48c0-b5bd-0b18518e5a36/07203_koriyama-shi_2020_3dtiles_6_op_bldg_lod2/tileset.json",
-
-  tilesetUrls.map(async tilesetUrl => {
-    try {
-      // https://cesium.com/learn/cesiumjs/ref-doc/Cesium3DTileset.html
-      const plateauTileset = await Cesium.Cesium3DTileset.fromUrl(
-        tilesetUrl,
-        // オプション一覧はこちら https://cesium.com/learn/cesiumjs/ref-doc/Cesium3DTileset.html#.ConstructorOptions
-        {
-          //debugShowBoundingVolume: true, // ローカルのファイルシステムから実行している場合はエラーが出る
-          //debugShowContentBoundingVolume: true
-          //customShader: customShader // ここでカスタムシェーダーを渡す https://cesium.com/learn/cesiumjs/ref-doc/CustomShader.html
-        }
-      );
-      // 3DTiles専用のスタイルを作成
-      // https://cesium.com/learn/cesiumjs/ref-doc/Cesium3DTileStyle.html
-      // const style = new Cesium.Cesium3DTileStyle();
-      // 3DTilesのStyleExpressionsの記法で指定
-      // https://github.com/CesiumGS/3d-tiles/tree/main/specification/Styling
-      // style.color = 'color("aliceblue", 0.8)';
-      // plateauTileset.style = style;
-  
-      console.log("Success loading tileset");
-  
-      cesiumViewer.scene.primitives.add(plateauTileset);
-      cesiumViewer.flyTo(plateauTileset);
-    } catch (error) {
-      console.log(`Error loading tileset: ${error}`);
-    }
-  });
 }
 
 // Cesium Viewer を破棄
 function destroyCesiumViewer() {
+  if (!cesiumViewer) { return; }
   cesiumViewer.scene.primitives.removeAll();
   cesiumViewer.destroy();
 }
@@ -235,12 +193,12 @@ function setupOcclusionStage() {
 }
 
 // Cesium系セットアップ
-function setupCesium(tilesetUrls) {
+function setupCesium() {
   Cesium = window.Cesium;
   oldDestination = new Cesium.Cartesian3();
   oldDirection = new Cesium.Cartesian3();
   oldUp = new Cesium.Cartesian3();
-  setupCesiumViewer(tilesetUrls);
+  setupCesiumViewer();
   setupSilhouetteStage();
   // setupOcclusionStage();
 }
@@ -284,6 +242,7 @@ async function startDeviceCameraPreview() {
 
 // Cesiumのカメラ座標を更新
 function moveCesiumCamera(destination) {
+  if (!destination) { return; }
   // console.log(`camera moved: ${destination}`);
   cesiumCamera.setView({
     destination: destination,
@@ -342,6 +301,8 @@ function gpsTrackingProcess(pos) {
   const alt = coords.altitude ?? 0;
   const head = coords.heading ?? 0;
   const accur = coords.accuracy ?? 0;
+
+  console.log(lat, long, alt);
 
   // 緯度経度高度のデカルト座標にまとめる
   // Cesiumの指定はlong, lat, altの順であることに注意
@@ -483,11 +444,11 @@ function orientationTrackingProcess(event) {
   } else {
     biasedAlpha = biasedDegree;
   }
-  console.log("===");
-  console.log("device alpha: ", deviceAlpha);
-  console.log("compass bias: ", viewModel.compassBias);
-  console.log("biased degree: ", biasedDegree);
-  console.log("biased alpha: ", biasedAlpha);
+  // console.log("===");
+  // console.log("device alpha: ", deviceAlpha);
+  // console.log("compass bias: ", viewModel.compassBias);
+  // console.log("biased degree: ", biasedDegree);
+  // console.log("biased alpha: ", biasedAlpha);
 
   // alpha/beta/gammaをそれぞれラジアンに変換
   //const deviceAlphaRad = Cesium.Math.toRadians(180 - deviceAlpha); // 0~360の値をラジアン変換用に-180~180の値に直す(toRadiansは受け取ったdegreeにMath.PI/180.0を掛けるので)
@@ -673,9 +634,9 @@ export function pickUpFeature(callback) {
 // Lifecycle
 
 // ARを開始
-export function startAR(tilesetUrls) {
+export function startAR() {
   // Viewセットアップ
-  setupCesium(tilesetUrls);
+  setupCesium();
   setupUserInput();
   // Repoセットアップ
   startDeviceCameraPreview();
@@ -701,9 +662,52 @@ export function stopAR() {
 
 // ARViewで表示するTilesetをリセット
 export async function resetTileset(tilesetUrls) {
+  // TODO: cesiumViewer.scene.primitives.remove(primitive) を使用して個別にremove
   cesiumViewer.scene.primitives.removeAll();
-  const plateauTilesets = tilesetUrls.map(async tilesetUrl => Cesium.Cesium3DTileset.fromUrl(tilesetUrl));
-  await plateauTilesets.map(tileset => cesiumViewer.scene.primitives.add(tileset));
+
+  // PLATEAUのテクスチャ付き3DTilesを表示
+  // PLATEAUのデータはここから取得
+  // https://github.com/Project-PLATEAU/plateau-streaming-tutorial/blob/main/3d-tiles/plateau-3dtiles-streaming.md
+  // 港区LOD2
+  // "https://assets.cms.plateau.reearth.io/assets/df/b95190-23af-4087-9981-430ca798f502/13100_tokyo23-ku_2022_3dtiles%20_1_1_op_bldg_13103_minato-ku_lod2/tileset.json",
+  // 中央区LOD2
+  // "https://assets.cms.plateau.reearth.io/assets/38/9cf378-c397-49bb-a4fb-894ce86647d8/13100_tokyo23-ku_2022_3dtiles_1_1_op_bldg_13102_chuo-ku_lod2/tileset.json",
+  // 千代田区LOD2
+  // "https://assets.cms.plateau.reearth.io/assets/14/b8f886-921d-46d3-9fd4-4f6e568b27d4/13100_tokyo23-ku_2022_3dtiles%20_1_1_op_bldg_13101_chiyoda-ku_lod2/tileset.json",
+  // 川崎市多摩区LOD1
+  // "https://assets.cms.plateau.reearth.io/assets/f5/9392d2-5974-4df4-bb49-bcd4ebd44ff8/14130_kawasaki-shi_2022_3dtiles_1_op_bldg_14135_tama-ku_lod1/tileset.json",
+  // 郡山市LOD2
+  // "https://assets.cms.plateau.reearth.io/assets/0b/095119-b1e9-48c0-b5bd-0b18518e5a36/07203_koriyama-shi_2020_3dtiles_6_op_bldg_lod2/tileset.json",
+
+  tilesetUrls.map(async tilesetUrl => {
+    // console.log(tilesetUrl);
+    try {
+      // https://cesium.com/learn/cesiumjs/ref-doc/Cesium3DTileset.html
+      const plateauTileset = await Cesium.Cesium3DTileset.fromUrl(
+        tilesetUrl,
+        // オプション一覧はこちら https://cesium.com/learn/cesiumjs/ref-doc/Cesium3DTileset.html#.ConstructorOptions
+        {
+          //debugShowBoundingVolume: true, // ローカルのファイルシステムから実行している場合はエラーが出る
+          //debugShowContentBoundingVolume: true
+          //customShader: customShader // ここでカスタムシェーダーを渡す https://cesium.com/learn/cesiumjs/ref-doc/CustomShader.html
+        }
+      );
+      // 3DTiles専用のスタイルを作成
+      // https://cesium.com/learn/cesiumjs/ref-doc/Cesium3DTileStyle.html
+      // const style = new Cesium.Cesium3DTileStyle();
+      // 3DTilesのStyleExpressionsの記法で指定
+      // https://github.com/CesiumGS/3d-tiles/tree/main/specification/Styling
+      // style.color = 'color("aliceblue", 0.8)';
+      // plateauTileset.style = style;
+  
+      console.log("Success loading tileset");
+  
+      cesiumViewer.scene.primitives.add(plateauTileset);
+      cesiumViewer.flyTo(plateauTileset);
+    } catch (error) {
+      console.log(`Error loading tileset: ${error}`);
+    }
+  });
 }
 
 // オクルージョン表示を更新

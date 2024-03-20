@@ -1,9 +1,140 @@
 import { useAtomValue } from "jotai";
 import { useEffect, useMemo, useState } from "react";
-import { pickUpFeature, updateCompassBias, updateFov } from "./ar";
-import { compassBiasAtom, fovPiOverAtom, cesiumLoadedAtom, arStartedAtom } from "./components/prototypes/view/states/ar";
+import { resetTileset, pickUpFeature, updateCompassBias, updateFov } from "./ar";
+import { compassBiasAtom, fovPiOverAtom, arStartedAtom } from "./components/prototypes/view/states/ar";
+import { PlateauDataset, PlateauDatasetItem } from "./components/shared/graphql/types/catalog";
+import queryString from "query-string";
+import { useDatasetsByIds } from "./components/shared/graphql";
+import { rootLayersAtom } from "./components/shared/states/rootLayer";
+import { useAddLayer } from "./components/prototypes/layers";
+import { settingsAtom } from "./components/shared/states/setting";
+import { useSearchParams } from "react-router-dom";
+import { templatesAtom } from "./components/shared/states/template";
+import { createRootLayerAtom } from "./components/shared/view-layers";
+
+function tilesetUrls(plateauDatasets: [PlateauDataset]): string[] {
+  return plateauDatasets.map(plateauDataset => {
+    const plateauDatasetItems = plateauDataset.items as [PlateauDatasetItem];
+    // LOD2(テクスチャあり)->LOD2(テクスチャなし)->LOD1の順でフォールバック
+    const tilesetUrlLod2TexItem = plateauDatasetItems.find(({ lod, texture }) => lod == 2 && texture == "TEXTURE")
+    if (tilesetUrlLod2TexItem && tilesetUrlLod2TexItem.url) {
+      return tilesetUrlLod2TexItem.url;
+    } else {
+      const tilesetUrlLod2NoneTexItem = plateauDatasetItems.find(({ lod, texture }) => lod == 2 && texture == "NONE")
+      if (tilesetUrlLod2NoneTexItem && tilesetUrlLod2NoneTexItem.url) {
+        return tilesetUrlLod2NoneTexItem.url;
+      } else {
+        const tilesetUrlLod1Item = plateauDatasetItems.find(({ lod }) => lod == 1)
+        if (tilesetUrlLod1Item && tilesetUrlLod1Item.url) {
+          return tilesetUrlLod1Item.url;
+        } else {
+          return null;
+        }
+      }
+    }
+  }).filter(x => x);
+}
 
 export default function AROverlayView({...props}) {
+  // 開始時にクエパラでデータセットIDを指定された場合にデータセットパネルの初期化に使用するデータセット群 (レンダリング毎に忘却したいのでStateにはしない)
+  let initialPlateauDatasets: [PlateauDataset];
+  let initialDatasetIds: string[] = [];
+  // 開始時にクエパラでデータセットIDを指定された場合にARViewの初期化に使用するtilesetURL (レンダリング毎に忘却したいのでStateにはしない)
+  let initialTilesetUrls: string[] = [];
+  // クエパラを見てPLATEAU ViewからのデータセットID群の初期値が来ていれば取得し、tilesetURL群に変換
+  // クエパラはこんな感じで来る ?dataList=[{"datasetId":"d_13101_bldg","dataId":"di_13101_bldg_LOD1"}]
+  // データセットIDのみ使用する。複数来る場合はこんな感じ ?dataList=[{"datasetId":"d_14136_bldg"},{"datasetId":"d_14135_bldg"}]
+  // const searchQueryParams = queryString.parse(location.search, {arrayFormat: 'comma'});
+  const searchQueryParams = queryString.parse(location.search);
+  const dataList = searchQueryParams.dataList;
+  // console.log(dataList);
+  try {
+    if (typeof dataList === 'string') {
+      const evaled: any[] = eval(dataList);
+      // console.log(evaled);
+      if (evaled) {
+        initialDatasetIds = evaled.map(x => x.datasetId);
+        // console.log(initialDatasetIds);
+      } else {
+        throw "単一のパラメータが評価できません";
+      }
+    } else {
+      throw "指定のキーを持つ単一のパラメータではありません";
+    }
+  } catch(e) {
+    console.log("クエリパラメータが取得できません");
+    console.log(e);
+  }
+  // フックの数を変えないためにもしクエパラがundefinedでも空配列で必ずクエリを呼び出す
+  const { data } = useDatasetsByIds(initialDatasetIds);
+  // console.log(data);
+  if (data) {
+    initialPlateauDatasets = data.nodes as [PlateauDataset];
+    // useDatasetsByIdsクエリが中身のあるデータを返してくるまでは待機
+    if (initialPlateauDatasets) {
+      initialTilesetUrls = tilesetUrls(initialPlateauDatasets);
+      // console.log("initialTilesetUrls: ", initialTilesetUrls);
+    }
+  }
+
+  // データセットパネルに追加されたレイヤー群と関連フック
+  const rootLayers = useAtomValue(rootLayersAtom);
+  const addLayer = useAddLayer();
+  const settings = useAtomValue(settingsAtom);
+  const templates = useAtomValue(templatesAtom);
+
+  // クエパラから来たデータセットID群をデータセットパネルに同期して再レンダリング
+  useEffect(() => {
+    if (!initialPlateauDatasets || !initialPlateauDatasets.length) { return; }
+    initialPlateauDatasets.map(dataset => {
+      const datasetId = dataset.id;
+      const rootLayersDatasetIds = rootLayers.map(rootLayer => rootLayer.rawDataset.id);
+      if (rootLayersDatasetIds.includes(datasetId)) { return; }
+      const filteredSettings = settings.filter(s => s.datasetId === datasetId);
+      addLayer(
+        createRootLayerAtom({
+          dataset,
+          settings: filteredSettings,
+          templates,
+          areaCode: dataset.wardCode,
+        }),
+        // { autoSelect: !smDown }, // TODO: ここの挙動追う
+      );
+    });
+
+    return () => {
+      // TODO: クリーンアップ
+    };
+  }, [initialPlateauDatasets]);
+
+  // 以降ARView関連
+  const arStarted = useAtomValue(arStartedAtom);
+
+  // データセットパネルのレイヤー群が変化したらクエパラを更新して再レンダリング
+  let [searchParams, setSearchParams] = useSearchParams();
+  useEffect(() => {
+    if (!rootLayers.length) { return; }
+    const datasetIds = rootLayers.map(rootLayer => rootLayer.rawDataset.id);
+    const objs = datasetIds.map(id => {
+      const mapped = new Map([["datasetId", id]]);
+      const obj = Object.fromEntries(mapped);
+      return obj;
+    });
+    const datasetIdsObjsStr = JSON.stringify(objs);
+    setSearchParams({dataList: datasetIdsObjsStr});
+
+    return () => {
+      setSearchParams({});
+    };
+  }, [rootLayers]);
+
+  // tilesetをリセット
+  useEffect(() => {
+    if (!arStarted) { return; }
+    console.log("Resetting tilesets:", initialTilesetUrls);
+    resetTileset(initialTilesetUrls);
+  }, [initialTilesetUrls]);
+
   // const cesiumLoaded = useAtomValue(cesiumLoadedAtom);
   // const [selectedFeature, setSelectedFeature] = useAtom(selectedFeatureAtom);
   // useEffect(() => {
@@ -18,7 +149,6 @@ export default function AROverlayView({...props}) {
   // }, [cesiumLoaded]);
 
   // UIのステート変更を監視してVMに反映
-  const arStarted = useAtomValue(arStartedAtom);
   const compassBias = useAtomValue(compassBiasAtom);
   const fovPiOver = useAtomValue(fovPiOverAtom);
   useEffect(() => {
@@ -32,5 +162,5 @@ export default function AROverlayView({...props}) {
     updateFov(fovPiOver);
   }, [fovPiOver]);
 
-  return <div {...props}>AROverlayView</div>;
+  return <div {...props}>hoge</div>;
 }
