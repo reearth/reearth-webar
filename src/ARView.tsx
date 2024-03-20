@@ -73,6 +73,7 @@ export default function ARView({...props}) {
     initialPlateauDatasets = data.nodes as [PlateauDataset];
     // useDatasetsByIdsクエリが中身のあるデータを返してくるまでは待機
     if (initialPlateauDatasets) {
+      // TODO: ここでdatasetのTypeが対応していないものであればアラートポップアップを出し除外する
       initialTilesetUrls = tilesetUrls(initialPlateauDatasets);
       // console.log("initialTilesetUrls: ", initialTilesetUrls);
     }

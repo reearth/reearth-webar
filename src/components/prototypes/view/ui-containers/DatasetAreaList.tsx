@@ -36,6 +36,9 @@ export const DatasetGroup: FC<{
   invariant(datasets.length > 0);
 
   if (datasets.length > 1) {
+    // TODO: 今は建築物モデルのみ表示するようにしているが対応可能地物が増えればここを変更
+    if (datasets[0].type.code !== PlateauDatasetType.Building) return;
+
     return (
       <DatasetTreeItem nodeId={groupId} label={datasets[0].type.name} disabled={!datasets.length}>
         {datasets.map(dataset => {
@@ -56,6 +59,8 @@ export const DatasetGroup: FC<{
     const isUsecaseType = dataset.type.code === PlateauDatasetType.UseCase;
     const label = isUsecaseType ? dataset.name : dataset.type.name;
     const title = label;
+    // TODO: 今は建築物モデルのみ表示するようにしているが対応可能地物が増えればここを変更
+    if (dataset.type.code !== PlateauDatasetType.Building) return;
 
     return (
       <DatasetListItem
