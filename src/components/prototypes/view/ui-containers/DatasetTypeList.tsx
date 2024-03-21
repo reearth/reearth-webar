@@ -102,14 +102,15 @@ const DatasetTypeItem: FC<{ datasetType: PlateauDatasetType }> = ({ datasetType 
   const query = useAreas({
     datasetTypes: [datasetType],
   });
+  // TODO: 対応地物が増えればここを増やして対応。なおなぜか今も建築物モデルはどの都道府県も表示されない
+  if(datasetType !== PlateauDatasetType.Building) return;
   return (
     <DatasetTreeItem
       nodeId={datasetType}
       label={datasetTypeNames[datasetType]}
       loading={query.loading}>
-      {datasetType === PlateauDatasetType.UseCase && <GlobalItem />}
-      {/* TODO: 対応地物が増えればここを増やして対応。なおなぜか今も建築物モデルはどの都道府県も表示されない */}
-      {datasetType === PlateauDatasetType.Building && query.data?.areas.map(
+      {/* {datasetType === PlateauDatasetType.UseCase && <GlobalItem />} */}
+      {query.data?.areas.map(
         prefecture =>
           prefecture.__typename === "Prefecture" && (
             <PrefectureItem
