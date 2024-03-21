@@ -4,6 +4,7 @@ import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useSearchParams } from "react-router-dom";
 import queryString from "query-string";
 import { FloatingButton } from "./components/prototypes/ui-components";
+import PopupDialog from "./components/prototypes/ui-components/PopupDialog";
 import { useDatasetById, useDatasetsByIds } from "./components/shared/graphql";
 import { PlateauDataset, PlateauDatasetItem } from "./components/shared/graphql/types/catalog";
 import { rootLayersAtom } from "./components/shared/states/rootLayer";
@@ -184,12 +185,9 @@ export default function ARView({...props}) {
         // <div className="absolute top-2 right-2">
         //   <input type="button" value="iOSのジャイロセンサを許可" onClick={requestImuPermission} />
         // </div>
-        <div className="absolute top-2 right-2">
-          <FloatingButton onClick={requestImuPermission}>
-            iOSのジャイロセンサを許可
-          </FloatingButton>
-        </div>
+        <PopupDialog onClose={requestImuPermission} open={!isImuPermissionGranted} content="iOSのジャイロセンサを許可します"/>
       }
+
       <div
         id="status_container"
         className="
