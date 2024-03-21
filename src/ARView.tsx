@@ -175,6 +175,10 @@ export default function ARView({...props}) {
     requestImuPermission();
     setIMUPermit(true);
   }
+  const [isOpenDeniedPopup, toggleOpenDeniedPopup] = useState<boolean>(false);
+  const handleCloseDeniedPopup = () => {
+    toggleOpenDeniedPopup(true);
+  }
 
   return (
     <div {...props}>
@@ -187,11 +191,13 @@ export default function ARView({...props}) {
         id="cesium_container"
         className="absolute top-0 left-0 w-full h-full"
       ></div>
-      {isios && !isImuPermissionGranted &&
+      {isios && !isImuPermissionGranted && isImuPermissionGranted !== "denied" ? 
         // <div className="absolute top-2 right-2">
         //   <input type="button" value="iOSのジャイロセンサを許可" onClick={requestImuPermission} />
         // </div>
         <PopupDialog onClose={handleClickIMURequest} open={!isIMUPermitted} content="iOSのジャイロセンサを許可します"/>
+        : <PopupDialog onClose={handleCloseDeniedPopup} open={!isOpenDeniedPopup} content="ジャイロセンサが許可されていません、ブラウザの設定から許可してください。"/>
+
       }
 
       <div

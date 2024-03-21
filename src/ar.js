@@ -631,17 +631,17 @@ function setupUserInput() {
   }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 }
 
-export let isImuPermissionGranted = false;
+export let isImuPermissionGranted = null;
 export function requestImuPermission() {
   DeviceOrientationEvent.requestPermission()
     .then((response) => {
       if (response === "granted") {
-        isImuPermissionGranted = true;
+        isImuPermissionGranted = response;
 
         startOrientationTracking();
       } else {
         window.alert("ジャイロセンサーの使用を許可しないとARが正常に動作しません");
-        isImuPermissionGranted = false;
+        isImuPermissionGranted = response;
         // requestImuPermission();
       }
     })
