@@ -74,7 +74,14 @@ export default function ARView({...props}) {
     // useDatasetsByIdsクエリが中身のあるデータを返してくるまでは待機
     if (initialPlateauDatasets) {
       // TODO: ここでdatasetのTypeが対応していないものであればアラートポップアップを出し除外する
-      initialTilesetUrls = tilesetUrls(initialPlateauDatasets);
+      const removedInitialPlateauDatasets = initialPlateauDatasets.filter(dataset => dataset.type.code !== 'bldg');
+      const filteredInitialPlateauDatasets = initialPlateauDatasets.filter(dataset => dataset.type.code === 'bldg') as [PlateauDataset];
+
+      if (removedInitialPlateauDatasets.length > 0) {
+        const removedNames = removedInitialPlateauDatasets.map(item => item.name).join(', ');
+        console.log(`${removedNames} はAR非対応のため非表示になります。`); // ポップアップメッセージを設定
+      }
+      initialTilesetUrls = tilesetUrls(filteredInitialPlateauDatasets);
       // console.log("initialTilesetUrls: ", initialTilesetUrls);
     }
   }
@@ -110,7 +117,7 @@ export default function ARView({...props}) {
   }, [initialPlateauDatasets]);
 
   // データセットパネルのレイヤー群が変化したらクエパラを更新してARViewを再レンダリング
-  let [searchParams, setSearchParams] = useSearchParams();
+  const [, setSearchParams] = useSearchParams();
   useEffect(() => {
     if (!rootLayers.length) { return; }
     const datasetIds = rootLayers.map(rootLayer => rootLayer.rawDataset.id);
