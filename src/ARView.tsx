@@ -196,7 +196,7 @@ export default function ARView({...props}) {
         //   <input type="button" value="iOSのジャイロセンサを許可" onClick={requestImuPermission} />
         // </div>
         <PopupDialog onClose={handleClickIMURequest} open={!isIMUPermitted} content="iOSのジャイロセンサを許可します"/>
-        : <PopupDialog onClose={handleCloseDeniedPopup} open={!isOpenDeniedPopup} content="ジャイロセンサが許可されていません、ブラウザの設定から許可してください。"/>
+        : <PopupDialog onClose={handleCloseDeniedPopup} open={!isOpenDeniedPopup} content={isImuPermissionGranted + "ジャイロセンサが許可されていません、ブラウザの設定から許可してください。"}/>
 
       }
 
