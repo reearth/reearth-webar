@@ -640,7 +640,6 @@ export function requestImuPermission() {
 
         startOrientationTracking();
       } else {
-        window.alert("ジャイロセンサーの使用を許可しないとARが正常に動作しません");
         isImuPermissionGranted = response;
         // requestImuPermission();
       }
