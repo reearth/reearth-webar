@@ -642,7 +642,7 @@ export function requestImuPermission() {
       } else {
         window.alert("ジャイロセンサーの使用を許可しないとARが正常に動作しません");
         isImuPermissionGranted = false;
-        requestImuPermission();
+        // requestImuPermission();
       }
     })
     .catch(e =>{
