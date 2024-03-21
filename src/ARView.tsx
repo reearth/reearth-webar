@@ -191,7 +191,7 @@ export default function ARView({...props}) {
         id="cesium_container"
         className="absolute top-0 left-0 w-full h-full"
       ></div>
-      {isios && isImuPermissionGranted === null &&
+      {isios && isImuPermissionGranted === null && !isIMUPermitted &&
         // <div className="absolute top-2 right-2">
         //   <input type="button" value="iOSのジャイロセンサを許可" onClick={requestImuPermission} />
         // </div>
