@@ -173,7 +173,7 @@ export default function ARView({...props}) {
   const [isIMUPermitted, setIMUPermit] = useState<boolean>(false);
   const handleClickIMURequest = () => {
     requestImuPermission();
-    setIMUPermit(true);
+    if(isImuPermissionGranted) setIMUPermit(true);
   }
 
   return (
