@@ -7,6 +7,7 @@ import AROverlayView from "./AROverlayView";
 import { Provider } from "jotai";
 import { ApolloProvider } from "@apollo/client";
 import { createCatalogClient, createGeoClient } from "./components/shared/graphql/clients";
+import DatasetSyncer from "./DatasetSyncer";
 
 function App() {
   const catalogUrl = 'https://api.plateau.reearth.io/datacatalog/graphql';
@@ -19,6 +20,7 @@ function App() {
           <ThemeProvider theme={darkTheme}>
             <main className="flex flex-col">
               <Provider>
+                <DatasetSyncer className="hidden" />
                 <AppHeader />
                 <ARView className="relative w-full h-full" />
                 <AROverlayView className="absolute top-12 left-0 w-full" />
