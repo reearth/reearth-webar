@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { startAR, stopAR, isios, isImuPermissionGranted, requestImuPermission } from "./ar";
-import { useSetAtom } from "jotai";
+import { useAtom, useSetAtom } from "jotai";
 import PopupDialog from "./components/prototypes/ui-components/PopupDialog";
 import { cesiumLoadedAtom, arStartedAtom } from "./components/prototypes/view/states/ar";
 
 export default function ARView({...props}) {
   // CDNからCesiumを読み込む
-  const setCesiumLoaded = useSetAtom(cesiumLoadedAtom);
+  const [cesiumLoaded, setCesiumLoaded] = useAtom(cesiumLoadedAtom);
   const setArStarted = useSetAtom(arStartedAtom);
   useEffect(() => {
     const script = document.createElement('script');
@@ -14,20 +14,27 @@ export default function ARView({...props}) {
     script.async = true;
     script.onload = () => {
       setCesiumLoaded(true);
-      console.log("start ar");
-      startAR(); // TODO: 何故かクリーンアップ関数が初回しか実行されず、startARが2度実行されてしまい、cesium-viewer要素が2つ追加されてしまうので調査する
-      setArStarted(true);
     }
     document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+      setCesiumLoaded(false);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!cesiumLoaded) { return; }
+    console.log("start ar");
+    startAR();
+    setArStarted(true);
 
     return () => {
       console.log("clean up");
       stopAR();
       setArStarted(false);
-      document.body.removeChild(script);
-      setCesiumLoaded(false);
     };
-  }, []);
+  }, [cesiumLoaded]);
 
   const [isIMUPermitted, setIMUPermit] = useState<boolean>(false);
   const handleClickIMURequest = () => {
