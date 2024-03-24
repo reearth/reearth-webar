@@ -660,9 +660,29 @@ export function stopAR() {
 }
 
 // ARViewで表示するTilesetをリセット
+let oldTilesetUrls = [];
+let tilesets = [];
 export async function resetTileset(tilesetUrls) {
-  // TODO: cesiumViewer.scene.primitives.remove(primitive) を使用して個別にremove
-  cesiumViewer.scene.primitives.removeAll();
+  if (!cesiumViewer) { return; }
+  // cesiumViewer.scene.primitives.removeAll();
+
+  console.log("oldTilesetUrls: ", oldTilesetUrls);
+  console.log("tilesetUrls: ", tilesetUrls);
+
+  // 削除されたtilesetをremove
+  const removedUrls = oldTilesetUrls.filter(x => !tilesetUrls.includes(x));
+  console.log("removedUrls: ", removedUrls);
+  const removingPrimitives = tilesets.filter(tileset => removedUrls.includes(tileset.url));
+  console.log("removingPrimitives: ", removingPrimitives);
+  removingPrimitives.map(removingPrimitive => {
+    // TODO: このremoveが上手く動いていない
+    cesiumViewer.scene.primitives.remove(removingPrimitive);
+  });
+  tilesets = tilesets.filter(tileset => !removedUrls.includes(tileset.url));
+
+  // 追加されたtilesetをadd
+  const addedUrls = tilesetUrls.filter(x => !oldTilesetUrls.includes(x));
+  console.log("addedUrls: ", addedUrls);
 
   // PLATEAUのテクスチャ付き3DTilesを表示
   // PLATEAUのデータはここから取得
@@ -678,7 +698,7 @@ export async function resetTileset(tilesetUrls) {
   // 郡山市LOD2
   // "https://assets.cms.plateau.reearth.io/assets/0b/095119-b1e9-48c0-b5bd-0b18518e5a36/07203_koriyama-shi_2020_3dtiles_6_op_bldg_lod2/tileset.json",
 
-  tilesetUrls.map(async tilesetUrl => {
+  addedUrls.map(async tilesetUrl => {
     // console.log(tilesetUrl);
     try {
       // https://cesium.com/learn/cesiumjs/ref-doc/Cesium3DTileset.html
@@ -700,6 +720,7 @@ export async function resetTileset(tilesetUrls) {
       // plateauTileset.style = style;
   
       console.log("Success loading tileset");
+      tilesets.push({url: tilesetUrl, primitive: plateauTileset});
   
       cesiumViewer.scene.primitives.add(plateauTileset);
       cesiumViewer.flyTo(plateauTileset);
@@ -707,6 +728,9 @@ export async function resetTileset(tilesetUrls) {
       console.log(`Error loading tileset: ${error}`);
     }
   });
+
+  oldTilesetUrls = tilesetUrls;
+  console.log("tilesets: ", tilesets);
 }
 
 // オクルージョン表示を更新

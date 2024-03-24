@@ -25,12 +25,10 @@ export default function ARView({...props}) {
 
   useEffect(() => {
     if (!cesiumLoaded) { return; }
-    console.log("start ar");
     startAR();
     setArStarted(true);
 
     return () => {
-      console.log("clean up");
       stopAR();
       setArStarted(false);
     };

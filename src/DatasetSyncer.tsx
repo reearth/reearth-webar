@@ -113,13 +113,17 @@ export default function DatasetSyncer({...props}) {
 
     return () => {
       // TODO: クリーンアップ
+
     };
   }, [initialPlateauDatasets]);
 
   // データセットパネルのレイヤー群が変化したらクエパラを更新して再レンダリング
   const [, setSearchParams] = useSearchParams();
   useEffect(() => {
-    if (!rootLayers.length) { return; }
+    if (!rootLayers.length) {
+      setSearchParams({});
+      return; 
+    }
     const datasetIds = rootLayers.map(rootLayer => rootLayer.rawDataset.id);
     const objs = datasetIds.map(id => {
       const mapped = new Map([["datasetId", id]]);
@@ -130,7 +134,8 @@ export default function DatasetSyncer({...props}) {
     setSearchParams({dataList: datasetIdsObjsStr});
 
     return () => {
-      setSearchParams({});
+      // クリーンアップではクエパラをクリアしないこと
+      // setSearchParams({});
     };
   }, [rootLayers]);
 
@@ -140,6 +145,10 @@ export default function DatasetSyncer({...props}) {
     if (!arStarted) { return; }
     console.log("Resetting tilesets:", initialTilesetUrls);
     resetTileset(initialTilesetUrls);
+
+    return () => {
+      // resetTileset([]);
+    };
   }, [initialTilesetUrls]);
 
   return (
