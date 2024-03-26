@@ -27,8 +27,8 @@ export const CompassBiasPanel: FC = () => {
         <SliderParameterItem
           label="コンパスバイアス"
           description="方位を微調整します。注目オブジェクトを選択してから使用してください。"
-          min={-180}
-          max={180}
+          min={-60}
+          max={60}
           step={1}
           atom={compassBiasAtom}
         />
