@@ -31,8 +31,10 @@ export const SelectionPanel: FC = () => {
   let useScrollable = undefined;
 
   // const contentType: "default" | "pedestrian" = "default";
+  // 選択中のレイヤー一覧?
   const selectionGroups = useAtomValue(selectionGroupsAtom);
 
+  // レイヤーID (データセットID) からレイヤーを検索する
   const findRootLayer = useSetAtom(findRootLayerAtom);
 
   if (selectionGroups.length === 1) {
