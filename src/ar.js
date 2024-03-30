@@ -740,15 +740,24 @@ export async function resetTileset(tilesetUrls) {
 export function updateOcclusion(shouldHideOtherBldgs) {
   if (silhouetteStage === undefined || occlusionStage === undefined) { return; }
   if (Boolean(shouldHideOtherBldgs)) {
-    console.log(selectedFeatures);
+    // オクルージョン表示にするときは
+    // ビル選択シルエットを非表示とし
     silhouetteStage.selected = [];
     silhouetteStage.enabled = false;
-    // occlusionStage.selected = selectedFeatures;
+    // オクルージョンシェーダを有効とする
+    selectedFeatures.map(feature => {
+      // PostProcessStageのselectedを新しいオブジェクトで置き換えてしまうと
+      // シェーダのczm_selected()関数がboolを返さずクラッシュする問題があるので
+      // selectedを代入で置き換えずにpushして対応
+      occlusionStage.selected.push(feature);
+    });
     occlusionStage.enabled = true;
   } else {
-    console.log(selectedFeatures);
+    // オクルージョン表示しないときは
+    // オクルージョンシェーダを無効とし
     occlusionStage.enabled = false;
     occlusionStage.selected = [];
+    // ビル選択シルエットを表示する
     silhouetteStage.selected = selectedFeatures;
     silhouetteStage.enabled = true;
   }
