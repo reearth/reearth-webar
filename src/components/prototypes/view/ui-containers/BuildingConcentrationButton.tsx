@@ -11,7 +11,7 @@ export const BuildingConcentrationButton: FC = () => {
     setBuildingConcentrated(!buildingConcentrated);
   }
   useEffect(() => {
-    if (!buildingConcentrated) { return; }
+    if (buildingConcentrated === undefined) { return; }
     console.log(buildingConcentrated);
     updateOcclusion(buildingConcentrated);
   }, [buildingConcentrated]);
