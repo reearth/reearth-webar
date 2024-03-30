@@ -736,6 +736,7 @@ export async function resetTileset(tilesetUrls) {
 
 // オクルージョン表示を更新
 export function updateOcclusion(shouldHideOtherBldgs) {
+  if (silhouetteStage === undefined || occlusionStage === undefined) { return; }
   if (Boolean(shouldHideOtherBldgs)) {
     silhouetteStage.enabled = false;
     occlusionStage.selected = selectedFeatures;
