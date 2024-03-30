@@ -577,18 +577,20 @@ function orientationTrackingProcess(event) {
 }
 
 // ユーザーインタラクションハンドリング
-// TODO: オクルージョン表示中はタップ選択を無効化する
 function setupUserInput() {
   const handler = new Cesium.ScreenSpaceEventHandler(cesiumViewer.scene.canvas);
   handler.setInputAction(function onLeftClick(movement) {
-    const pickedFeature = cesiumViewer.scene.pick(movement.position);    
-    if (Cesium.defined(pickedFeature)) {
-      // selectedには3DTilesのFeatureをそのまま突っ込めるのでprimitiveにはアクセスしなくてよい
-      selectedFeatures = [pickedFeature];
-      silhouetteStage.selected = selectedFeatures;
-    } else {
-      selectedFeatures = [];
-      silhouetteStage.selected = [];
+    // オクルージョン表示していないときだけビルを選択可能
+    if (!occlusionStage.enabled) {
+      const pickedFeature = cesiumViewer.scene.pick(movement.position);    
+      if (Cesium.defined(pickedFeature)) {
+        // selectedには3DTilesのFeatureをそのまま突っ込めるのでprimitiveにはアクセスしなくてよい
+        selectedFeatures = [pickedFeature];
+        silhouetteStage.selected = selectedFeatures;
+      } else {
+        selectedFeatures = [];
+        silhouetteStage.selected = [];
+      }
     }
   }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 }
@@ -738,12 +740,16 @@ export async function resetTileset(tilesetUrls) {
 export function updateOcclusion(shouldHideOtherBldgs) {
   if (silhouetteStage === undefined || occlusionStage === undefined) { return; }
   if (Boolean(shouldHideOtherBldgs)) {
+    console.log(selectedFeatures);
+    silhouetteStage.selected = [];
     silhouetteStage.enabled = false;
-    occlusionStage.selected = selectedFeatures;
+    // occlusionStage.selected = selectedFeatures;
     occlusionStage.enabled = true;
   } else {
+    console.log(selectedFeatures);
     occlusionStage.enabled = false;
     occlusionStage.selected = [];
+    silhouetteStage.selected = selectedFeatures;
     silhouetteStage.enabled = true;
   }
 }
