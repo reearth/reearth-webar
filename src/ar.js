@@ -191,6 +191,7 @@ function setupOcclusionStage() {
       //clearColor: Cesium.Color.TRANSPARENT,
     })
   );
+  occlusionStage.enabled = false;
   occlusionStage.selected = [];
 }
 
@@ -202,7 +203,7 @@ function setupCesium() {
   oldUp = new Cesium.Cartesian3();
   setupCesiumViewer();
   setupSilhouetteStage();
-  // setupOcclusionStage();
+  setupOcclusionStage();
 }
 
 // Cesium系クリーンアップ
