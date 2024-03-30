@@ -7,6 +7,7 @@ import { MainMenuButton } from "./MainMenuButton";
 import { DatasetButton } from "./DatasetButton";
 import { CompassBiasButton } from "./CompassBiasButton";
 import { FovButton } from "./FovButton";
+import { BuildingConcentrationButton } from "./BuildingConcentrationButton";
 
 export const AppHeader: FC = () => {
   // const hidden = useAtomValue(hideAppOverlayAtom);
@@ -20,9 +21,7 @@ export const AppHeader: FC = () => {
       <DatasetButton />
       <CompassBiasButton />
       <FovButton />
-      <AppIconButton title="表示モード">
-        <BuildingIcon />
-      </AppIconButton>
+      <BuildingConcentrationButton />
     </AppBar>
   );
 };

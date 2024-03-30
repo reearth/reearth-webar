@@ -24,6 +24,8 @@ export const fovPiOverAtom = atomWithStorageValidation({
 export const cesiumLoadedAtom = atom(false);
 export const arStartedAtom = atom(false);
 
+export const buildingConcentratedAtom = atom(false);
+
 type Feature = {
   // フィーチャーオブジェクトの型定義
   // 必要なプロパティを追加してください
