@@ -1,5 +1,5 @@
 import { styled } from "@mui/material";
-import { type FC } from "react";
+import { useEffect, type FC } from "react";
 
 import {
   FloatingPanel,
@@ -7,7 +7,9 @@ import {
   SliderParameterItem,
 } from "../../ui-components";
 
-import { compassBiasAtom } from "../states/ar";
+import { arStartedAtom, compassBiasAtom } from "../states/ar";
+import { useAtomValue } from "jotai";
+import { updateCompassBias } from "../../../../ar";
 
 const Root = styled(FloatingPanel)(({ theme }) => ({
   width: 360,
@@ -20,6 +22,13 @@ const Title = styled("div")(({ theme }) => ({
 }));
 
 export const CompassBiasPanel: FC = () => {
+  const arStarted = useAtomValue(arStartedAtom);
+  const compassBias = useAtomValue(compassBiasAtom);
+  useEffect(() => {
+    if (!arStarted) { return; }
+    updateCompassBias(compassBias);
+  }, [compassBias]);
+
   return (
     <Root>
       <Title>コンパス設定</Title>

@@ -1,5 +1,5 @@
 import { styled } from "@mui/material";
-import { type FC } from "react";
+import { useEffect, type FC } from "react";
 
 import {
   FloatingPanel,
@@ -7,7 +7,9 @@ import {
   SliderParameterItem,
 } from "../../ui-components";
 
-import { fovPiOverAtom } from "../states/ar";
+import { arStartedAtom, fovPiOverAtom } from "../states/ar";
+import { updateFov } from "../../../../ar";
+import { useAtomValue } from "jotai";
 
 const Root = styled(FloatingPanel)(({ theme }) => ({
   width: 360,
@@ -20,6 +22,13 @@ const Title = styled("div")(({ theme }) => ({
 }));
 
 export const FovPanel: FC = () => {
+  const arStarted = useAtomValue(arStartedAtom);
+  const fovPiOver = useAtomValue(fovPiOverAtom);
+  useEffect(() => {
+    if (!arStarted) { return; }
+    updateFov(fovPiOver);
+  }, [fovPiOver]);
+
   return (
     <Root>
       <Title>視野角設定</Title>

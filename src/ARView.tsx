@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
-import { startAR, stopAR, isios, isImuPermissionGranted, requestImuPermission } from "./ar";
-import { useAtom, useSetAtom } from "jotai";
+import { startAR, stopAR, isios, isImuPermissionGranted, requestImuPermission, updateFov, updateCompassBias } from "./ar";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import PopupDialog from "./components/prototypes/ui-components/PopupDialog";
-import { cesiumLoadedAtom, arStartedAtom } from "./components/prototypes/view/states/ar";
+import { cesiumLoadedAtom, arStartedAtom, fovPiOverAtom, compassBiasAtom } from "./components/prototypes/view/states/ar";
 
 export default function ARView({...props}) {
   // CDNからCesiumを読み込む
   const [cesiumLoaded, setCesiumLoaded] = useAtom(cesiumLoadedAtom);
-  const setArStarted = useSetAtom(arStartedAtom);
   useEffect(() => {
     const script = document.createElement('script');
     script.src = 'https://cesium.com/downloads/cesiumjs/releases/1.114/Build/Cesium/Cesium.js';
@@ -23,10 +22,15 @@ export default function ARView({...props}) {
     };
   }, []);
 
+  const setArStarted = useSetAtom(arStartedAtom);
+  const compassBias = useAtomValue(compassBiasAtom);
+  const fovPiOver = useAtomValue(fovPiOverAtom);
   useEffect(() => {
     if (!cesiumLoaded) { return; }
     startAR();
     setArStarted(true);
+    updateCompassBias(compassBias);
+    updateFov(fovPiOver);
 
     return () => {
       stopAR();

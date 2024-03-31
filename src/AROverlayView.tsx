@@ -17,20 +17,5 @@ export default function AROverlayView({...props}) {
   //   pickUpFeature(handlePickedFeature);
   // }, [cesiumLoaded]);
 
-  // UIのステート変更を監視してVMに反映
-  const arStarted = useAtomValue(arStartedAtom);
-  const compassBias = useAtomValue(compassBiasAtom);
-  const fovPiOver = useAtomValue(fovPiOverAtom);
-  useEffect(() => {
-    if (!arStarted) { return; }
-    console.log("compass bias (UI): ", compassBias);
-    updateCompassBias(compassBias);
-  }, [compassBias]);
-  useEffect(() => {
-    if (!arStarted) { return; }
-    console.log("fov pi over (UI): ", fovPiOver);
-    updateFov(fovPiOver);
-  }, [fovPiOver]);
-
-  return <div {...props}>AROverlayView</div>;
+  return <div {...props}></div>;
 }
