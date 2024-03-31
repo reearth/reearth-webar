@@ -745,10 +745,10 @@ export function updateOcclusion(shouldHideOtherBldgs) {
     silhouetteStage.selected = [];
     silhouetteStage.enabled = false;
     // オクルージョンシェーダを有効とする
+    // PostProcessStageのselectedを新しい配列で置き換えてしまうと
+    // シェーダのczm_selected()関数がboolを返さずクラッシュする問題があるので
+    // selectedを代入で置き換えずにpushして対応
     selectedFeatures.map(feature => {
-      // PostProcessStageのselectedを新しいオブジェクトで置き換えてしまうと
-      // シェーダのczm_selected()関数がboolを返さずクラッシュする問題があるので
-      // selectedを代入で置き換えずにpushして対応
       occlusionStage.selected.push(feature);
     });
     occlusionStage.enabled = true;
