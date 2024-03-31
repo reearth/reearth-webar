@@ -12,7 +12,7 @@ import { settingsAtom } from "./components/shared/states/setting";
 import { templatesAtom } from "./components/shared/states/template";
 import { createRootLayerAtom } from "./components/shared/view-layers";
 
-function tilesetUrls(plateauDatasets: [PlateauDataset]): string[] {
+function tilesetUrlsFromDatasets(plateauDatasets: [PlateauDataset]): string[] {
   return plateauDatasets.map(plateauDataset => {
     const plateauDatasetItems = plateauDataset.items as [PlateauDatasetItem];
     // LOD2(テクスチャあり)->LOD2(テクスチャなし)->LOD1の順でフォールバック
@@ -36,11 +36,13 @@ function tilesetUrls(plateauDatasets: [PlateauDataset]): string[] {
 }
 
 export default function DatasetSyncer({...props}) {
-  // 開始時にクエパラでデータセットIDを指定された場合にデータセットパネルの初期化に使用するデータセット群 (レンダリング毎に忘却したいのでStateにはしない)
-  let initialPlateauDatasets: [PlateauDataset];
-  let initialDatasetIds: string[] = [];
-  // 開始時にクエパラでデータセットIDを指定された場合にARViewの初期化に使用するtilesetURL (レンダリング毎に忘却したいのでStateにはしない)
-  let initialTilesetUrls: string[] = [];
+  // 開始時にクエパラでデータセットIDを指定された場合にデータセットパネルの初期化に使用するデータセットID群 (レンダリング毎に忘却したいのでStateにはしない)
+  let datasetIds: string[] = [];
+  // データセットID群をもとにカタログから取得するデータセット群
+  let plateauDatasets: [PlateauDataset];
+  // データセット群から抽出するtilesetURL群 (ARViewのタイルセット描画リセットに使用)
+  let tilesetUrls: string[] = [];
+
   // クエパラを見てPLATEAU ViewからのデータセットID群の初期値が来ていれば取得し、tilesetURL群に変換
   // クエパラはこんな感じで来る ?dataList=[{"datasetId":"d_13101_bldg","dataId":"di_13101_bldg_LOD1"}]
   // データセットIDのみ使用する。複数来る場合はこんな感じ ?dataList=[{"datasetId":"d_14136_bldg"},{"datasetId":"d_14135_bldg"}]
@@ -53,7 +55,7 @@ export default function DatasetSyncer({...props}) {
       const evaled: any[] = eval(dataList);
       // console.log(evaled);
       if (evaled) {
-        initialDatasetIds = evaled.map(x => x.datasetId);
+        datasetIds = evaled.map(x => x.datasetId);
         // console.log(initialDatasetIds);
       } else {
         throw "単一のパラメータが評価できません";
@@ -66,26 +68,26 @@ export default function DatasetSyncer({...props}) {
     console.log(e);
   }
   // フックの数を変えないためにもしクエパラがundefinedでも空配列で必ずクエリを呼び出す
-  const { data } = useDatasetsByIds(initialDatasetIds);
+  const { data } = useDatasetsByIds(datasetIds);
   // console.log(data);
   if (data) {
-    initialPlateauDatasets = data.nodes as [PlateauDataset];
+    plateauDatasets = data.nodes as [PlateauDataset];
     // useDatasetsByIdsクエリが中身のあるデータを返してくるまでは待機
-    if (initialPlateauDatasets) {
+    if (plateauDatasets) {
       // TODO: ここでdatasetのTypeが対応していないものであればアラートポップアップを出し除外する
-      const removedInitialPlateauDatasets = initialPlateauDatasets.filter(dataset => dataset.type.code !== 'bldg');
-      const filteredInitialPlateauDatasets = initialPlateauDatasets.filter(dataset => dataset.type.code === 'bldg') as [PlateauDataset];
+      const removedInitialPlateauDatasets = plateauDatasets.filter(dataset => dataset.type.code !== 'bldg');
+      const filteredInitialPlateauDatasets = plateauDatasets.filter(dataset => dataset.type.code === 'bldg') as [PlateauDataset];
 
       if (removedInitialPlateauDatasets.length > 0) {
         const removedNames = removedInitialPlateauDatasets.map(item => item.name).join(', ');
         console.log(`${removedNames} はAR非対応のため非表示になります。`); // ポップアップメッセージを設定
       }
-      initialTilesetUrls = tilesetUrls(filteredInitialPlateauDatasets);
+      tilesetUrls = tilesetUrlsFromDatasets(filteredInitialPlateauDatasets);
       // console.log("initialTilesetUrls: ", initialTilesetUrls);
     }
   }
 
-  // データセットパネルに追加されたレイヤー群と関連フック
+  // データセットパネルと同期されるレイヤー群とその関連フック
   const rootLayers = useAtomValue(rootLayersAtom);
   const addLayer = useAddLayer();
   const settings = useAtomValue(settingsAtom);
@@ -94,8 +96,8 @@ export default function DatasetSyncer({...props}) {
   // クエパラから来たデータセットID群をデータセットパネルに同期
   // TODO: これはeffectである必要性なし (上の処理に続けて書いて良さそう)
   useEffect(() => {
-    if (!initialPlateauDatasets || !initialPlateauDatasets.length) { return; }
-    initialPlateauDatasets.map(dataset => {
+    if (!plateauDatasets || !plateauDatasets.length) { return; }
+    plateauDatasets.map(dataset => {
       const datasetId = dataset.id;
       const rootLayersDatasetIds = rootLayers.map(rootLayer => rootLayer.rawDataset.id);
       if (rootLayersDatasetIds.includes(datasetId)) { return; }
@@ -115,7 +117,7 @@ export default function DatasetSyncer({...props}) {
       // TODO: クリーンアップ
 
     };
-  }, [initialPlateauDatasets]);
+  }, [plateauDatasets]);
 
   // データセットパネルのレイヤー群が変化したらクエパラを更新して再レンダリング
   const [, setSearchParams] = useSearchParams();
@@ -143,13 +145,13 @@ export default function DatasetSyncer({...props}) {
   const arStarted = useAtomValue(arStartedAtom);
   useEffect(() => {
     if (!arStarted) { return; }
-    console.log("Resetting tilesets:", initialTilesetUrls);
-    resetTileset(initialTilesetUrls);
+    console.log("Resetting tilesets:", tilesetUrls);
+    resetTileset(tilesetUrls);
 
     return () => {
       // resetTileset([]);
     };
-  }, [initialTilesetUrls]);
+  }, [tilesetUrls]);
 
   return (
     <div id="dataset_syncer" {...props}></div>
