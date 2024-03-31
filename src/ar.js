@@ -246,7 +246,7 @@ async function startDeviceCameraPreview() {
 // Cesiumのカメラ座標を更新
 function moveCesiumCamera(destination) {
   if (!destination) { return; }
-  // console.log(`camera moved: ${destination}`);
+  console.log(`camera moved: ${destination}`);
   cesiumCamera.setView({
     destination: destination,
     // orientation: isios ? oldHeadingPitchRoll : { direction: oldDirection, up: oldUp }
@@ -669,14 +669,14 @@ export async function resetTileset(tilesetUrls) {
   if (!cesiumViewer) { return; }
   // cesiumViewer.scene.primitives.removeAll();
 
-  console.log("oldTilesetUrls: ", oldTilesetUrls);
-  console.log("tilesetUrls: ", tilesetUrls);
+  // console.log("oldTilesetUrls: ", oldTilesetUrls);
+  // console.log("tilesetUrls: ", tilesetUrls);
 
   // 削除されたtilesetをremove
   const removedUrls = oldTilesetUrls.filter(x => !tilesetUrls.includes(x));
-  console.log("removedUrls: ", removedUrls);
+  // console.log("removedUrls: ", removedUrls);
   const removingPrimitives = tilesets.filter(tileset => removedUrls.includes(tileset.url));
-  console.log("removingPrimitives: ", removingPrimitives);
+  // console.log("removingPrimitives: ", removingPrimitives);
   removingPrimitives.map(removingPrimitive => {
     // TODO: このremoveが上手く動いていない
     cesiumViewer.scene.primitives.remove(removingPrimitive);
@@ -685,7 +685,7 @@ export async function resetTileset(tilesetUrls) {
 
   // 追加されたtilesetをadd
   const addedUrls = tilesetUrls.filter(x => !oldTilesetUrls.includes(x));
-  console.log("addedUrls: ", addedUrls);
+  // console.log("addedUrls: ", addedUrls);
 
   // PLATEAUのテクスチャ付き3DTilesを表示
   // PLATEAUのデータはここから取得
@@ -733,7 +733,7 @@ export async function resetTileset(tilesetUrls) {
   });
 
   oldTilesetUrls = tilesetUrls;
-  console.log("tilesets: ", tilesets);
+  // console.log("tilesets: ", tilesets);
 }
 
 // オクルージョン表示を更新
@@ -773,6 +773,5 @@ export function updateFov(fovPiOver) {
 // コンパス手動調整用のバイアスを更新
 export function updateCompassBias(compassBias) {
   viewModel.compassBias = compassBias;
-  console.log("compass bias (VM): ", viewModel.compassBias);
 }
 
