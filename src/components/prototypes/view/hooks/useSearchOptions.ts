@@ -162,6 +162,9 @@ export interface SearchOptions {
   select: (option: SearchOption) => void;
 }
 
+// SearchAutocompletePanelで使用されている
+// 返り値として、現在選択されているものを詰め込む操作を行うためのselectを返している。
+// SearchAutocompletePanelにおいて、useSearchOptionsを使用する際に、selectを叩いてあげればよい
 export function useSearchOptions(options?: SearchOptionsParams): SearchOptions {
   const datasets = useDatasetSearchOptions(options);
   const buildings = useBuildingSearchOption(options);
@@ -169,6 +172,9 @@ export function useSearchOptions(options?: SearchOptionsParams): SearchOptions {
   const templates = useAtomValue(templatesAtom);
 
   const addLayer = useSetAtom(addLayerAtom);
+  // selectコールバックで建物が選択されていたらscreenSpaceSelectionAtomにvalueを保存
+  // screenSpaceSelectionAtomはselectionAtomで参照されており、selectionAtomは更にselectionGroupsAtomで参照されているため、
+  // 巡り巡って、selectionGroupsAtomを用いるSelectionPanelのcontentsに利用される形で表示される。
   const setScreenSpaceSelection = useSetAtom(screenSpaceSelectionAtom);
   const select = useCallback(
     (option: SearchOption) => {

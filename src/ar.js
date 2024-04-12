@@ -584,6 +584,7 @@ function setupUserInput() {
     if (!occlusionStage.enabled) {
       const pickedFeature = cesiumViewer.scene.pick(movement.position);    
       if (Cesium.defined(pickedFeature)) {
+        // console.log("pickedFeature: ", pickedFeature);
         // selectedには3DTilesのFeatureをそのまま突っ込めるのでprimitiveにはアクセスしなくてよい
         selectedFeatures = [pickedFeature];
         silhouetteStage.selected = selectedFeatures;

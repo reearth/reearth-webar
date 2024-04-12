@@ -21,6 +21,8 @@ type ScreenSpaceSelectionOptions = Partial<typeof defaultOptions>;
 
 export type ScreenSpaceSelectionProps = ScreenSpaceSelectionOptions;
 
+// スクリーン上で選択された部分にMarqueeを表示しつつ、選択時の挙動を定義するイベントハンドラを保持する
+// View3.0においては、PlateauScreenSpaceSelectionとしてラップされ、Widgetの1つとして使用されている
 export const ScreenSpaceSelection: FC<ScreenSpaceSelectionProps> = ({ ...options }) => {
   const handler = useMemo(() => new ScreenSpaceSelectionHandler(), []);
   const pointRef = useRef({ x: 0, y: 0 });

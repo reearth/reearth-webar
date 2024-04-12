@@ -53,7 +53,6 @@ export interface DatasetDialogProps extends Omit<DialogProps, "children"> {
 }
 
 export const DatasetDialog: FC<DatasetDialogProps> = ({ dataset, municipalityCode, ...props }) => {
-  // TODO: 単一データセットを選択した際のダイアログ (Re:EarthのSTGからReactのツリーが見れるかもなのでそれ聞いて参考にしてもいいかも。プロダクションでは見れるか分からん)
   const { data } = useDatasetById(dataset.id);
 
   // TODO: Separate into hook

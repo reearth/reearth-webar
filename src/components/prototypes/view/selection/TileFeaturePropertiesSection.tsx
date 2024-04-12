@@ -18,11 +18,14 @@ export interface TileFeaturePropertiesSectionProps {
   })["values"];
 }
 
+// Takramの方の実装に寄せるのがよい
+// ただし日本語にする処理はこちらにしかないので組み合わせる必要がある
 export const TileFeaturePropertiesSection: FC<TileFeaturePropertiesSectionProps> = ({ values }) => {
   const rootLayersLayers = useAtomValue(rootLayersLayersAtom);
   const findRootLayer = useSetAtom(findRootLayerAtom);
   const findLayer = useFindLayer();
 
+  // ここを置き換える
   const layers = useMemo(() => {
     const layersMap = values.reduce((res, v) => {
       if (!res[v.layerId]) {

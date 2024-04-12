@@ -94,6 +94,7 @@ export class ScreenSpaceSelectionHandler {
     pointEvent.action = actionForModifier(keyName);
     pointEvent.x = position[0];
     pointEvent.y = position[1];
+    // ここでイベントリスナーに渡す
     this.change.dispatch(pointEvent);
   };
 

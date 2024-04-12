@@ -46,6 +46,9 @@ export type Selection =
 
 export type SelectionType = Selection["type"];
 
+// 選択中の対象を保持するAtom
+// useSearchOptionsでセットされるscreenSpaceSelectionAtomを取得している。
+// selectionGroupsAtomを経由して、SelectionPanelにおいて表示内容として使用されている
 export const selectionAtom = atom((get): Selection[] => [
   ...get(layerSelectionAtom)
     .map(({ id }): LayerSelection | undefined => {
@@ -139,6 +142,8 @@ export type SelectionGroup =
   | ColorSchemeSelectionGroup
   | ImageSchemeSelectionGroup;
 
+// 選択中の対象をグループ分けして保持するAtom
+// SelectionPanelで表示内容として使用される
 export const selectionGroupsAtom = atom<SelectionGroup[]>(get => {
   const groups = Object.entries(groupBy(get(selectionAtom), "type")) as unknown as Array<
     {
