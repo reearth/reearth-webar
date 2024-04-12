@@ -679,8 +679,7 @@ export async function resetTileset(tilesetUrls) {
   const removingPrimitives = tilesets.filter(tileset => removedUrls.includes(tileset.url));
   // console.log("removingPrimitives: ", removingPrimitives);
   removingPrimitives.map(removingPrimitive => {
-    // TODO: このremoveが上手く動いていない
-    cesiumViewer.scene.primitives.remove(removingPrimitive);
+    cesiumViewer.scene.primitives.remove(removingPrimitive.primitive);
   });
   tilesets = tilesets.filter(tileset => !removedUrls.includes(tileset.url));
 
