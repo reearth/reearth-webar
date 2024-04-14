@@ -670,12 +670,12 @@ export async function resetTileset(tilesetUrls) {
   if (!cesiumViewer) { return; }
   // cesiumViewer.scene.primitives.removeAll();
 
-  // console.log("oldTilesetUrls: ", oldTilesetUrls);
-  // console.log("tilesetUrls: ", tilesetUrls);
+  console.log("oldTilesetUrls: ", oldTilesetUrls);
+  console.log("newTilesetUrls: ", tilesetUrls);
 
   // 削除されたtilesetをremove
   const removedUrls = oldTilesetUrls.filter(x => !tilesetUrls.includes(x));
-  // console.log("removedUrls: ", removedUrls);
+  console.log("removedUrls: ", removedUrls);
   const removingPrimitives = tilesets.filter(tileset => removedUrls.includes(tileset.url));
   // console.log("removingPrimitives: ", removingPrimitives);
   removingPrimitives.map(removingPrimitive => {
@@ -685,7 +685,7 @@ export async function resetTileset(tilesetUrls) {
 
   // 追加されたtilesetをadd
   const addedUrls = tilesetUrls.filter(x => !oldTilesetUrls.includes(x));
-  // console.log("addedUrls: ", addedUrls);
+  console.log("addedUrls: ", addedUrls);
 
   // PLATEAUのテクスチャ付き3DTilesを表示
   // PLATEAUのデータはここから取得

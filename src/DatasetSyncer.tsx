@@ -45,6 +45,7 @@ export default function DatasetSyncer({...props}) {
         const evaled: any[] = eval(dataList);
         if (evaled) {
           const datasetIds = evaled.map(x => x.datasetId);
+          console.log("New Dataset Ids: ", datasetIds);
           setDatasetIds(datasetIds);
         } else {
           throw "単一のパラメータが評価できません";
@@ -59,20 +60,21 @@ export default function DatasetSyncer({...props}) {
     }
 
     return () => {
-      setDatasetIds([]);
+      // setDatasetIds([]);
     };
   }, [searchParams]);
 
   // データセットID群が変化したらuseDatasetsByIdsを用いてカタログからデータセット群を取得・保存して本コンポーネントを再レンダリング
   useEffect(() => {
-    // カタログからデータセット群を取得できていない間は何もしない
+    // カタログからデータセット群を取得できていない間も何度かコールされるのでその間は何もしない
     if (!data || !data.nodes || !data.nodes.length) { return; }
     // データセット群を抽出
     const plateauDatasets = data.nodes as PlateauDataset[];
+    console.log("New Datasets: ", plateauDatasets);
     setDatasets(plateauDatasets);
   
     return () => {
-      setDatasets([]);
+      // setDatasets([]);
     };
   }, [data]);
 
@@ -87,11 +89,11 @@ export default function DatasetSyncer({...props}) {
       console.log(`${removedNames} はAR非対応のため非表示になります。`); // ポップアップメッセージを設定
     }
 
+    console.log("New Filterd Datasets: ", filteredDatasets);
     setFilteredDatasets(filteredDatasets);
   
     return () => {
-      // TODO:
-      setFilteredDatasets([]);
+      // setFilteredDatasets([]);
     };
   }, [datasets]);
 
@@ -100,11 +102,12 @@ export default function DatasetSyncer({...props}) {
     // クエパラからのデータセット変換が完了するまではスルー
     if (!filteredDatasets) { return; }
 
-    filteredDatasets.map(dataset => {
-      const datasetId = dataset.id;
-      const rootLayersDatasetIds = rootLayers.map(rootLayer => rootLayer.rawDataset.id);
-      if (rootLayersDatasetIds.includes(datasetId)) { return; }
-      const filteredSettings = settings.filter(s => s.datasetId === datasetId);
+    // 既にデータセットパネルで選択されているレイヤーは追加対象から除外
+    const rootLayersDatasetIds = rootLayers.map(rootLayer => rootLayer.rawDataset.id);
+    const uniqueDatasets = filteredDatasets.filter(dataset => !rootLayersDatasetIds.includes(dataset.id));
+
+    uniqueDatasets.map(dataset => {
+      const filteredSettings = settings.filter(s => s.datasetId === dataset.id);
       addLayer(
         createRootLayerAtom({
           dataset,
@@ -117,7 +120,7 @@ export default function DatasetSyncer({...props}) {
     });
   
     return () => {
-      // TODO:
+      // setFilteredDatasets([]);
     };
   }, [filteredDatasets]);
 
@@ -153,7 +156,7 @@ export default function DatasetSyncer({...props}) {
     resetTileset(tilesetUrls);
   
     return () => {
-      resetTileset([]);
+      // resetTileset([]);
     };
   }, [filteredDatasets]);
 
@@ -180,7 +183,7 @@ export default function DatasetSyncer({...props}) {
     setSearchParams({dataList: datasetIdsObjsStr});
 
     return () => {
-      setSearchParams({});
+      // setSearchParams({});
     };
   }, [rootLayers]);
 
