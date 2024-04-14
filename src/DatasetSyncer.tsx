@@ -70,6 +70,10 @@ export default function DatasetSyncer({...props}) {
     if (!data || !data.nodes || !data.nodes.length) { return; }
     // データセット群を抽出
     const plateauDatasets = data.nodes as PlateauDataset[];
+    // データセット群がデータセットID群と整合しない場合はまだカタログの取得途中なので完全に出揃うまではむやみに更新しない
+    // 正確にはIDで比較したいが、数の整合で十分と思われるので一旦そうする
+    console.log("datasets length:", plateauDatasets.length, "dataset ids length:", datasetIds.length);
+    if (plateauDatasets.length !== datasetIds.length) { return; }
     console.log("New Datasets: ", plateauDatasets);
     setDatasets(plateauDatasets);
   
