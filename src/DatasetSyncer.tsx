@@ -24,7 +24,7 @@ export default function DatasetSyncer({...props}) {
   const [datasets, setDatasets] = useState<PlateauDataset[]>([]);
   // ARで使用不可能なデータセットを弾いたデータセット群
   // クエパラを反映した初期化が完了するまではrootLayersによるフックを作動させないためのフラグとしても使用する
-  // そのため敢えて配列で初期化せずにnudefinedとなるようにしていることに注意
+  // そのため敢えて配列で初期化せずにudefinedとなるようにしていることに注意
   const [filteredDatasets, setFilteredDatasets] = useState<PlateauDataset[]>();
   // データセットパネルと同期されるレイヤー群とその関連フック
   const rootLayers = useAtomValue(rootLayersAtom);
