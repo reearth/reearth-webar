@@ -3,7 +3,7 @@ import queryString from "query-string";
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { resetTileset } from "./ar";
-import { useAddLayer } from "./components/prototypes/layers";
+import { LayersRenderer, useAddLayer } from "./components/prototypes/layers";
 import { arStartedAtom } from "./components/prototypes/view/states/ar";
 import { useDatasetsByIds } from "./components/shared/graphql";
 import { PlateauDataset, PlateauDatasetItem } from "./components/shared/graphql/types/catalog";
@@ -11,6 +11,8 @@ import { rootLayersAtom } from "./components/shared/states/rootLayer";
 import { settingsAtom } from "./components/shared/states/setting";
 import { templatesAtom } from "./components/shared/states/template";
 import { createRootLayerAtom } from "./components/shared/view-layers";
+import { layerComponents } from "./components/shared/view-layers/layerComponents";
+import { LoadedTileset } from "./components/shared/types";
 
 // クエパラとデータセットパネルの間の双方向同期ならびにタイルセット描画更新を行うためのヘッドレス(非表示)コンポーネント
 export default function DatasetSyncer({...props}) {
@@ -33,6 +35,8 @@ export default function DatasetSyncer({...props}) {
   const templates = useAtomValue(templatesAtom);
   // ARロジックが開始・準備完了しているか
   const arStarted = useAtomValue(arStartedAtom);
+
+  const [tilesets, setTilesets] = useState<LoadedTileset[]>([]);
 
   // クエパラが変化したらデータセットID群を取得・保存して本コンポーネントを再レンダリング
   useEffect(() => {
@@ -130,20 +134,20 @@ export default function DatasetSyncer({...props}) {
     if (!filteredDatasets) { return; }
 
     // データセット群をタイルセットURL群に変換
-    const tilesetUrls = filteredDatasets.map(plateauDataset => {
+    const tilesetConfigs = filteredDatasets.map(plateauDataset => {
       const plateauDatasetItems = plateauDataset.items as PlateauDatasetItem[];
       // LOD2(テクスチャあり)->LOD2(テクスチャなし)->LOD1の順でフォールバック
       const tilesetUrlLod2TexItem = plateauDatasetItems.find(({ lod, texture }) => lod == 2 && texture == "TEXTURE")
       if (tilesetUrlLod2TexItem && tilesetUrlLod2TexItem.url) {
-        return tilesetUrlLod2TexItem.url;
+        return {url: tilesetUrlLod2TexItem.url, id: plateauDataset.id};
       } else {
         const tilesetUrlLod2NoneTexItem = plateauDatasetItems.find(({ lod, texture }) => lod == 2 && texture == "NONE")
         if (tilesetUrlLod2NoneTexItem && tilesetUrlLod2NoneTexItem.url) {
-          return tilesetUrlLod2NoneTexItem.url;
+          return {url: tilesetUrlLod2NoneTexItem.url, id: plateauDataset.id};
         } else {
           const tilesetUrlLod1Item = plateauDatasetItems.find(({ lod }) => lod == 1)
           if (tilesetUrlLod1Item && tilesetUrlLod1Item.url) {
-            return tilesetUrlLod1Item.url;
+            return {url: tilesetUrlLod1Item.url, id: plateauDataset.id};
           } else {
             return null;
           }
@@ -152,8 +156,10 @@ export default function DatasetSyncer({...props}) {
     }).filter(x => x);
   
     // tilesetをリセット
-    if (!tilesetUrls || !arStarted) { return; }
-    resetTileset(tilesetUrls);
+    if (!tilesetConfigs || !arStarted) { return; }
+    resetTileset(tilesetConfigs.map(t => t.url)).then((tilesets: LoadedTileset[]) => {
+      setTilesets(tilesets.map(t => ({ ...t, id: tilesetConfigs.find(c => c.url === t.url).id })));
+    });
   
     return () => {
       // resetTileset([]);
@@ -188,6 +194,8 @@ export default function DatasetSyncer({...props}) {
   }, [rootLayers]);
 
   return (
-    <div id="dataset_syncer" {...props}></div>
+    <div id="dataset_syncer" {...props}>
+      <LayersRenderer tilesets={tilesets} components={layerComponents} />
+    </div>
   )
 }

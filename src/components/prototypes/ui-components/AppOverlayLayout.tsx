@@ -70,7 +70,7 @@ const RootGrid = styled("div", {
   gridColumnGap: theme.spacing(spacing),
   gridAutoFlow: "column",
   gridAutoColumns: "",
-  // margin: theme.spacing(spacing),
+  margin: theme.spacing(spacing),
   minHeight: 0,
 }));
 
@@ -105,8 +105,8 @@ const Main = styled("main", {
   flexShrink: 1,
   flexGrow: 0,
   width: mainWidth,
-  // minHeight: 0,
-  // marginRight: theme.spacing(spacing),
+  minHeight: 0,
+  marginRight: theme.spacing(spacing),
   [`@container (min-width: calc(${mainWidth + contextWidth}px + ${theme.spacing(spacing)}))`]: {
     flexBasis: mainWidth,
     flexShrink: 0,
@@ -203,7 +203,7 @@ export const AppOverlayLayout: FC<AppOverlayLayoutProps> = memo(
     const mainRef = useRef<HTMLDivElement>(null);
     useEffect(() => {
       invariant(rootRef.current != null);
-      invariant(mainRef.current != null);
+      if(mainRef.current == null) return;
       setGridHeight(rootRef.current.getBoundingClientRect().height);
       setMaxMainHeight(mainRef.current.getBoundingClientRect().height);
       const observerForRoot = new ResizeObserver(([entry]) => {
@@ -230,7 +230,7 @@ export const AppOverlayLayout: FC<AppOverlayLayoutProps> = memo(
         <Root ref={rootRef} hidden={hidden}>
           <RootColumn>
             <RootGrid spacing={spacing}>
-              <SizeContainer ref={mainRef}>
+              {/* <SizeContainer ref={mainRef}>
                 <MainContainer spacing={spacing} mainWidth={mainWidth} contextWidth={contextWidth}>
                   <Main spacing={spacing} mainWidth={mainWidth} contextWidth={contextWidth}>
                     {main}
@@ -239,7 +239,7 @@ export const AppOverlayLayout: FC<AppOverlayLayoutProps> = memo(
                     {context}
                   </Context>
                 </MainContainer>
-              </SizeContainer>
+              </SizeContainer> */}
               {aside}
             </RootGrid>
             <DarkThemeOverride>

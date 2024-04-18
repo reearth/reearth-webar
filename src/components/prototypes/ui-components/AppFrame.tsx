@@ -2,9 +2,12 @@ import { styled } from "@mui/material";
 import { type FC, type ReactNode } from "react";
 
 const Root = styled("div")({
-  overflow: "hidden",
-  display: "flex",
-  flexDirection: "column",
+  overflow: 'hidden',
+  display: 'flex',
+  flexDirection: 'column',
+  position: 'fixed',
+  inset: 0,
+  touchAction: 'none'
 });
 
 const Header = styled("div")({
@@ -14,8 +17,8 @@ const Header = styled("div")({
 
 const Body = styled("div")({
   position: "relative",
-  flexGrow: 0,
-  flexShrink: 0,
+  flexGrow: 1,
+  flexShrink: 1,
 });
 
 export interface AppFrameProps {

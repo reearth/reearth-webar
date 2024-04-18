@@ -27,7 +27,7 @@ export const tilesetLayersLayersAtom = atom(get =>
 // );
 
 export const highlightedTilesetLayersAtom = atom(get => {
-  const featureKeys = get(featureSelectionAtom).map(({ value }) => value);
+  const featureKeys = get(featureSelectionAtom).map(({ value }) => value.key);
   const tilesetLayers = get(tilesetLayersAtom);
   return tilesetLayers.filter(root => {
     const layer = get(get(root.rootLayerAtom).layer);
@@ -35,8 +35,7 @@ export const highlightedTilesetLayersAtom = atom(get => {
       return;
     }
     const featureIndex = get(layer.featureIndexAtom);
-    const features = featureIndex?.featureIds;
-    return features && featureKeys.some(key => features.includes(key.key));
+    return featureIndex != null && featureKeys.some(key => featureIndex.has(key))
   });
 });
 

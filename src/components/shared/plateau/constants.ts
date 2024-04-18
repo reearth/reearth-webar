@@ -14,20 +14,16 @@ export const REEARTH_DATA_FORMATS: Record<DatasetFormat, DataType> = {
   [DatasetFormat.Wms]: "wms",
 };
 
-export const BUILDING_MODEL_FILTER_RANGE: Record<string, [min: number, max: number]> = {
-  // Height
-  ["計測高さ"]: [0, 200],
-  // Aboveground floor
-  ["地上階数"]: [0, 100],
-  // Basement floor
-  ["地下階数"]: [0, 5],
-  // Building age
-  ["建築年"]: [1850, new Date().getFullYear()],
-};
-
 export const FEATURE_PROPERTIES_CONFIG = [
   {
     property: "attributes",
     name: "全ての属性",
   },
 ];
+
+export const BUILDING_FEATURE_TYPE = "bldg:Building";
+
+// Some area codes are changed due to some goverment reason, but digital data isn't updated yet.
+// Then we can't get the actual area code for each ward from API.
+// But we can get city's code, so we need to show the data for ward as city.
+export const CITY_CODES_FOR_BUILDING_MODEL = ["22130"];

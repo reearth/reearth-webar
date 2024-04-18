@@ -19,7 +19,7 @@ export const MainPanel: FC = () => {
 
   const clearLayerSelection = useSetAtom(clearLayerSelectionAtom);
   const handleLayersMouseDown = useCallback(() => {
-    clearLayerSelection();
+    // clearLayerSelection();
   }, [clearLayerSelection]);
 
   return (

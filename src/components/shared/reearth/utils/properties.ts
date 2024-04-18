@@ -1,9 +1,11 @@
+import { Cesium3DTileset } from "cesium";
+
 export class Properties {
-  private _layerId: string;
+  private _layer: Cesium3DTileset;
   private _cachedProperties?: any;
 
-  constructor(layerId: string) {
-    this._layerId = layerId;
+  constructor(layer: Cesium3DTileset) {
+    this._layer = layer;
   }
 
   get value() {
@@ -11,7 +13,7 @@ export class Properties {
       return this._cachedProperties;
     }
 
-    const properties = window.reearth?.layers?.findById?.(this._layerId)?.computed?.properties;
+    const properties = this._layer.properties;
     this._cachedProperties = properties;
 
     return this._cachedProperties;

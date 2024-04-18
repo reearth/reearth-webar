@@ -28,6 +28,7 @@ export interface PlateauTilesetLayerState {
   colorPropertyAtom: PrimitiveAtom<string | null>;
   colorMapAtom: WritableAtom<ColorMap<ColorMapType>, [SetStateAction<ColorMap>], void>;
   colorRangeAtom: PrimitiveAtom<number[]>;
+  opacityAtom: PrimitiveAtom<number>;
   colorSchemeAtom: ViewLayerModel["colorSchemeAtom"];
 }
 
@@ -124,5 +125,6 @@ export function createPlateauTilesetLayerState(
     colorMapAtom,
     colorRangeAtom,
     colorSchemeAtom,
+    opacityAtom: atom(1),
   };
 }

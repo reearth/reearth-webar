@@ -2,6 +2,7 @@ import { type Getter } from "jotai";
 import { type ComponentType, type HTMLAttributes } from "react";
 
 import { ScreenSpaceSelectionEntry } from "../screen-space-selection";
+import { LoadedTileset } from "../../shared/types";
 
 export interface LayerModelOverrides {}
 
@@ -41,6 +42,7 @@ export type LayerProps<T extends LayerType = LayerType> = LayerModel<T> & {
   selected?: boolean;
   itemProps?: HTMLAttributes<HTMLElement>;
   selections?: ScreenSpaceSelectionEntry[];
+  tilesets: LoadedTileset[];
 };
 
 export type LayerComponents = {

@@ -20,6 +20,13 @@ import { atomFamily } from "jotai/utils";
 import { groupBy, max, mean, min, round, intersection } from "lodash-es";
 import { forwardRef, useCallback, type ComponentPropsWithRef, type FC, useMemo } from "react";
 
+import {
+  ancestorsKey,
+  getPropertyAttributeValue,
+  makePropertyName,
+  makePropertyValue,
+} from "../../shared/plateau";
+import { roundFloat } from "../../shared/utils";
 import { isNotNullish } from "../type-helpers";
 
 import { TreeArrowCollapsedIcon } from "./icons/TreeArrowCollapsedIcon";
@@ -52,6 +59,7 @@ export interface PropertySet {
   id?: string;
   name: string;
   values: string[] | number[] | PropertySet[];
+  path?: string[];
 }
 
 const StringValue: FC<{
@@ -101,8 +109,10 @@ const NumberValue: FC<{
   );
 
   if (values.length === 1 || values.slice(1).every(value => value === values[0])) {
-    return <>{values[0]}</>;
+    const roundedValue = roundFloat(values[0]);
+    return <>{roundedValue}</>;
   }
+
   return (
     <NumberValueRoot>
       {format === "mean"
@@ -132,12 +142,16 @@ const NumberValue: FC<{
   );
 };
 
-const ObjectValue: FC<{ id: string; name: string; values: object[]; level?: number }> = ({
-  id,
-  name,
-  values,
-  level,
-}) => {
+const ObjectValue: FC<{
+  id: string;
+  name: string;
+  values: object[];
+  level?: number;
+  path?: string[];
+  featureType: string;
+  ancestorsFeatureType?: string;
+  hasDefaultPath: boolean;
+}> = ({ id, name, values, level, path, featureType, ancestorsFeatureType, hasDefaultPath }) => {
   const properties = useMemo(() => {
     return intersection(...values.map(v => Object.keys(v ?? {})))
       .filter(name => !name.startsWith("_"))
@@ -162,7 +176,15 @@ const ObjectValue: FC<{ id: string; name: string; values: object[]; level?: numb
       .sort((a, b) => a.name.localeCompare(b.name));
   }, [values]);
   return (
-    <PropertyGroup id={id} name={name} properties={properties as PropertySet[]} level={level} />
+    <PropertyGroup
+      id={id}
+      name={name}
+      properties={properties as PropertySet[]}
+      level={level}
+      path={path ? [...path, ...(isNaN(Number(name)) && !hasDefaultPath ? [name] : [])] : []}
+      featureType={featureType}
+      ancestorsFeatureType={ancestorsFeatureType}
+    />
   );
 };
 
@@ -171,29 +193,65 @@ const PropertyNameCell = styled(TableCell)<{
 }>(({ theme, level }) => ({
   ...(level != null && {
     paddingLeft: theme.spacing(level * 2.5 + 2),
+    wordBreak: "break-all",
   }),
 }));
 
 const Property: FC<{
   property: PropertySet;
   level?: number;
-}> = ({ property: { id, name, values }, level }) => {
+  path?: string[];
+  featureType: string;
+  ancestorsFeatureType?: string;
+}> = ({
+  property: { id, name, values, path: defaultPath },
+  level,
+  path,
+  featureType,
+  ancestorsFeatureType,
+}) => {
   const isPrimitive = ["string", "number"].includes(typeof values[0]);
+  const hasAncestors = !!path?.includes(ancestorsKey);
+  const actualName = `${hasAncestors ? ancestorsFeatureType : featureType}_${[
+    ...((hasAncestors ? path?.filter(p => p !== ancestorsKey) : path) ?? []),
+    ...(isNaN(Number(name)) ? [name] : []),
+  ].join("_")}`;
+  const attrVal = isPrimitive ? getPropertyAttributeValue(actualName) : undefined;
+
   return isPrimitive ? (
-    <TableRow>
+    <TableRow style={{ wordBreak: "break-all" }}>
       <PropertyNameCell variant="head" width="50%" level={level}>
-        {name.replaceAll("_", " ")}
+        {makePropertyName(actualName, name, attrVal)}
       </PropertyNameCell>
       <TableCell width="50%">
         {typeof values[0] === "string" ? (
-          <StringValue name={name} values={values as string[]} />
+          <StringValue
+            name={name}
+            values={(values as string[]).map(v =>
+              attrVal ? (makePropertyValue(attrVal, v) as string) : v,
+            )}
+          />
         ) : typeof values[0] === "number" ? (
-          <NumberValue name={name} values={values as number[]} />
+          <NumberValue
+            name={name}
+            values={(values as number[]).map(v =>
+              attrVal ? (makePropertyValue(attrVal, v) as number) : v,
+            )}
+          />
         ) : null}
       </TableCell>
     </TableRow>
   ) : (
-    <ObjectValue id={id ?? name} name={name} values={values as object[]} level={level} />
+    <ObjectValue
+      id={id ?? name}
+      name={name}
+      values={values as object[]}
+      level={level}
+      hasDefaultPath={!path && !!defaultPath}
+      path={path ?? defaultPath}
+      featureType={featureType}
+      ancestorsFeatureType={ancestorsFeatureType}
+    />
   );
 };
 
@@ -221,7 +279,11 @@ const PropertyGroup: FC<{
   name: string;
   properties: readonly PropertySet[];
   level?: number;
-}> = ({ id = "", name, properties, level = 0 }) => {
+  path?: string[];
+  featureType: string;
+  ancestorsFeatureType?: string;
+}> = ({ id = "", name, properties, level = 0, path, featureType, ancestorsFeatureType }) => {
+  const hasAncestors = path?.slice(-1)[0] !== ancestorsKey && !!path?.includes(ancestorsKey);
   const expandedAtom = groupExpandedAtomFamily(id ?? name);
   const [expanded, setExpanded] = useAtom(expandedAtom);
   const handleClick = useCallback(() => {
@@ -235,7 +297,18 @@ const PropertyGroup: FC<{
             <TreeArrowButton size="small" onClick={handleClick}>
               {expanded ? <TreeArrowExpandedIcon /> : <TreeArrowCollapsedIcon />}
             </TreeArrowButton>
-            {name}
+            {isNaN(Number(name))
+              ? makePropertyName(
+                  `${hasAncestors ? ancestorsFeatureType : featureType}_${[
+                    ...(path?.length
+                      ? hasAncestors
+                        ? path.filter(p => p !== ancestorsKey)
+                        : path
+                      : [name]),
+                  ].join("_")}`,
+                  name,
+                )
+              : name}
           </PropertyGroupName>
         </PropertyGroupCell>
       </TableRow>
@@ -253,6 +326,9 @@ const PropertyGroup: FC<{
                       name: property.name,
                     }}
                     level={level + 1}
+                    path={path}
+                    featureType={featureType}
+                    ancestorsFeatureType={ancestorsFeatureType}
                   />
                 ))}
               </TableBody>
@@ -268,22 +344,36 @@ export interface PropertyParameterItemProps
   extends Omit<ComponentPropsWithRef<typeof Root>, "children"> {
   properties: readonly PropertySet[];
   labelFontSize?: "small" | "medium";
+  featureType: string;
+  ancestorsFeatureType?: string;
 }
 
 export const PropertyParameterItem = forwardRef<HTMLDivElement, PropertyParameterItemProps>(
-  ({ properties, ...props }, ref) => {
-    const groups = Object.entries(groupBy(properties, property => property.name.split("_")[0])).map(
-      ([name, properties]) => ({ name, properties }),
-    );
+  ({ properties, featureType, ancestorsFeatureType, ...props }, ref) => {
+    const groups = Object.entries(groupBy(properties, property => property.name))
+      .map(([name, properties]) => ({ name, properties }))
+      .filter(({ name }) => !name.startsWith("_"));
     return (
       <Root ref={ref} {...props}>
         <StyledTable size="small">
           <TableBody>
             {groups.map(({ name, properties }) =>
               properties.length === 1 ? (
-                <Property key={properties[0].name} property={properties[0]} />
+                <Property
+                  key={properties[0].name}
+                  property={properties[0]}
+                  featureType={featureType}
+                  ancestorsFeatureType={ancestorsFeatureType}
+                />
               ) : (
-                <PropertyGroup key={name} name={name} id={name} properties={properties} />
+                <PropertyGroup
+                  key={name}
+                  name={name}
+                  id={name}
+                  properties={properties}
+                  featureType={featureType}
+                  ancestorsFeatureType={ancestorsFeatureType}
+                />
               ),
             )}
           </TableBody>

@@ -1,5 +1,5 @@
 import { PrimitiveAtom, atom, useAtom, useAtomValue, useSetAtom } from "jotai";
-import { FC, useCallback, useEffect } from "react";
+import { FC, useCallback, useEffect, useMemo } from "react";
 
 import type { LayerProps } from "../../../prototypes/layers";
 import { ScreenSpaceSelectionEntry } from "../../../prototypes/screen-space-selection";
@@ -73,12 +73,16 @@ export const BuildingLayer: FC<LayerProps<typeof BUILDING_LAYER>> = ({
   colorMapAtom,
   colorRangeAtom,
   componentAtoms,
+  opacityAtom,
+  tilesets,
   // showWireframeAtom,
 }) => {
   const hidden = useAtomValue(hiddenAtom);
 
   const [_version, _setVersion] = useAtom(versionAtom);
   const [_lod, _setLod] = useAtom(lodAtom);
+
+  const renderedTileset = useMemo(() => tilesets.find(t => t.id === id), [tilesets, id]);
 
   const setLayerId = useSetAtom(layerIdAtom);
   const handleLoad = useCallback(
@@ -128,6 +132,8 @@ export const BuildingLayer: FC<LayerProps<typeof BUILDING_LAYER>> = ({
         colorRangeAtom={colorRangeAtom}
         searchedFeaturesAtom={searchedFeaturesAtom}
         selections={selections as ScreenSpaceSelectionEntry<typeof TILESET_FEATURE>[]}
+        renderedTileset={renderedTileset}
+        opacityAtom={opacityAtom}
         // showWireframe={showWireframe}
 
         // Field components

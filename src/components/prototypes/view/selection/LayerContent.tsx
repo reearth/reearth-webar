@@ -30,6 +30,7 @@ import { DatasetDialog } from "../ui-containers/DatasetDialog";
 // import { LayerHeatmapSection } from "./LayerHeatmapSection";
 
 import { LayerHiddenFeaturesSection } from "./LayerHiddenFeaturesSection";
+import { LayerOpacitySection } from "./LayerOpacitySection";
 // import { LayerShowWireframeSection } from "./LayerShowWireframeSection";
 // import { LayerSketchSection } from "./LayerSketchSection";
 
@@ -156,14 +157,14 @@ export function LayerContent<T extends LayerType>({
                   {hidden ? <VisibilityOffIcon /> : <VisibilityOnIcon />}
                 </IconButton>
               </Tooltip>
-              <Tooltip title="移動">
+              {/* <Tooltip title="移動">
                 <span>
                   <IconButton aria-label="移動" disabled={layerId == null} onClick={handleMove}>
                     <AddressIcon />
                   </IconButton>
                 </span>
-              </Tooltip>
-              {buildingLayers.length !== 0 && (
+              </Tooltip> */}
+              {/* {buildingLayers.length !== 0 && (
                 <Tooltip title="検索">
                   <IconButton
                     {...bindTrigger(buildingSearchPanelState)}
@@ -172,7 +173,7 @@ export function LayerContent<T extends LayerType>({
                     <SearchIcon />
                   </IconButton>
                 </Tooltip>
-              )}
+              )} */}
               <Tooltip title="出典">
                 <span>
                   <IconButton
@@ -193,12 +194,13 @@ export function LayerContent<T extends LayerType>({
           onClose={handleClose}
         />
         <LayerHiddenFeaturesSection layers={values} />
-        <SwitchDataset layers={values} />
-        <SwitchGroup layers={values} />
+        {/* <SwitchDataset layers={values} /> */}
+        {/* <SwitchGroup layers={values} /> */}
         {/* <LayerHeatmapSection layers={values} /> */}
-        {components.map(([type, atoms]) => (
+          <LayerOpacitySection layers={values}/>
+        {/* {components.map(([type, atoms]) => (
           <Fields key={type} layers={values} type={type} atoms={atoms} />
-        ))}
+        ))} */}
         {/* <InspectorItem> */}
         {/* <LayerShowWireframeSection layers={values} />
         <LayerSketchSection layers={values} /> */}

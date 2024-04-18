@@ -10,6 +10,9 @@ const StyledPaper = styled(Paper)(({ theme, elevation = 4 }) => ({
   maxHeight: "100%",
   boxShadow: theme.shadows[elevation],
   pointerEvents: "auto",
+  [theme.breakpoints.down('sm')]: {
+    width: `calc(100vw - ${theme.spacing(2)})`
+  }
 }));
 
 const ResizableRoot = styled("div")({
@@ -49,7 +52,7 @@ export const Inspector = forwardRef<HTMLDivElement, InspectorProps>(
   ) => (
     <AutoHeight>
       <StyledPaper ref={ref} {...props}>
-        <Resizable
+        {/* <Resizable
           as={ResizableRoot}
           defaultSize={{
             width: defaultWidth,
@@ -64,7 +67,8 @@ export const Inspector = forwardRef<HTMLDivElement, InspectorProps>(
           onResizeStart={onResizeStart}
           onResizeStop={onResizeStop}>
           {scrollable ? <ScrollableRoundedBox defer>{children}</ScrollableRoundedBox> : children}
-        </Resizable>
+        </Resizable> */}
+        <ScrollableRoundedBox defer>{children}</ScrollableRoundedBox>
       </StyledPaper>
     </AutoHeight>
   ),

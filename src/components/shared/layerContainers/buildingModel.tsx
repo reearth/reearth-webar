@@ -1,6 +1,6 @@
 import { useTheme } from "@mui/material";
 import { PrimitiveAtom, WritableAtom, useAtom, useAtomValue, useSetAtom } from "jotai";
-import { FC, useCallback, useMemo } from "react";
+import { FC, useCallback, useEffect, useMemo, useRef } from "react";
 
 import { ColorMap } from "../../prototypes/color-maps";
 import {
@@ -26,6 +26,9 @@ import { useFindComponent } from "../view-layers/hooks";
 import { useClippingBox } from "./hooks/useClippingBox";
 import { useEvaluateFeatureColor } from "./hooks/useEvaluateFeatureColor";
 import { useEvaluateFilter } from "./hooks/useEvaluateFilter";
+import { LoadedTileset } from "../types";
+import { Cesium3DTile, Cesium3DTileFeature, Cesium3DTileStyle, Color } from "cesium";
+import { getGMLId } from "../plateau/utils";
 
 type TilesetContainerProps = Omit<TilesetProps, "appearance" | "boxAppearance"> & {
   id: string;
@@ -38,43 +41,50 @@ type TilesetContainerProps = Omit<TilesetProps, "appearance" | "boxAppearance"> 
   searchedFeaturesAtom: PrimitiveAtom<SearchedFeatures | null>;
   colorRangeAtom: PrimitiveAtom<number[]>;
   colorSchemeAtom: ViewLayerModel["colorSchemeAtom"];
+  opacityAtom: PrimitiveAtom<number>;
   selections?: ScreenSpaceSelectionEntry<typeof TILESET_FEATURE>[];
   hidden: boolean;
   textured?: boolean;
   componentAtoms: ComponentAtom[];
+  renderedTileset?: LoadedTileset;
 };
 
 export const BuildingModelLayerContainer: FC<TilesetContainerProps> = ({
   id,
-  onLoad,
+  // onLoad,
   layerIdAtom,
   featureIndexAtom,
   propertiesAtom,
-  colorPropertyAtom,
-  colorSchemeAtom,
-  componentAtoms,
-  selections,
-  hidden,
-  hiddenFeaturesAtom,
-  searchedFeaturesAtom,
-  textured,
-  ...props
+  // colorPropertyAtom,
+  // colorSchemeAtom,
+  // componentAtoms,
+  // selections,
+  // hidden,
+  // hiddenFeaturesAtom,
+  // searchedFeaturesAtom,
+  // textured,
+  opacityAtom,
+  renderedTileset,
 }) => {
-  const [featureIndex, setFeatureIndex] = useAtom(featureIndexAtom);
+  const featureIndex = useMemo(() => new TileFeatureIndex(), []);
+  const setFeatureIndex = useSetAtom(featureIndexAtom);
   const [layerId, setLayerId] = useAtom(layerIdAtom);
   useScreenSpaceSelectionResponder({
     type: TILESET_FEATURE,
-    convertToSelection: object => {
-      return "id" in object &&
-        typeof object.id === "string" &&
-        featureIndex &&
-        layerId &&
-        "layerId" in object &&
-        object.layerId === layerId
+    convertToSelection: (object) => {
+      const obj = object as Cesium3DTileFeature
+      if (
+        obj.tileset !== renderedTileset?.primitive
+      ) {
+        return
+      }
+      const gmlId = getGMLId(obj)
+      return typeof gmlId === "string" &&
+        featureIndex
         ? {
             type: TILESET_FEATURE,
             value: {
-              key: object.id,
+              key: gmlId,
               layerId,
               featureIndex,
               datasetId: id,
@@ -85,19 +95,25 @@ export const BuildingModelLayerContainer: FC<TilesetContainerProps> = ({
     shouldRespondToSelection: (
       value,
     ): value is ScreenSpaceSelectionEntry<typeof TILESET_FEATURE> => {
-      return value.type === TILESET_FEATURE && !!value.value && value.value.layerId === layerId;
+      return value.type === TILESET_FEATURE && featureIndex.has(value.value.key);
     },
     onSelect: value => {
-      if (featureIndex?.selectedFeatureIds.has(value.value.key)) {
-        return;
+      const features = featureIndex.find(value.value.key)
+      if (features == null) {
+        return
       }
-      featureIndex?.select([value.value.key]);
+      features.forEach(feature => {
+        feature.setProperty('__selected', true)
+      })
     },
     onDeselect: value => {
-      if (!featureIndex?.selectedFeatureIds.has(value.value.key)) {
-        return;
+      const features = featureIndex.find(value.value.key)
+      if (features == null) {
+        return
       }
-      featureIndex?.unselect([value.value.key]);
+      features.forEach(feature => {
+        feature.setProperty('__selected', false)
+      })
     },
     // computeBoundingSphere: (value, result = new BoundingSphere()) => {
     //   computeCartographicToCartesian(scene, location, result.center);
@@ -107,109 +123,138 @@ export const BuildingModelLayerContainer: FC<TilesetContainerProps> = ({
   });
 
   const setProperties = useSetAtom(propertiesAtom);
-  const handleLoad = useCallback(
-    (layerId: string) => {
-      onLoad?.(layerId);
-      setLayerId(layerId);
-      setFeatureIndex(new TileFeatureIndex(layerId));
-      setProperties(new PlateauTilesetProperties(layerId));
+  useEffect(
+    () => {
+      if(!renderedTileset) return;
+      setProperties(new PlateauTilesetProperties(renderedTileset.primitive));
+      const removeTileLoad = renderedTileset.primitive.tileLoad.addEventListener((tile: Cesium3DTile) => {
+        featureIndex.addTile(tile, getGMLId);
+      })
+      const removeTileUnload = renderedTileset.primitive.tileUnload.addEventListener((tile: Cesium3DTile) => {
+        featureIndex.removeTile(tile, getGMLId);
+      })
+      return () => {
+        removeTileLoad();
+        removeTileUnload();
+      }
     },
-    [onLoad, setFeatureIndex, setProperties, setLayerId],
+    [renderedTileset, featureIndex, setProperties],
   );
 
-  const colorProperty = useAtomValue(colorPropertyAtom);
-  const colorScheme = useAtomValue(colorSchemeAtom);
+  useEffect(
+    () => {
+      // onLoad?.(layerId);
+      // setLayerId(layerId);
+      setFeatureIndex(featureIndex);
+    },
+    [setFeatureIndex, featureIndex],
+  );
+
+  // const colorProperty = useAtomValue(colorPropertyAtom);
+  // const colorScheme = useAtomValue(colorSchemeAtom);
 
   // Field components
-  const opacityAtom = useFindComponent(componentAtoms, OPACITY_FIELD);
-  const buildingModelColorAtom = useFindComponent(componentAtoms, TILESET_BUILDING_MODEL_COLOR);
-  const [clippingBox, boxAppearance] = useClippingBox(
-    useOptionalAtomValue(useFindComponent(componentAtoms, TILESET_CLIPPING)),
-  );
+  // const opacityAtom = useFindComponent(componentAtoms, OPACITY_FIELD);
+  // const buildingModelColorAtom = useFindComponent(componentAtoms, TILESET_BUILDING_MODEL_COLOR);
+  // const [clippingBox, boxAppearance] = useClippingBox(
+  //   useOptionalAtomValue(useFindComponent(componentAtoms, TILESET_CLIPPING)),
+  // );
 
-  const filter = useEvaluateFilter(
-    useOptionalAtomValue(useFindComponent(componentAtoms, TILESET_BUILDING_MODEL_FILTER)),
-  );
+  // const filter = useEvaluateFilter(
+  //   useOptionalAtomValue(useFindComponent(componentAtoms, TILESET_BUILDING_MODEL_FILTER)),
+  // );
 
-  const hiddenFeatures = useAtomValue(hiddenFeaturesAtom);
-  const hiddenFeaturesConditions: ConditionsExpression = useMemo(
-    () => ({
-      conditions:
-        hiddenFeatures?.map(f => [`${variable("gml_id")} ===  ${string(f)}`, "false"]) ?? [],
-    }),
-    [hiddenFeatures],
-  );
+  // const hiddenFeatures = useAtomValue(hiddenFeaturesAtom);
+  // const hiddenFeaturesConditions: ConditionsExpression = useMemo(
+  //   () => ({
+  //     conditions:
+  //       hiddenFeatures?.map(f => [`${variable("gml_id")} ===  ${string(f)}`, "false"]) ?? [],
+  //   }),
+  //   [hiddenFeatures],
+  // );
 
-  const searchedFeatures = useAtomValue(searchedFeaturesAtom);
-  const shownSearchedFeaturesConditions: ConditionsExpression | undefined = useMemo(
-    () =>
-      searchedFeatures?.onlyShow
-        ? {
-            conditions: [
-              ...(searchedFeatures?.features?.map(
-                f => [`${variable("gml_id")} ===  ${string(f)}`, "true"] as [string, string],
-              ) ?? []),
-              ...hiddenFeaturesConditions.conditions,
-              ...(filter.conditions[0].every(c => c === "true") ? [] : filter.conditions),
-              ["true", "false"],
-            ],
-          }
-        : undefined,
-    [searchedFeatures, hiddenFeaturesConditions, filter],
-  );
+  // const searchedFeatures = useAtomValue(searchedFeaturesAtom);
+  // const shownSearchedFeaturesConditions: ConditionsExpression | undefined = useMemo(
+  //   () =>
+  //     searchedFeatures?.onlyShow
+  //       ? {
+  //           conditions: [
+  //             ...(searchedFeatures?.features?.map(
+  //               f => [`${variable("gml_id")} ===  ${string(f)}`, "true"] as [string, string],
+  //             ) ?? []),
+  //             ...hiddenFeaturesConditions.conditions,
+  //             ...(filter.conditions[0].every(c => c === "true") ? [] : filter.conditions),
+  //             ["true", "false"],
+  //           ],
+  //         }
+  //       : undefined,
+  //   [searchedFeatures, hiddenFeaturesConditions, filter],
+  // );
 
   const opacity = useOptionalAtomValue(opacityAtom);
-  const color = useEvaluateFeatureColor({
-    colorProperty: buildingModelColorAtom ? colorProperty ?? undefined : undefined,
-    colorScheme: buildingModelColorAtom ? colorScheme ?? undefined : undefined,
-    opacity: opacity?.value,
-    selections,
-  });
+  // const color = useEvaluateFeatureColor({
+  //   colorProperty: buildingModelColorAtom ? colorProperty ?? undefined : undefined,
+  //   colorScheme: buildingModelColorAtom ? colorScheme ?? undefined : undefined,
+  //   opacity: opacity?.value,
+  //   selections,
+  // });
 
-  const theme = useTheme();
+  // const theme = useTheme();
 
-  const enableShadow = !opacity || opacity.value === 1;
+  // const enableShadow = !opacity || opacity.value === 1;
 
-  const appearance: LayerAppearance<Cesium3DTilesAppearance> = useMemo(
-    () => ({
-      pbr: textured,
-      ...(color
-        ? {
-            color: {
-              expression: color,
-            },
-          }
-        : {}),
-      show: {
-        expression: {
-          conditions: shownSearchedFeaturesConditions
-            ? [...shownSearchedFeaturesConditions.conditions]
-            : [...hiddenFeaturesConditions.conditions, ...filter.conditions],
-        },
-      },
-      shadows: enableShadow ? "enabled" : "disabled",
-      selectedFeatureColor: theme.palette.primary.main,
-      experimental_clipping: clippingBox,
-    }),
-    [
-      color,
-      enableShadow,
-      textured,
-      theme.palette.primary.main,
-      clippingBox,
-      filter.conditions,
-      hiddenFeaturesConditions.conditions,
-      shownSearchedFeaturesConditions,
-    ],
-  );
+  // const appearance: LayerAppearance<Cesium3DTilesAppearance> = useMemo(
+  //   () => ({
+  //     pbr: textured,
+  //     ...(color
+  //       ? {
+  //           color: {
+  //             expression: color,
+  //           },
+  //         }
+  //       : {}),
+  //     show: {
+  //       expression: {
+  //         conditions: shownSearchedFeaturesConditions
+  //           ? [...shownSearchedFeaturesConditions.conditions]
+  //           : [...hiddenFeaturesConditions.conditions, ...filter.conditions],
+  //       },
+  //     },
+  //     shadows: enableShadow ? "enabled" : "disabled",
+  //     selectedFeatureColor: theme.palette.primary.main,
+  //     experimental_clipping: clippingBox,
+  //   }),
+  //   [
+  //     color,
+  //     enableShadow,
+  //     textured,
+  //     theme.palette.primary.main,
+  //     clippingBox,
+  //     filter.conditions,
+  //     hiddenFeaturesConditions.conditions,
+  //     shownSearchedFeaturesConditions,
+  //   ],
+  // );
 
-  return (
-    <TilesetLayer
-      {...props}
-      onLoad={handleLoad}
-      appearance={appearance}
-      boxAppearance={boxAppearance}
-      visible={!hidden}
-    />
-  );
+  const styles = useMemo(() => ({ opacity }), [opacity]);
+  const stylesRef = useRef(styles);
+  stylesRef.current = styles;
+
+  useEffect(() => {
+    if(!renderedTileset) return;
+    renderedTileset.primitive.style = new Cesium3DTileStyle({
+      color: {
+        evaluateColor: (_feature: Cesium3DTileFeature, result: Color) => {
+          return Color.clone(Color.WHITE.withAlpha(stylesRef.current.opacity), result);
+        }
+      }
+    });
+  }, [renderedTileset]);
+
+  useEffect(() => {
+    if(!renderedTileset) return;
+    renderedTileset.primitive.makeStyleDirty();
+  }, [renderedTileset, styles]);
+
+  return null;
 };

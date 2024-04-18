@@ -701,7 +701,7 @@ export async function resetTileset(tilesetUrls) {
   // 郡山市LOD2
   // "https://assets.cms.plateau.reearth.io/assets/0b/095119-b1e9-48c0-b5bd-0b18518e5a36/07203_koriyama-shi_2020_3dtiles_6_op_bldg_lod2/tileset.json",
 
-  addedUrls.map(async tilesetUrl => {
+  return await Promise.all(addedUrls.map(async tilesetUrl => {
     // console.log(tilesetUrl);
     try {
       // https://cesium.com/learn/cesiumjs/ref-doc/Cesium3DTileset.html
@@ -723,23 +723,27 @@ export async function resetTileset(tilesetUrls) {
       // plateauTileset.style = style;
   
       console.log("Success loading tileset");
-      tilesets.push({url: tilesetUrl, primitive: plateauTileset});
+      const result = {url: tilesetUrl, primitive: plateauTileset};
+      tilesets.push(result);
   
       cesiumViewer.scene.primitives.add(plateauTileset);
-      cesiumViewer.flyTo(plateauTileset);
+      plateauTileset.initialTilesLoaded.addEventListener(() => {
+        cesiumViewer.flyTo(plateauTileset);
+      })
+      return result;
     } catch (error) {
       console.log(`Error loading tileset: ${error}`);
     }
+  }).filter(Boolean)).finally(() => {
+    oldTilesetUrls = tilesetUrls;
+    // console.log("tilesets: ", tilesets);
   });
-
-  oldTilesetUrls = tilesetUrls;
-  // console.log("tilesets: ", tilesets);
 }
 
 // オクルージョン表示を更新
 export function updateOcclusion(shouldHideOtherBldgs) {
   if (silhouetteStage === undefined || occlusionStage === undefined) { return; }
-  if (Boolean(shouldHideOtherBldgs)) {
+  if (shouldHideOtherBldgs) {
     // オクルージョン表示にするときは
     // ビル選択シルエットを非表示とし
     silhouetteStage.selected = [];

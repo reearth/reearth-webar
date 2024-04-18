@@ -109,13 +109,13 @@ export const TileFeatureContent: FC<TileFeatureContentProps> = ({ values }) => {
                   <LayerIcon />
                 </IconButton>
               </Tooltip>
-              <Tooltip title={hidden ? "表示" : "隠す"}>
+              {/* <Tooltip title={hidden ? "表示" : "隠す"}>
                 <IconButton
                   aria-label={hidden ? "表示" : "隠す"}
                   onClick={hidden ? handleShow : handleHide}>
                   {hidden ? <VisibilityOffIcon /> : <VisibilityOnIcon />}
                 </IconButton>
-              </Tooltip>
+              </Tooltip> */}
             </>
           ) : undefined
         }
