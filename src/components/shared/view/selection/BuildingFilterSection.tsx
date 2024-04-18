@@ -11,7 +11,7 @@ import {
 } from "../../../prototypes/ui-components";
 import { BUILDING_LAYER } from "../../../prototypes/view-layers";
 import { PlateauTilesetProperty } from "../../plateau";
-import { BUILDING_MODEL_FILTER_RANGE } from "../../plateau/constants";
+// import { BUILDING_MODEL_FILTER_RANGE } from "../../plateau/constants";
 import {
   TilesetBuildingModelFilterField,
   TilesetFloodModelFilterField,
@@ -61,7 +61,8 @@ export const BuildingFilterSection: FC<BuildingFilterSectionProps> = ({
                       const minimum = Math.ceil(property.minimum);
                       const maximum = Math.ceil(property.maximum);
 
-                      const defaultRange = BUILDING_MODEL_FILTER_RANGE[property.name];
+                      // const defaultRange = BUILDING_MODEL_FILTER_RANGE[property.name];
+                      const defaultRange = undefined;
                       if (!defaultRange) {
                         return {
                           ...property,

@@ -42,7 +42,7 @@ export type LayerProps<T extends LayerType = LayerType> = LayerModel<T> & {
   selected?: boolean;
   itemProps?: HTMLAttributes<HTMLElement>;
   selections?: ScreenSpaceSelectionEntry[];
-  tilesets: LoadedTileset[];
+  tilesets?: LoadedTileset[];
 };
 
 export type LayerComponents = {

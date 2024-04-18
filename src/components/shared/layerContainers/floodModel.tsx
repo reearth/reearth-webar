@@ -52,57 +52,57 @@ export const FloodModelLayerContainer: FC<TilesetContainerProps> = ({
 }) => {
   const [featureIndex, setFeatureIndex] = useAtom(featureIndexAtom);
   const [layerId, setLayerId] = useAtom(layerIdAtom);
-  useScreenSpaceSelectionResponder({
-    type: TILESET_FEATURE,
-    convertToSelection: object => {
-      return "id" in object &&
-        typeof object.id === "string" &&
-        featureIndex &&
-        layerId &&
-        "layerId" in object &&
-        object.layerId === layerId
-        ? {
-            type: TILESET_FEATURE,
-            value: {
-              key: object.id,
-              layerId,
-              featureIndex,
-              datasetId: id,
-            },
-          }
-        : undefined;
-    },
-    shouldRespondToSelection: (
-      value,
-    ): value is ScreenSpaceSelectionEntry<typeof TILESET_FEATURE> => {
-      return value.type === TILESET_FEATURE && !!value.value && value.value.layerId === layerId;
-    },
-    onSelect: value => {
-      if (featureIndex?.selectedFeatureIds.has(value.value.key)) {
-        return;
-      }
-      featureIndex?.select([value.value.key]);
-    },
-    onDeselect: value => {
-      if (!featureIndex?.selectedFeatureIds.has(value.value.key)) {
-        return;
-      }
-      featureIndex?.unselect([value.value.key]);
-    },
-    // computeBoundingSphere: (value, result = new BoundingSphere()) => {
-    //   computeCartographicToCartesian(scene, location, result.center);
-    //   result.radius = 200; // Arbitrary size
-    //   return result;
-    // },
-  });
+  // useScreenSpaceSelectionResponder({
+  //   type: TILESET_FEATURE,
+  //   convertToSelection: object => {
+  //     return "id" in object &&
+  //       typeof object.id === "string" &&
+  //       featureIndex &&
+  //       layerId &&
+  //       "layerId" in object &&
+  //       object.layerId === layerId
+  //       ? {
+  //           type: TILESET_FEATURE,
+  //           value: {
+  //             key: object.id,
+  //             layerId,
+  //             featureIndex,
+  //             datasetId: id,
+  //           },
+  //         }
+  //       : undefined;
+  //   },
+  //   shouldRespondToSelection: (
+  //     value,
+  //   ): value is ScreenSpaceSelectionEntry<typeof TILESET_FEATURE> => {
+  //     return value.type === TILESET_FEATURE && !!value.value && value.value.layerId === layerId;
+  //   },
+  //   onSelect: value => {
+  //     if (featureIndex?.selectedFeatureIds.has(value.value.key)) {
+  //       return;
+  //     }
+  //     featureIndex?.select([value.value.key]);
+  //   },
+  //   onDeselect: value => {
+  //     if (!featureIndex?.selectedFeatureIds.has(value.value.key)) {
+  //       return;
+  //     }
+  //     featureIndex?.unselect([value.value.key]);
+  //   },
+  //   // computeBoundingSphere: (value, result = new BoundingSphere()) => {
+  //   //   computeCartographicToCartesian(scene, location, result.center);
+  //   //   result.radius = 200; // Arbitrary size
+  //   //   return result;
+  //   // },
+  // });
 
   const setProperties = useSetAtom(propertiesAtom);
   const handleLoad = useCallback(
     (layerId: string) => {
       onLoad?.(layerId);
       setLayerId(layerId);
-      setFeatureIndex(new TileFeatureIndex(layerId));
-      setProperties(new PlateauTilesetProperties(layerId));
+      // setFeatureIndex(new TileFeatureIndex(layerId));
+      // setProperties(new PlateauTilesetProperties(layerId));
     },
     [onLoad, setFeatureIndex, setProperties, setLayerId],
   );

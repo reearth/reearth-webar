@@ -82,7 +82,7 @@ export const GeneralLayerContainer: FC<GeneralContainerProps> = ({
     (layerId: string, camera?: CameraPosition) => {
       onLoad?.(layerId);
       setLayerId(layerId);
-      setProperties(new Properties(layerId) as PlateauTilesetProperties);
+      // setProperties(new Properties(layerId) as PlateauTilesetProperties);
 
       if (camera) {
         setCamera(camera);

@@ -145,9 +145,10 @@ export const BuildingSearchPanel: FC<Props> = ({ state, layer, layerId }) => {
     ),
   );
 
-  const allFeatures = useMemo(
+  const allFeatures: any[] = useMemo(
     () =>
-      window.reearth?.layers?.findFeaturesByIds?.(layerId ?? "", featureIndex?.featureIds ?? []),
+      // window.reearth?.layers?.findFeaturesByIds?.(layerId ?? "", featureIndex?.featureIds ?? []),
+      undefined,
     [layerId, featureIndex, triggerUpdateRef.current], // eslint-disable-line react-hooks/exhaustive-deps
   );
 

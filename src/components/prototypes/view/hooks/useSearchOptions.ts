@@ -130,10 +130,11 @@ function useBuildingSearchOption({
       }
       return featureIndices.flatMap(([id, featureIndex]) => {
         const fs =
-          window.reearth?.layers?.findFeaturesByIds?.(
-            featureIndex.layerId,
-            featureIndex.featureIds
-          ) ?? [];
+          // window.reearth?.layers?.findFeaturesByIds?.(
+          //   featureIndex.layerId,
+          //   featureIndex.featureIds
+          // ) ?? [];
+          [];
         const addedIds: string[] = [];
         return fs.reduce<BuildingSearchOption[]>((res, f) => {
           if (f?.properties?.["名称"] && !addedIds.includes(f.id)) {
@@ -218,17 +219,17 @@ export function useSearchOptions(options?: SearchOptionsParams): SearchOptions {
           const buildingOption = option as BuildingSearchOption;
           invariant(buildingOption.id);
           // TODO: Implement flyTo by `_x` and `_y` properties which are embeded in feature.
-          setScreenSpaceSelection([
-            {
-              type: "TILESET_FEATURE",
-              value: {
-                layerId: buildingOption.featureIndex.layerId,
-                featureIndex: buildingOption.featureIndex,
-                key: buildingOption.id,
-                datasetId: buildingOption.datasetId,
-              },
-            },
-          ]);
+          // setScreenSpaceSelection([
+          //   {
+          //     type: "TILESET_FEATURE",
+          //     value: {
+          //       layerId: buildingOption.featureIndex.layerId,
+          //       featureIndex: buildingOption.featureIndex,
+          //       key: buildingOption.id,
+          //       datasetId: buildingOption.datasetId,
+          //     },
+          //   },
+          // ]);
           break;
         }
       }
