@@ -5,5 +5,5 @@ export * from "./usageColorSet";
 export * from "./structureTypeColorSet";
 export * from "./fireproofStructureTypeColorSet";
 export * from "./steepSlopeRiskColorSet";
-export * from "./landslideRiskColorSet";
+export * from "./landSlideRiskColorSet";
 export * from "./mudflowRiskColorSet";

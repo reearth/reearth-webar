@@ -6,7 +6,7 @@ import {
 } from '@cesium/engine'
 import { defaults, pick } from 'lodash'
 
-import { createUniforms } from '@takram/plateau-cesium-helpers'
+import { createUniforms } from '../../cesium-helpers/src'
 
 import { type AmbientOcclusionOutputType } from './AmbientOcclusionOutputType'
 import { createBilateralFilterStage } from './createCrossBilateralFilterStage'

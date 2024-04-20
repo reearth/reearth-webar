@@ -2,8 +2,8 @@ import { PerspectiveFrustum, type Scene } from '@cesium/engine'
 import { useState, type FC } from 'react'
 import invariant from 'tiny-invariant'
 
-import { useCesium, useInstance, usePreRender } from '@takram/plateau-cesium'
-import { withEphemerality } from '@takram/plateau-react-helpers'
+import { useCesium, useInstance, usePreRender } from '../../cesium/src'
+import { withEphemerality } from '../../react-helpers/src'
 
 import {
   createAmbientOcclusionStage,
