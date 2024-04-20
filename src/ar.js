@@ -1,6 +1,8 @@
 // import * as Cesium from "cesium";
 // import "cesium/Build/Cesium/Widgets/widgets.css";
 
+import { createAmbientOcclusionStage } from "./libs/cesium-hbao/src/createAmbientOcclusionStage";
+
 // CDNの場合はここにwindowオブジェクトからCesiumを入れる
 let Cesium;
 
@@ -12,6 +14,7 @@ const viewModel = {
 let cesiumViewer;
 let cesiumCamera;
 let postProcessStages;
+let ambientOcclusionStageComposite;
 let occlusionStage;
 let silhouetteStage;
 let selectedFeatures = [];
@@ -152,6 +155,14 @@ function destroyCesiumViewer() {
   console.log("viewer destroyed");
 }
 
+// AmbientOcclusionシェーダーのポストプロセスステージコンポジットをセットアップ
+function setupAmbientOcclusionStage() {
+  ambientOcclusionStageComposite = postProcessStages.add(
+    createAmbientOcclusionStage('plateau')
+  );
+  ambientOcclusionStageComposite.enabled = true;
+}
+
 // 輪郭表示シェーダーのポストプロセスステージをセットアップ
 function setupSilhouetteStage() {
   const edgeDetectionStage =
@@ -202,6 +213,7 @@ function setupCesium() {
   oldDirection = new Cesium.Cartesian3();
   oldUp = new Cesium.Cartesian3();
   setupCesiumViewer();
+  setupAmbientOcclusionStage();
   setupSilhouetteStage();
   setupOcclusionStage();
 }
