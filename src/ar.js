@@ -158,7 +158,16 @@ function destroyCesiumViewer() {
 // AmbientOcclusionシェーダーのポストプロセスステージコンポジットをセットアップ
 function setupAmbientOcclusionStage() {
   ambientOcclusionStageComposite = postProcessStages.add(
-    createAmbientOcclusionStage('plateau')
+    // options
+    // https://github.com/takram-design-engineering/plateau-view/blob/6c8225d626cd8085e5d10ffe8980837814c333b0/libs/view/src/states/graphics.ts#L150-L206
+    // https://github.com/takram-design-engineering/plateau-view/blob/6c8225d626cd8085e5d10ffe8980837814c333b0/libs/view/src/states/graphics.ts#L60-L125
+    createAmbientOcclusionStage(
+      'plateau', // prefix
+      1, // textureScale
+      8, // directions
+      8, // steps
+      true // denoise
+    )
   );
   ambientOcclusionStageComposite.enabled = true;
 }
