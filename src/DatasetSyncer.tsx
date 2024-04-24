@@ -119,7 +119,7 @@ export default function DatasetSyncer({...props}) {
           templates,
           areaCode: dataset.wardCode,
         }),
-        // { autoSelect: !smDown }, // TODO: ここの挙動追う
+        { autoSelect: false },
       );
     });
   

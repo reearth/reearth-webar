@@ -55,8 +55,8 @@ export const DatasetListItem: FC<DatasetListItemProps> = ({
   const layerType = datasetTypeLayers[dataset.type.code as PlateauDatasetType] ?? datasetTypeLayers.usecase;
   const addLayer = useAddLayer();
   const removeLayer = useSetAtom(removeLayerAtom);
-  const theme = useTheme();
-  const smDown = useMediaQuery(theme.breakpoints.down("sm"));
+  // const theme = useTheme();
+  // const smDown = useMediaQuery(theme.breakpoints.down("sm"));
   // データセット行が選択された際のコールバック
   // TODO: ここで当該のデータセットが渡ってくるので、ARViewの場合はデータセットのIDだけ使用して表示非表示を切り替えるとよさそう
   const handleClick = useCallback(() => {
@@ -75,7 +75,7 @@ export const DatasetListItem: FC<DatasetListItemProps> = ({
           templates,
           areaCode: municipalityCode,
         }),
-        { autoSelect: !smDown },
+        // { autoSelect: !smDown },
       );
     } else {
       // ここでremoveLayerAtomを経由してlayerAtomsAtom(rootLayersAtomのsplit)からレイヤーを削除している
@@ -87,7 +87,7 @@ export const DatasetListItem: FC<DatasetListItemProps> = ({
     layerType,
     addLayer,
     removeLayer,
-    smDown,
+    // smDown,
     municipalityCode,
     settings,
     templates,
