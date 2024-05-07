@@ -34,6 +34,10 @@ import { LayerOpacitySection } from "./LayerOpacitySection";
 // import { LayerShowWireframeSection } from "./LayerShowWireframeSection";
 // import { LayerSketchSection } from "./LayerSketchSection";
 
+import { BuildingIcon } from "../../ui-components";
+import { buildingConcentratedAtom } from "../states/ar";
+import { updateOcclusion } from "../../../../ar";
+
 export interface LayerContentProps<T extends LayerType> {
   values: (SelectionGroup & {
     type: typeof LAYER_SELECTION;
@@ -102,6 +106,13 @@ export function LayerContent<T extends LayerType>({
       remove(value.id);
     });
   }, [values, remove]);
+
+  const [buildingConcentrated, setBuildingConcentrated] = useAtom(buildingConcentratedAtom);
+  const handleBuildingConcentration = useCallback(() => {
+    setBuildingConcentrated(!buildingConcentrated);
+    if (buildingConcentrated === undefined) { return; }
+    updateOcclusion(buildingConcentrated);
+  }, [buildingConcentrated]);
 
   const components = useMemo(() => {
     const result: { [K in ComponentAtom["type"]]?: ComponentAtom["atom"][] } = {};
@@ -188,6 +199,14 @@ export function LayerContent<T extends LayerType>({
                 <IconButton aria-label="削除" onClick={handleRemove}>
                   <TrashIcon />
                 </IconButton>
+              </Tooltip>
+              <Tooltip title="選択建築物に注目">      
+              <IconButton
+                aria-label="選択中のビルのみ表示"
+                onClick={handleBuildingConcentration}
+              >
+                <BuildingIcon />
+              </IconButton>
               </Tooltip>
             </>
           }

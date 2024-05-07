@@ -25,7 +25,6 @@ export const MainPanel: FC = () => {
   return (
     <AutoHeight>
       <SearchAutocompletePanel>
-        {/* TODO: レイヤー機能はかなりUIに密結合な概念なので、やっぱりレイヤー機能は使うのが良いかも */}
         <LayerListComponent
           footer={`${layerAtoms.length}項目`}
           open={layersOpen}
