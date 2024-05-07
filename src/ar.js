@@ -733,6 +733,7 @@ export async function resetTileset(tilesetUrls) {
           //debugShowBoundingVolume: true, // ローカルのファイルシステムから実行している場合はエラーが出る
           //debugShowContentBoundingVolume: true
           //customShader: customShader // ここでカスタムシェーダーを渡す https://cesium.com/learn/cesiumjs/ref-doc/CustomShader.html
+          cacheBytes: Infinity,
         }
       );
       // 3DTiles専用のスタイルを作成
