@@ -60,9 +60,6 @@ export default function ARView({...props}) {
         className="absolute top-0 left-0 w-full h-full"
       ></div>
       {isios && isImuPermissionGranted === null &&
-        // <div className="absolute top-2 right-2">
-        //   <input type="button" value="iOSのジャイロセンサを許可" onClick={requestImuPermission} />
-        // </div>
         <PopupDialog onClose={handleClickIMURequest} open={!isIMUPermitted} content="iOSのジャイロセンサを許可します"/>
       }
       {isios && isImuPermissionGranted === "denied" && <PopupDialog onClose={handleCloseDeniedPopup} open={!isOpenDeniedPopup} content={"ジャイロセンサが許可されていません、ブラウザの設定から許可してください。"}/>}

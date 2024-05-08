@@ -617,6 +617,7 @@ function setupUserInput() {
   }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 }
 
+// 必ずhttpsで接続すること (httpsでないと必ずdeniedになる)
 export let isImuPermissionGranted = null;
 export function requestImuPermission() {
   DeviceOrientationEvent.requestPermission()
