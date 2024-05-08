@@ -59,7 +59,7 @@ export const BuildingModelLayerContainer: FC<TilesetContainerProps> = ({
   // colorSchemeAtom,
   // componentAtoms,
   // selections,
-  // hidden,
+  hidden,
   // hiddenFeaturesAtom,
   // searchedFeaturesAtom,
   // textured,
@@ -255,6 +255,11 @@ export const BuildingModelLayerContainer: FC<TilesetContainerProps> = ({
     if(!renderedTileset) return;
     renderedTileset.primitive.makeStyleDirty();
   }, [renderedTileset, styles]);
+
+  useEffect(() => {
+    if(!renderedTileset) return;
+    renderedTileset.primitive.show = !hidden;
+  }, [renderedTileset, hidden]);
 
   return null;
 };
