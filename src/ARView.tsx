@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { startAR, stopAR, isios, isImuPermissionGranted, requestImuPermission, updateFov, updateCompassBias } from "./ar";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import PopupDialog from "./components/prototypes/ui-components/PopupDialog";
@@ -38,6 +38,12 @@ export default function ARView({...props}) {
     };
   }, [cesiumLoaded]);
 
+  // Reactでvideoタグのmutedが除去されてしまう古来からのバグへのワークアラウンド
+  const videoRef = useRef(null);
+  useEffect(() => {
+      videoRef.current.defaultMuted = true;
+  })
+
   const [isIMUPermitted, setIMUPermit] = useState<boolean>(false);
   const handleClickIMURequest = () => {
     requestImuPermission();
@@ -51,8 +57,9 @@ export default function ARView({...props}) {
   return (
     <div {...props}>
       <video
-        id="device_camera_preview" 
-        autoPlay muted playsInline
+        id="device_camera_preview"
+        ref={videoRef}
+        autoPlay={true} muted={true} playsInline={true}
         className="absolute top-0 left-0 w-full h-full object-cover"
       ></video>
       <div

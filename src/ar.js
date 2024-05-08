@@ -255,8 +255,7 @@ async function startDeviceCameraPreview() {
   };
 
   try {
-    devicCameraPreview.srcObject =
-      await navigator.mediaDevices.getUserMedia(constraints);
+    devicCameraPreview.srcObject = await navigator.mediaDevices.getUserMedia(constraints);
   } catch (err) {
     // window.alert(window.isSecurityContext);
     // window.alert(err.toString());
