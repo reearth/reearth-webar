@@ -233,8 +233,8 @@ function cleanUpCesium() {
 }
 
 // デバイスカメラプレビューのセットアップ
-async function startDeviceCameraPreview() {
-  const devicCameraPreview = document.getElementById("device_camera_preview");
+function startDeviceCameraPreview() {
+  const deviceCameraPreview = document.getElementById("device_camera_preview");
 
   // TODO: onResizeイベントでdebounce
   const cameraWidth = window.innerWidth;
@@ -244,23 +244,39 @@ async function startDeviceCameraPreview() {
 
   const constraints = {
     audio: false,
-    video: {
-      // ここはあくまでカメラに要求する解像度を指定するオプションなので、この通りの解像度でフィードがくるわけではなく、要求した値に近い最適な解像度で返ってくる。
-      // https://developer.mozilla.org/ja/docs/Web/API/MediaDevices/getUserMedia
-      // よってそこから更に全画面にしたければコンテナ側のobject-fitをcoverにするなどする。
-      width: cameraWidth,
-      height: cameraHeight,
-      facingMode: "environment",
-    },
+    video: true,
+    // video: {
+    //   // ここはあくまでカメラに要求する解像度を指定するオプションなので、この通りの解像度でフィードがくるわけではなく、要求した値に近い最適な解像度で返ってくる。
+    //   // https://developer.mozilla.org/ja/docs/Web/API/MediaDevices/getUserMedia
+    //   // よってそこから更に全画面にしたければコンテナ側のobject-fitをcoverにするなどする。
+    //   width: cameraWidth,
+    //   height: cameraHeight,
+    //   facingMode: "environment",
+    // },
   };
 
-  try {
-    devicCameraPreview.srcObject = await navigator.mediaDevices.getUserMedia(constraints);
-  } catch (err) {
-    // window.alert(window.isSecurityContext);
-    // window.alert(err.toString());
-    console.log(err.toString());
-  }
+  // try {
+  //   deviceCameraPreview.srcObject = await navigator.mediaDevices.getUserMedia(constraints);
+  //   deviceCameraPreview.play();
+  // } catch (err) {
+  //   // window.alert(window.isSecurityContext);
+  //   // window.alert(err.toString());
+  //   console.log(err.toString());
+  // }
+
+  // iOSでは非同期処理でもasync/awaitを使用するとNotAllowedErrorになってしまう可能性があるので代わりにpromiseで行う
+  // TODO: そもそも手動でplayするか否か以前に、手動でgetUserMediaしてもその時点でNotAllowedErrorになってしまっているので調査する (getElementByIdとgetUserMediaは別タイミングで行わないといけないとか??)
+  navigator.mediaDevices
+    .getUserMedia(constraints)
+    .then((stream) => {
+      deviceCameraPreview.srcObject = stream;
+      // deviceCameraPreview.play();
+      // deviceCameraPreview.play().catch(() => {});
+      // deviceCameraPreview.pause();
+    })
+    .catch((err) => {
+      console.log(err.toString());
+    });
 }
 
 // Cesiumのカメラ座標を更新
@@ -616,6 +632,8 @@ function setupUserInput() {
   }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 }
 
+// iOSのIMUパーミッションをユーザーインタラクショントリガで取る
+// 直接ユーザータップのイベントでrequestしないと無効になるため、ARView側のボタンで発動させる
 // 必ずhttpsで接続すること (httpsでないと必ずdeniedになる)
 export let isImuPermissionGranted = null;
 export function requestImuPermission() {
@@ -633,6 +651,12 @@ export function requestImuPermission() {
     .catch(e =>{
       window.alert(e);
     });
+}
+
+// iOSの動画再生をユーザーインタラクショントリガで開始する
+// 直接ユーザータップのイベントでplayしないと無効になるため、ARView側のボタンで発動させる
+export function playCameraPreview() {
+  startDeviceCameraPreview();
 }
 
 let pickedFeatureCallback = null;
@@ -663,16 +687,10 @@ export function startAR() {
   setupCesium();
   setupUserInput();
   // Repoセットアップ
-  startDeviceCameraPreview();
   startGpsTracking();
   // iOSではパーミッション取ってからIMUの値を読む
-  if (isios) {
-    if (!isImuPermissionGranted) {
-      // window.alert("ARを正常に動作させるためジャイロセンサーの使用を許可してください");
-      // 直接ユーザータップのイベントでrequestしないと無効になるため、ARView側のボタンで発動させる
-      // requestImuPermission();
-    }
-  } else {
+  if (!isios) {
+    startDeviceCameraPreview();
     startOrientationTracking();
   }
 }
