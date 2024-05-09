@@ -158,7 +158,11 @@ export default function DatasetSyncer({...props}) {
     // tilesetをリセット
     if (!tilesetConfigs || !arStarted) { return; }
     resetTileset(tilesetConfigs.map(t => t.url)).then((tilesets: LoadedTileset[]) => {
-      setTilesets(tilesets.map(t => ({ ...t, id: tilesetConfigs.find(c => c.url === t.url).id })));
+      setTilesets((prevTilesets) => {
+        const filteredPrevTilesets = prevTilesets.filter(t => tilesetConfigs.find(c => c.id === t.id));
+        const nextTilesets = tilesets.map(t => ({ ...t, id: tilesetConfigs.find(c => c.url === t.url).id }));
+        return [...filteredPrevTilesets, ...nextTilesets];
+      });
     });
   
     return () => {
