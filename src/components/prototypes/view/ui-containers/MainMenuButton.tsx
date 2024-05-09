@@ -19,46 +19,47 @@ export interface MainMenuButtonProps extends Omit<IconButtonProps, "onClick"> {
 }
 
 export const MainMenuButton = forwardRef<HTMLButtonElement, MainMenuButtonProps>(
-  ({ onClick, ...props }, ref) => {
-    const id = useId();
-    const popupState = usePopupState({
-      variant: "popover",
-      popupId: id,
-    });
+  ({/*{ onClick, ...props }, ref*/}) => {
+    // const id = useId();
+    // const popupState = usePopupState({
+    //   variant: "popover",
+    //   popupId: id,
+    // });
 
-    const [hideAppOverlay, setHideAppOverlay] = useAtom(hideAppOverlayAtom);
-    const [showDeveloperPanels, setShowDeveloperPanels] = useAtom(showDeveloperPanelsAtom);
+    // const [hideAppOverlay, setHideAppOverlay] = useAtom(hideAppOverlayAtom);
+    // const [showDeveloperPanels, setShowDeveloperPanels] = useAtom(showDeveloperPanelsAtom);
 
-    const onClickRef = useRef(onClick);
-    onClickRef.current = onClick;
-    const handleClick = useCallback(
-      (event: MouseEvent<HTMLElement>) => {
-        const name = event.currentTarget.dataset.name;
-        if (name == null) {
-          popupState.close();
-          return;
-        }
-        switch (name) {
-          case "hide-ui":
-            setHideAppOverlay(value => !value);
-            break;
-          case "developer":
-            setShowDeveloperPanels(value => !value);
-            break;
-        }
-        onClickRef.current?.(event, name);
-        popupState.close();
-      },
-      [popupState, setHideAppOverlay, setShowDeveloperPanels],
-    );
+    // const onClickRef = useRef(onClick);
+    // onClickRef.current = onClick;
+    // const handleClick = useCallback(
+    //   (event: MouseEvent<HTMLElement>) => {
+    //     const name = event.currentTarget.dataset.name;
+    //     if (name == null) {
+    //       popupState.close();
+    //       return;
+    //     }
+    //     switch (name) {
+    //       case "hide-ui":
+    //         setHideAppOverlay(value => !value);
+    //         break;
+    //       case "developer":
+    //         setShowDeveloperPanels(value => !value);
+    //         break;
+    //     }
+    //     onClickRef.current?.(event, name);
+    //     popupState.close();
+    //   },
+    //   [popupState, setHideAppOverlay, setShowDeveloperPanels],
+    // );
 
-    const platform = useAtomValue(platformAtom);
+    // const platform = useAtomValue(platformAtom);
     return (
       <>
-        <IconButton ref={ref} aria-label="メインメニュー" {...bindTrigger(popupState)} {...props}>
+        {/* <IconButton ref={ref} aria-label="メインメニュー" {...bindTrigger(popupState)} {...props}> */}
+        <IconButton aria-label="メインメニュー" href="https://plateauview.mlit.go.jp/" target="_blank">
           <PlateauSymbol sx={{ fontSize: 24 }} />
         </IconButton>
-        <Menu
+        {/* <Menu
           {...bindMenu(popupState)}
           anchorOrigin={{
             horizontal: "center",
@@ -104,7 +105,7 @@ export const MainMenuButton = forwardRef<HTMLButtonElement, MainMenuButtonProps>
               <Shortcut platform={platform} shortcutKey="\" commandKey />
             </ListItemSecondaryAction>
           </SelectItem>
-        </Menu>
+        </Menu> */}
       </>
     );
   },
