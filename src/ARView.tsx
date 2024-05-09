@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { startAR, stopAR, isios, isImuPermissionGranted, requestImuPermission, playCameraPreview, updateFov, updateCompassBias } from "./ar";
+import { startAR, stopAR, isios, isImuPermissionGranted, requestImuPermission, updateFov, updateCompassBias } from "./ar";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import PopupDialog from "./components/prototypes/ui-components/PopupDialog";
 import { cesiumLoadedAtom, arStartedAtom, fovPiOverAtom, compassBiasAtom } from "./components/prototypes/view/states/ar";
@@ -49,7 +49,6 @@ export default function ARView({...props}) {
   const [isIMUPermitted, setIMUPermit] = useState<boolean>(false);
   const handleClickIMURequest = () => {
     requestImuPermission();
-    playCameraPreview();
     setIMUPermit(true);
   }
   const [isOpenDeniedPopup, toggleOpenDeniedPopup] = useState<boolean>(false);

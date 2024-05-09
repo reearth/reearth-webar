@@ -244,15 +244,15 @@ function startDeviceCameraPreview() {
 
   const constraints = {
     audio: false,
-    video: true,
-    // video: {
-    //   // ここはあくまでカメラに要求する解像度を指定するオプションなので、この通りの解像度でフィードがくるわけではなく、要求した値に近い最適な解像度で返ってくる。
-    //   // https://developer.mozilla.org/ja/docs/Web/API/MediaDevices/getUserMedia
-    //   // よってそこから更に全画面にしたければコンテナ側のobject-fitをcoverにするなどする。
-    //   width: cameraWidth,
-    //   height: cameraHeight,
-    //   facingMode: "environment",
-    // },
+    // video: true,
+    video: {
+      // ここはあくまでカメラに要求する解像度を指定するオプションなので、この通りの解像度でフィードがくるわけではなく、要求した値に近い最適な解像度で返ってくる。
+      // https://developer.mozilla.org/ja/docs/Web/API/MediaDevices/getUserMedia
+      // よってそこから更に全画面にしたければコンテナ側のobject-fitをcoverにするなどする。
+      width: cameraWidth,
+      height: cameraHeight,
+      facingMode: "environment",
+    },
   };
 
   // try {
@@ -265,7 +265,6 @@ function startDeviceCameraPreview() {
   // }
 
   // iOSでは非同期処理でもasync/awaitを使用するとNotAllowedErrorになってしまう可能性があるので代わりにpromiseで行う
-  // TODO: そもそも手動でplayするか否か以前に、手動でgetUserMediaしてもその時点でNotAllowedErrorになってしまっているので調査する (getElementByIdとgetUserMediaは別タイミングで行わないといけないとか??)
   navigator.mediaDevices
     .getUserMedia(constraints)
     .then((stream) => {
@@ -653,12 +652,6 @@ export function requestImuPermission() {
     });
 }
 
-// iOSの動画再生をユーザーインタラクショントリガで開始する
-// 直接ユーザータップのイベントでplayしないと無効になるため、ARView側のボタンで発動させる
-export function playCameraPreview() {
-  startDeviceCameraPreview();
-}
-
 let pickedFeatureCallback = null;
 export function pickUpFeature(callback) {
   pickedFeatureCallback = callback;
@@ -687,10 +680,10 @@ export function startAR() {
   setupCesium();
   setupUserInput();
   // Repoセットアップ
+  startDeviceCameraPreview();
   startGpsTracking();
   // iOSではパーミッション取ってからIMUの値を読む
   if (!isios) {
-    startDeviceCameraPreview();
     startOrientationTracking();
   }
 }
