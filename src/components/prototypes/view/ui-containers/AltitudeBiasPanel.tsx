@@ -7,9 +7,9 @@ import {
   SliderParameterItem,
 } from "../../ui-components";
 
-import { arStartedAtom, compassBiasAtom } from "../states/ar";
+import { arStartedAtom, altitudeBiasAtom } from "../states/ar";
 import { useAtomValue } from "jotai";
-import { updateCompassBias } from "../../../../ar";
+import { updateAltitudeBias } from "../../../../ar";
 
 const Root = styled(FloatingPanel)(({ theme }) => ({
   width: 360,
@@ -21,25 +21,25 @@ const Title = styled("div")(({ theme }) => ({
   margin: theme.spacing(1),
 }));
 
-export const CompassBiasPanel: FC = () => {
+export const AltitudeBiasPanel: FC = () => {
   const arStarted = useAtomValue(arStartedAtom);
-  const compassBias = useAtomValue(compassBiasAtom);
+  const altitudeBias = useAtomValue(altitudeBiasAtom);
   useEffect(() => {
     if (!arStarted) { return; }
-    updateCompassBias(compassBias);
-  }, [compassBias]);
+    updateAltitudeBias(altitudeBias);
+  }, [altitudeBias]);
 
   return (
     <Root>
-      <Title>コンパス設定</Title>
+      <Title>高度設定</Title>
       <ParameterList>
         <SliderParameterItem
-          label="コンパスバイアス"
-          description="方位を微調整します。注目オブジェクトを選択してから使用してください。"
-          min={-179}
-          max={179}
+          label="高度バイアス"
+          description="高度を微調整します。"
+          min={-100}
+          max={100}
           step={1}
-          atom={compassBiasAtom}
+          atom={altitudeBiasAtom}
         />
       </ParameterList>
     </Root>

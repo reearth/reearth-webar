@@ -3,6 +3,12 @@ import { atomWithStorageValidation, type AtomValue } from "../../shared-states";
 import { atom } from "jotai";
 // import { atomWithReset } from "jotai/utils";
 
+export const altitudeBiasAtom = atomWithStorageValidation({
+  key: "altitudeBias",
+  initialValue: 0,
+  validate: isNumber,
+});
+
 export const compassBiasAtom = atomWithStorageValidation({
   key: "compassBias",
   initialValue: 0,

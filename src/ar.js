@@ -8,6 +8,7 @@ let Cesium;
 
 const viewModel = {
   compassBias: 0, // コンパス手動調整用のバイアス
+  altitudeBias: 0, // 高度手動調整用のバイアス
 };
 
 // view層グローバル変数
@@ -340,11 +341,14 @@ function gpsTrackingProcess(pos) {
   const head = coords.heading ?? 0;
   const accur = coords.accuracy ?? 0;
 
+  // 高度バイアスを適用
+  const biasedAlt = Number(alt) + Number(viewModel.altitudeBias);
+
   // 緯度経度高度のデカルト座標にまとめる
   // Cesiumの指定はlong, lat, altの順であることに注意
   // const destination = Cesium.Cartesian3.fromDegrees(139.74530681029205, 35.65807022172221, 60); // 東京タワー前
   // const destination = Cesium.Cartesian3.fromDegrees(140.38804838405298, 37.39840050666605, 400); // 郡山駅前
-  const destination = Cesium.Cartesian3.fromDegrees(long, lat, alt);
+  const destination = Cesium.Cartesian3.fromDegrees(long, lat, biasedAlt);
 
   // カメラ座標を更新
   moveCesiumCamera(destination);
@@ -810,5 +814,10 @@ export function updateFov(fovPiOver) {
 // コンパス手動調整用のバイアスを更新
 export function updateCompassBias(compassBias) {
   viewModel.compassBias = compassBias;
+}
+
+// 高度手動調整用のバイアスを更新
+export function updateAltitudeBias(altitudeBias) {
+  viewModel.altitudeBias = altitudeBias;
 }
 

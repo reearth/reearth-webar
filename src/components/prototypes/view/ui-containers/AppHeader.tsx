@@ -7,6 +7,7 @@ import { MainMenuButton } from "./MainMenuButton";
 import { DatasetButton } from "./DatasetButton";
 import { CompassBiasButton } from "./CompassBiasButton";
 import { FovButton } from "./FovButton";
+import { AltitudeBiasButton } from "./AltitudeBiasButton";
 
 export const AppHeader: FC = () => {
   // const hidden = useAtomValue(hideAppOverlayAtom);
@@ -18,6 +19,7 @@ export const AppHeader: FC = () => {
       <MainMenuButton />
       <Space flexible />
       <DatasetButton />
+      <AltitudeBiasButton />
       <CompassBiasButton />
       <FovButton />
     </AppBar>
