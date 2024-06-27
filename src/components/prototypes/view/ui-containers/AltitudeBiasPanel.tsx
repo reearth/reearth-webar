@@ -35,7 +35,7 @@ export const AltitudeBiasPanel: FC = () => {
       <ParameterList>
         <SliderParameterItem
           label="高度バイアス"
-          description="高度を微調整します。"
+          description="高度を微調整します (単位: m)"
           min={-100}
           max={100}
           step={1}
