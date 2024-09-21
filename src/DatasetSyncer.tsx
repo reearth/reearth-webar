@@ -137,23 +137,23 @@ export default function DatasetSyncer({...props}) {
     const tilesetConfigs = filteredDatasets.map(plateauDataset => {
       const plateauDatasetItems = plateauDataset.items as PlateauDatasetItem[];
       // CESIUM3DTILESかどうかチェックしLOD2(テクスチャあり)->LOD2(テクスチャなし)->LOD1->テクスチャ・LODを持たないcsecase用3DTilesの順でフォールバック
-      const tilesetUrl3dtilesItems = plateauDatasetItems.filter(item => item.format === "CESIUM3DTILES");
-      if (tilesetUrl3dtilesItems.length != 0) {
-        const tilesetUrlLod2TexItem = tilesetUrl3dtilesItems.find(({ lod, texture }) => lod == 2 && texture == "TEXTURE");
-        if (tilesetUrlLod2TexItem && tilesetUrlLod2TexItem.url) {
-          return {url: tilesetUrlLod2TexItem.url, id: plateauDataset.id};
+      const cesium3dtilesItems = plateauDatasetItems.filter(item => item.format === "CESIUM3DTILES");
+      if (cesium3dtilesItems.length != 0) {
+        const cesium3dtilesLod2TexItem = cesium3dtilesItems.find(({ lod, texture }) => lod == 2 && texture == "TEXTURE");
+        if (cesium3dtilesLod2TexItem && cesium3dtilesLod2TexItem.url) {
+          return {url: cesium3dtilesLod2TexItem.url, id: plateauDataset.id};
         } else {
-          const tilesetUrlLod2NoneTexItem = tilesetUrl3dtilesItems.find(({ lod, texture }) => lod == 2 && texture == "NONE");
-          if (tilesetUrlLod2NoneTexItem && tilesetUrlLod2NoneTexItem.url) {
-            return {url: tilesetUrlLod2NoneTexItem.url, id: plateauDataset.id};
+          const cesium3dtilesLod2NoneTexItem = cesium3dtilesItems.find(({ lod, texture }) => lod == 2 && texture == "NONE");
+          if (cesium3dtilesLod2NoneTexItem && cesium3dtilesLod2NoneTexItem.url) {
+            return {url: cesium3dtilesLod2NoneTexItem.url, id: plateauDataset.id};
           } else {
-            const tilesetUrlLod1Item = tilesetUrl3dtilesItems.find(({ lod }) => lod == 1);
-            if (tilesetUrlLod1Item && tilesetUrlLod1Item.url) {
-              return {url: tilesetUrlLod1Item.url, id: plateauDataset.id};
+            const cesium3dtilesLod1Item = cesium3dtilesItems.find(({ lod }) => lod == 1);
+            if (cesium3dtilesLod1Item && cesium3dtilesLod1Item.url) {
+              return {url: cesium3dtilesLod1Item.url, id: plateauDataset.id};
             } else {
-              if (tilesetUrl3dtilesItems.length == 1 && tilesetUrl3dtilesItems[0]) {
-                const tilesetUrlUseCaseItem = tilesetUrl3dtilesItems[0]
-                return {url: tilesetUrlUseCaseItem.url, id: plateauDataset.id};
+              if (cesium3dtilesItems.length == 1 && cesium3dtilesItems[0]) {
+                const cesium3dtilesUseCaseItem = cesium3dtilesItems[0]
+                return {url: cesium3dtilesUseCaseItem.url, id: plateauDataset.id};
               } else {              
                 return null;
               }
