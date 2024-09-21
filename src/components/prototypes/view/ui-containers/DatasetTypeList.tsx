@@ -103,7 +103,8 @@ const DatasetTypeItem: FC<{ datasetType: PlateauDatasetType }> = ({ datasetType 
     datasetTypes: [datasetType],
   });
   // TODO: 対応地物が増えればここを増やして対応。なおなぜか今も建築物モデルはどの都道府県も表示されない
-  if(datasetType !== PlateauDatasetType.Building) return;
+  // 現在は建築物とユースケースだけ表示を許可している
+  if(datasetType !== PlateauDatasetType.Building && datasetType !== PlateauDatasetType.UseCase) return;
   return (
     <DatasetTreeItem
       nodeId={datasetType}

@@ -85,12 +85,12 @@ export default function DatasetSyncer({...props}) {
   // データセット群が変化したらARで使用可能なデータセットだけにフィルタ・保存して本コンポーネントを再レンダリング
   useEffect(() => {
     // TODO: ここでdatasetのTypeが対応していないものであればアラートポップアップを出し除外する
-    const removedDatasets = datasets.filter(dataset => dataset.type.code !== 'bldg');
-    const filteredDatasets = datasets.filter(dataset => dataset.type.code === 'bldg');
+    const removedDatasets = datasets.filter(dataset => dataset.type.code !== 'bldg' && dataset.type.code !== 'usecase');
+    const filteredDatasets = datasets.filter(dataset => dataset.type.code === 'bldg' || dataset.type.code === 'usecase');
   
     if (removedDatasets.length > 0) {
       const removedNames = removedDatasets.map(item => item.name).join(', ');
-      console.log(`${removedNames} はAR非対応のため非表示になります。`); // ポップアップメッセージを設定
+      console.log(`${removedNames} はAR非対応のため非表示になります。`); // 一旦ログでは出しておく
     }
 
     console.log("New Filterd Datasets: ", filteredDatasets);
@@ -136,22 +136,32 @@ export default function DatasetSyncer({...props}) {
     // データセット群をタイルセットURL群に変換
     const tilesetConfigs = filteredDatasets.map(plateauDataset => {
       const plateauDatasetItems = plateauDataset.items as PlateauDatasetItem[];
-      // LOD2(テクスチャあり)->LOD2(テクスチャなし)->LOD1の順でフォールバック
-      const tilesetUrlLod2TexItem = plateauDatasetItems.find(({ lod, texture }) => lod == 2 && texture == "TEXTURE")
-      if (tilesetUrlLod2TexItem && tilesetUrlLod2TexItem.url) {
-        return {url: tilesetUrlLod2TexItem.url, id: plateauDataset.id};
-      } else {
-        const tilesetUrlLod2NoneTexItem = plateauDatasetItems.find(({ lod, texture }) => lod == 2 && texture == "NONE")
-        if (tilesetUrlLod2NoneTexItem && tilesetUrlLod2NoneTexItem.url) {
-          return {url: tilesetUrlLod2NoneTexItem.url, id: plateauDataset.id};
+      // CESIUM3DTILESかどうかチェックしLOD2(テクスチャあり)->LOD2(テクスチャなし)->LOD1->テクスチャ・LODを持たないcsecase用3DTilesの順でフォールバック
+      const tilesetUrl3dtilesItems = plateauDatasetItems.filter(item => item.format === "CESIUM3DTILES");
+      if (tilesetUrl3dtilesItems.length != 0) {
+        const tilesetUrlLod2TexItem = tilesetUrl3dtilesItems.find(({ lod, texture }) => lod == 2 && texture == "TEXTURE");
+        if (tilesetUrlLod2TexItem && tilesetUrlLod2TexItem.url) {
+          return {url: tilesetUrlLod2TexItem.url, id: plateauDataset.id};
         } else {
-          const tilesetUrlLod1Item = plateauDatasetItems.find(({ lod }) => lod == 1)
-          if (tilesetUrlLod1Item && tilesetUrlLod1Item.url) {
-            return {url: tilesetUrlLod1Item.url, id: plateauDataset.id};
+          const tilesetUrlLod2NoneTexItem = tilesetUrl3dtilesItems.find(({ lod, texture }) => lod == 2 && texture == "NONE");
+          if (tilesetUrlLod2NoneTexItem && tilesetUrlLod2NoneTexItem.url) {
+            return {url: tilesetUrlLod2NoneTexItem.url, id: plateauDataset.id};
           } else {
-            return null;
+            const tilesetUrlLod1Item = tilesetUrl3dtilesItems.find(({ lod }) => lod == 1);
+            if (tilesetUrlLod1Item && tilesetUrlLod1Item.url) {
+              return {url: tilesetUrlLod1Item.url, id: plateauDataset.id};
+            } else {
+              if (tilesetUrl3dtilesItems.length == 1 && tilesetUrl3dtilesItems[0]) {
+                const tilesetUrlUseCaseItem = tilesetUrl3dtilesItems[0]
+                return {url: tilesetUrlUseCaseItem.url, id: plateauDataset.id};
+              } else {              
+                return null;
+              }
+            }
           }
         }
+      } else {
+        return null;
       }
     }).filter(x => x);
   
