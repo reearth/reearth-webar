@@ -712,7 +712,7 @@ export async function resetTileset(tilesetUrls) {
 
   // 削除されたtilesetをremove
   const removedUrls = oldTilesetUrls.filter(x => !tilesetUrls.includes(x));
-  console.log("removedUrls: ", removedUrls);
+  console.log("removedTilesetUrls: ", removedUrls);
   const removingPrimitives = tilesets.filter(tileset => removedUrls.includes(tileset.url));
   // console.log("removingPrimitives: ", removingPrimitives);
   removingPrimitives.map(removingPrimitive => {
@@ -722,7 +722,7 @@ export async function resetTileset(tilesetUrls) {
 
   // 追加されたtilesetをadd
   const addedUrls = tilesetUrls.filter(x => !oldTilesetUrls.includes(x));
-  console.log("addedUrls: ", addedUrls);
+  console.log("addedTilesetUrls: ", addedUrls);
 
   // PLATEAUのテクスチャ付き3DTilesを表示
   // PLATEAUのデータはここから取得
@@ -775,6 +775,50 @@ export async function resetTileset(tilesetUrls) {
   }).filter(Boolean)).finally(() => {
     oldTilesetUrls = tilesetUrls;
     // console.log("tilesets: ", tilesets);
+  });
+}
+
+// ARViewで表示するCZMLをリセット
+let oldCzmlUrls = [];
+let czmls = [];
+export async function resetCzml(czmlUrls) {
+  if (!cesiumViewer) { return; }
+  // cesiumViewer.scene.primitives.removeAll();
+
+  console.log("oldCzmlUrls: ", oldCzmlUrls);
+  console.log("newCzmlUrls: ", czmlUrls);
+
+  // 削除されたczmlをremove
+  const removedUrls = oldCzmlUrls.filter(x => !czmlUrls.includes(x));
+  console.log("removedCzmlUrls: ", removedUrls);
+  const removingDataSources = czmls.filter(czml => removedUrls.includes(czml.url));
+  removingDataSources.map(removingDataSource => {
+    cesiumViewer.dataSources.remove(removingDataSource, true);
+  });
+  czmls = czmls.filter(czml => !removedUrls.includes(czml.url));
+
+  // 追加されたczmlをadd
+  const addedUrls = czmlUrls.filter(x => !oldCzmlUrls.includes(x));
+  console.log("addedCzmlUrls: ", addedUrls);
+
+  return await Promise.all(addedUrls.map(async czmlUrl => {
+    // console.log(czmlUrl);
+    try {
+      // https://cesium.com/learn/cesiumjs/ref-doc/CzmlDataSource.html
+      const czmlDataSource = await Cesium.CzmlDataSource.load(czmlUrl);
+  
+      console.log("Success loading czml data source.");
+      const result = {url: czmlUrl, dataSource: czmlDataSource};
+      czmls.push(result);
+  
+      cesiumViewer.dataSources.add(czmlDataSource);
+      return result;
+    } catch (error) {
+      console.log(`Error loading czml data source.: ${error}`);
+    }
+  }).filter(Boolean)).finally(() => {
+    oldCzmlUrls = czmlUrls;
+    // console.log("czmls: ", czmls);
   });
 }
 
