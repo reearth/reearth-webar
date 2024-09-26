@@ -186,6 +186,7 @@ export default function DatasetSyncer({...props}) {
     // czmlをリセット
     const czmlUrls = resourceUrls.filter(x => x.type == "czml");
     resetCzml(czmlUrls.map(t => t.url));
+    // TODO: 表示非表示ボタンの制御が効いていない
   
     return () => {
       // resetTileset([]);
