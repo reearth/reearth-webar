@@ -808,6 +808,9 @@ export async function resetCzml(czmlUrls) {
       const czmlDataSource = await Cesium.CzmlDataSource.load(czmlUrl);
   
       console.log("Success loading czml data source.");
+
+      // CZMLの3DTilesもLayersRendererで表示スタイルを適用するためだけにtilesetを抽出
+      const czmlTilesets = czmlDataSource.entities.values.filter(e => e.tileset);
       const result = {url: czmlUrl, dataSource: czmlDataSource};
       czmls.push(result);
   

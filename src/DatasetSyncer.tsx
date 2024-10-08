@@ -187,6 +187,7 @@ export default function DatasetSyncer({...props}) {
     const czmlUrls = resourceUrls.filter(x => x.type == "czml");
     resetCzml(czmlUrls.map(t => t.url));
     // TODO: 表示非表示ボタンの制御が効いていない
+    // 表示非表示、透明度などはLayersRendererが司っているため、CZMLの場合も3DTilesであれば↑のようにtilesetをあつめてLayersRendererに渡しておく必要がある
   
     return () => {
       // resetTileset([]);
