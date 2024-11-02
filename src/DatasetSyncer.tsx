@@ -2,11 +2,11 @@ import { useAtomValue } from "jotai";
 import queryString from "query-string";
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { resetTileset, resetCzml } from "./ar";
+import { resetTileset, resetCzml, resetCzmlForTilesets } from "./ar";
 import { LayersRenderer, useAddLayer } from "./components/prototypes/layers";
 import { arStartedAtom } from "./components/prototypes/view/states/ar";
 import { useDatasetsByIds } from "./components/shared/graphql";
-import { PlateauDataset, PlateauDatasetItem } from "./components/shared/graphql/types/catalog";
+import { Dataset, GenericDataset, PlateauDataset, PlateauDatasetItem } from "./components/shared/graphql/types/catalog";
 import { rootLayersAtom } from "./components/shared/states/rootLayer";
 import { settingsAtom } from "./components/shared/states/setting";
 import { templatesAtom } from "./components/shared/states/template";
@@ -23,11 +23,11 @@ export default function DatasetSyncer({...props}) {
   // データセットID群をもとにカタログからデータセット群を取得 (↑datasetIdsが更新されればトリガー)
   const { data } = useDatasetsByIds(datasetIds);
   // useDatasetsByIdsから抽出したデータセット群
-  const [datasets, setDatasets] = useState<PlateauDataset[]>([]);
+  const [datasets, setDatasets] = useState<Dataset[]>([]);
   // ARで使用不可能なデータセットを弾いたデータセット群
   // クエパラを反映した初期化が完了するまではrootLayersによるフックを作動させないためのフラグとしても使用する
   // そのため敢えて配列で初期化せずにudefinedとなるようにしていることに注意
-  const [filteredDatasets, setFilteredDatasets] = useState<PlateauDataset[]>();
+  const [filteredDatasets, setFilteredDatasets] = useState<Dataset[]>();
   // データセットパネルと同期されるレイヤー群とその関連フック
   const rootLayers = useAtomValue(rootLayersAtom);
   const addLayer = useAddLayer();
@@ -72,10 +72,12 @@ export default function DatasetSyncer({...props}) {
   useEffect(() => {
     // カタログからデータセット群を取得できていない間も何度かコールされるのでその間は何もしない
     if (!data || !data.nodes || !data.nodes.length) { return; }
+
     // データセット群を抽出
-    const plateauDatasets = data.nodes as PlateauDataset[];
-    console.log("New Datasets: ", plateauDatasets);
-    setDatasets(plateauDatasets);
+    // GenericDatasetでもPlateauDatasetでも通す
+    const typedDatasets = data.nodes as Dataset[];
+    console.log("New Datasets: ", typedDatasets);
+    setDatasets(typedDatasets);
   
     return () => {
       // setDatasets([]);
@@ -174,20 +176,42 @@ export default function DatasetSyncer({...props}) {
     }).filter(x => x);
   
     if (!resourceUrls || !arStarted) { return; }
+
     // tilesetをリセット
-    const tlesetUrls = resourceUrls.filter(x => x.type == "3dtiles");
-    resetTileset(tlesetUrls.map(t => t.url)).then((tilesets: LoadedTileset[]) => {
+    const tilesetUrls = resourceUrls.filter(x => x.type == "3dtiles");
+    resetTileset(tilesetUrls.map(t => t.url)).then((tilesets: LoadedTileset[]) => {
       setTilesets((prevTilesets) => {
-        const filteredPrevTilesets = prevTilesets.filter(t => tlesetUrls.find(c => c.id === t.id));
-        const nextTilesets = tilesets.map(t => ({ ...t, id: tlesetUrls.find(c => c.url === t.url).id }));
+        // 今回removeされたtilesetを除去して前回と今回で共通のtilesetだけを残す
+        const filteredPrevTilesets = prevTilesets.filter(t => tilesetUrls.find(c => c.id === t.id));
+        // 新規追加されたtilesetにidも付ける
+        const nextTilesets = tilesets.map(t => ({ ...t, id: tilesetUrls.find(c => c.url === t.url).id }));
         return [...filteredPrevTilesets, ...nextTilesets];
       });
     });
+    // const awaitResetTileset = async () => {
+    //   return await resetTileset(tilesetUrls.map(t => t.url));
+    // };
+
     // czmlをリセット
-    const czmlUrls = resourceUrls.filter(x => x.type == "czml");
-    resetCzml(czmlUrls.map(t => t.url));
-    // TODO: 表示非表示ボタンの制御が効いていない
-    // 表示非表示、透明度などはLayersRendererが司っているため、CZMLの場合も3DTilesであれば↑のようにtilesetをあつめてLayersRendererに渡しておく必要がある
+    // const czmlUrls = resourceUrls.filter(x => x.type == "czml");
+    //resetCzml(czmlUrls.map(t => t.url));
+    // 表示非表示、透明度などはLayersRendererが司っているため、CZMLの場合も3DTilesであればtilesetをあつめてLayersRendererに渡しておく必要がある
+    // TODO: returnされてきたタイルセット群をsetTilesetsしてスタイルが当たるようにする
+    // resetCzmlForTilesets(czmlUrls.map(t => t.url));
+
+    // const awaitResetCzmlForTilesets = async () => {
+    //   // TODO: CZMLのURL単位で管理していると前回との差分抽出が非常に面倒、かつar.js側で無駄に処理が増えるので、ar.jsに渡す前にczmlからtilesetのURLを抽出してしまって、ar.js側では従来のresetTilesetを使う用にする方がよさそう
+    //   return await resetCzmlForTilesets(czmlUrls.map(t => t.url));
+    // };
+
+    // const newTilesets = awaitResetTileset();
+    // const newCzmlTilesets = awaitResetCzmlForTilesets();
+    // setTilesets((prevTilesets) => {
+    //   const filteredPrevTilesets = prevTilesets.filter(t => tilesetUrls.find(c => c.id === t.id));
+    //   const nextTilesets = newTilesets.map(t => ({ ...t, id: tilesetUrls.find(c => c.url === t.url).id }));
+    //   const nextCzmlTilesets = newCzmlTilesets.map(t => ({ ...t, id: czmlUrls.find(c => c.url === t.url).id }));
+    //   return [...filteredPrevTilesets, ...nextTilesets];
+    // });
   
     return () => {
       // resetTileset([]);
@@ -214,6 +238,7 @@ export default function DatasetSyncer({...props}) {
       return obj;
     });
     const datasetIdsObjsStr = JSON.stringify(objs);
+    // TODO: authトークンをクエパラに付けて叩いていた場合はそれを保存しておいてこちらで付け直す(そうしないと再レンダリング時に消える)
     setSearchParams({dataList: datasetIdsObjsStr});
 
     return () => {
