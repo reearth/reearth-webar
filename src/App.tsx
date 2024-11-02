@@ -12,12 +12,20 @@ import { SelectionCoordinator } from "./components/prototypes/view/containers/Se
 
 function App() {
   const catalogUrl = 'https://api.plateau.reearth.io/datacatalog/graphql';
+  const catalogClient = createCatalogClient(catalogUrl);
+
+  const url = new URL(decodeURIComponent(document.location.href));
+  const auth = url.searchParams.get("auth");
+  const catalogAdminUrl = 'https://api.plateau.reearth.io/datacatalog/admin/graphql';
+  const catalogAdminClient = auth ? createCatalogClient(catalogAdminUrl, auth) : null;
+
   const geoUrl = 'https://geo.plateau.reearth.io/';
+  const geoClient = createGeoClient(geoUrl);
 
   return (
     <BrowserRouter>
-      <ApolloProvider client={createCatalogClient(catalogUrl)}>
-        <ApolloProvider client={createGeoClient(geoUrl)}>
+      <ApolloProvider client={catalogAdminClient ?? catalogClient}>
+        <ApolloProvider client={geoClient}>
           <ThemeProvider theme={darkTheme}>
             <main className="flex flex-col">
               <Provider>
