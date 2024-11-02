@@ -292,6 +292,11 @@ export type DatasetTypesInput = {
 
 /** データセットを検索するためのクエリ。 */
 export type DatasetsInput = {
+  /**
+   * PLATEAU ARで閲覧可能なデータセットを含めるかどうか。
+   * trueの場合はARで閲覧可能なデータセットのみ、falseの場合はARで閲覧不可能なデータセットのみを返します。
+   */
+  ar?: InputMaybe<Scalars['Boolean']['input']>;
   /** データセットの地域コード（都道府県コードや市区町村コードが使用可能）。複数指定するとOR条件で検索を行います。 */
   areaCodes?: InputMaybe<Array<Scalars['AreaCode']['input']>>;
   /** 検索結果から除外するデータセットの種類コード。種類コードは例えば "bldg"（建築物モデル）の他、"plateau"（PLATEAU都市モデルデータセット）、"related"（関連データセット）、"generic"（その他のデータセット）が使用可能です。 */
