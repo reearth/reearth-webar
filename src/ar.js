@@ -765,9 +765,9 @@ export async function resetTileset(tilesetUrls) {
       tilesets.push(result);
   
       cesiumViewer.scene.primitives.add(plateauTileset);
-      plateauTileset.initialTilesLoaded.addEventListener(() => {
-        cesiumViewer.flyTo(plateauTileset);
-      })
+      // plateauTileset.initialTilesLoaded.addEventListener(() => {
+      //   cesiumViewer.flyTo(plateauTileset);
+      // })
       return result;
     } catch (error) {
       console.log(`Error loading tileset: ${error}`);
@@ -886,9 +886,9 @@ export async function resetCzmlForTilesets(czmlUrlsForTilesets) {
         czmlTilesets.push(czmlTileset);
     
         cesiumViewer.scene.primitives.add(plateauTileset);
-        plateauTileset.initialTilesLoaded.addEventListener(() => {
-          cesiumViewer.flyTo(plateauTileset);
-        })
+        // plateauTileset.initialTilesLoaded.addEventListener(() => {
+        //   cesiumViewer.flyTo(plateauTileset);
+        // })
         return czmlTileset;
       } catch (error) {
         console.log(`Error loading czml tilesets.: ${error}`);
