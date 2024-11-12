@@ -115,6 +115,9 @@ function setupCesiumViewer() {
   console.log("Default FOV Pi Over: %f", defaultFovPiOver);
   viewModel.fovPiOver = defaultFovPiOver;
 
+  // frustumの遠景を一定カットしておく
+  cesiumCamera.frustum.far = 1000.0;
+
   // ポストプロセスステージをとっておく
   postProcessStages = cesiumViewer.scene.postProcessStages;
 
