@@ -691,9 +691,9 @@ export function startAR() {
   startDeviceCameraPreview();
   startGpsTracking();
   // iOSではパーミッション取ってからIMUの値を読む
-  // if (!isios) {
-  //   startOrientationTracking();
-  // }
+  if (!isios) {
+    startOrientationTracking();
+  }
 }
 
 // ARを終了
