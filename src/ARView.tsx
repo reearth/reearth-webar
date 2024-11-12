@@ -68,10 +68,10 @@ export default function ARView({...props}) {
         id="cesium_container"
         className="absolute top-0 left-0 w-full h-full"
       ></div>
-      {isios && isImuPermissionGranted === null &&
+      {/* {isios && isImuPermissionGranted === null &&
         <PopupDialog onClose={handleClickIMURequest} open={!isIMUPermitted} content="iOSのジャイロセンサを許可します"/>
-      }
-      {isios && isImuPermissionGranted === "denied" && <PopupDialog onClose={handleCloseDeniedPopup} open={!isOpenDeniedPopup} content={"ジャイロセンサが許可されていません、ブラウザの設定から許可してください。"}/>}
+      } */}
+      {/* {isios && isImuPermissionGranted === "denied" && <PopupDialog onClose={handleCloseDeniedPopup} open={!isOpenDeniedPopup} content={"ジャイロセンサが許可されていません、ブラウザの設定から許可してください。"}/>} */}
       <div
         id="status_container"
         className="
