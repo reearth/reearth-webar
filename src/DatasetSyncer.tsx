@@ -38,6 +38,9 @@ export default function DatasetSyncer({...props}) {
 
   const [tilesets, setTilesets] = useState<LoadedTileset[]>([]);
 
+  // authトークンをクエパラに付けて叩いていた場合はそれを保持
+  const auth = searchParams.get("auth");
+
   // クエパラが変化したらデータセットID群を取得・保存して本コンポーネントを再レンダリング
   useEffect(() => {
     // クエパラはこんな感じで来る ?dataList=[{"datasetId":"d_13101_bldg","dataId":"di_13101_bldg_LOD1"}]
@@ -226,7 +229,7 @@ export default function DatasetSyncer({...props}) {
 
     // データセットパネルで何も選択されていない場合はクエパラをクリア
     if (!rootLayers.length) {
-      setSearchParams({});
+      setSearchParams(auth ? {auth: auth} : {});
       return;
     }
 
@@ -238,8 +241,8 @@ export default function DatasetSyncer({...props}) {
       return obj;
     });
     const datasetIdsObjsStr = JSON.stringify(objs);
-    // TODO: authトークンをクエパラに付けて叩いていた場合はそれを保存しておいてこちらで付け直す(そうしないと再レンダリング時に消える)
-    setSearchParams({dataList: datasetIdsObjsStr});
+    // authトークンをクエパラに付けて叩いていた場合はそれを保存しておいてこちらで再レンダリング時にも付け直す
+    setSearchParams(auth ? {dataList: datasetIdsObjsStr, auth: auth} : {dataList: datasetIdsObjsStr});
 
     return () => {
       // setSearchParams({});
