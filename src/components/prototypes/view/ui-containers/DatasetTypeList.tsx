@@ -1,6 +1,6 @@
 import { useAtom, useAtomValue } from "jotai";
 import { atomWithReset } from "jotai/utils";
-import { useCallback, type FC, useContext } from "react";
+import { useCallback, type FC, useContext, useMemo } from "react";
 
 import { useAreaDatasets, useAreas, useDatasets } from "../../../shared/graphql";
 import { AreasQuery } from "../../../shared/graphql/types/catalog";
@@ -32,7 +32,7 @@ const MunicipalityItem: FC<{
   }
   return (
     <DatasetTreeItem
-      nodeId={`${datasetType}:${municipality.code}`}
+      nodeId={`${datasetType}:${municipality.id}`}
       label={joinPath([...parents, municipality.name])}
       loading={query.loading}>
       {query.data?.area?.datasets?.map(dataset => (
@@ -73,7 +73,8 @@ const PrefectureItem: FC<{
     parentCode: prefecture.code,
     datasetTypes: [datasetType],
   });
-  if (query.data?.areas?.length === 1) {
+  const areas = useMemo(() => query.data?.areas.filter(a => a.code.length !== 2) ?? [], [query]);
+  if (areas.length === 1) {
     return (
       <MunicipalityItem
         datasetType={datasetType}
@@ -87,7 +88,7 @@ const PrefectureItem: FC<{
       nodeId={`${datasetType}:${prefecture.code}`}
       label={prefecture.name}
       loading={query.loading}>
-      {query.data?.areas.map(municipality => (
+      {areas.map(municipality => (
         <MunicipalityItem
           key={municipality.code}
           datasetType={datasetType}
