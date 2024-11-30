@@ -37,7 +37,7 @@ export const DatasetGroup: FC<{
 
   if (datasets.length > 1) {
     // TODO: 今は建築物モデルのみ表示するようにしているが対応可能地物が増えればここを変更
-    if (datasets[0].type.code !== PlateauDatasetType.Building) return;
+    if (datasets[0].type.code !== PlateauDatasetType.Building && datasets[0].type.code !== PlateauDatasetType.UseCase) return;
 
     return (
       <DatasetTreeItem nodeId={groupId} label={datasets[0].type.name} disabled={!datasets.length}>
