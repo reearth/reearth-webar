@@ -781,129 +781,129 @@ export async function resetTileset(tilesetUrls) {
   });
 }
 
-// ARViewで表示するCZMLをリセット
-let oldCzmlUrls = [];
-let czmls = [];
-export async function resetCzml(czmlUrls) {
-  if (!cesiumViewer) { return; }
-  // cesiumViewer.scene.primitives.removeAll();
+// // ARViewで表示するCZMLをリセット
+// let oldCzmlUrls = [];
+// let czmls = [];
+// export async function resetCzml(czmlUrls) {
+//   if (!cesiumViewer) { return; }
+//   // cesiumViewer.scene.primitives.removeAll();
 
-  console.log("oldCzmlUrls: ", oldCzmlUrls);
-  console.log("newCzmlUrls: ", czmlUrls);
+//   console.log("oldCzmlUrls: ", oldCzmlUrls);
+//   console.log("newCzmlUrls: ", czmlUrls);
 
-  // 削除されたczmlをremove
-  const removedUrls = oldCzmlUrls.filter(x => !czmlUrls.includes(x));
-  console.log("removedCzmlUrls: ", removedUrls);
-  const removingDataSources = czmls.filter(czml => removedUrls.includes(czml.url));
-  removingDataSources.map(removingDataSource => {
-    cesiumViewer.dataSources.remove(removingDataSource, true);
-  });
-  czmls = czmls.filter(czml => !removedUrls.includes(czml.url));
+//   // 削除されたczmlをremove
+//   const removedUrls = oldCzmlUrls.filter(x => !czmlUrls.includes(x));
+//   console.log("removedCzmlUrls: ", removedUrls);
+//   const removingDataSources = czmls.filter(czml => removedUrls.includes(czml.url));
+//   removingDataSources.map(removingDataSource => {
+//     cesiumViewer.dataSources.remove(removingDataSource, true);
+//   });
+//   czmls = czmls.filter(czml => !removedUrls.includes(czml.url));
 
-  // 追加されたczmlをadd
-  const addedUrls = czmlUrls.filter(x => !oldCzmlUrls.includes(x));
-  console.log("addedCzmlUrls: ", addedUrls);
+//   // 追加されたczmlをadd
+//   const addedUrls = czmlUrls.filter(x => !oldCzmlUrls.includes(x));
+//   console.log("addedCzmlUrls: ", addedUrls);
 
-  return await Promise.all(addedUrls.map(async czmlUrl => {
-    // console.log(czmlUrl);
-    try {
-      // https://cesium.com/learn/cesiumjs/ref-doc/CzmlDataSource.html
-      const czmlDataSource = await Cesium.CzmlDataSource.load(czmlUrl);
+//   return await Promise.all(addedUrls.map(async czmlUrl => {
+//     // console.log(czmlUrl);
+//     try {
+//       // https://cesium.com/learn/cesiumjs/ref-doc/CzmlDataSource.html
+//       const czmlDataSource = await Cesium.CzmlDataSource.load(czmlUrl);
   
-      console.log("Success loading czml data source.");
+//       console.log("Success loading czml data source.");
 
-      // CZMLの3DTilesもLayersRendererで表示スタイルを適用するためだけにtilesetを抽出
-      // const czmlTilesets = czmlDataSource.entities.values.filter(e => e.tileset);
+//       // CZMLの3DTilesもLayersRendererで表示スタイルを適用するためだけにtilesetを抽出
+//       // const czmlTilesets = czmlDataSource.entities.values.filter(e => e.tileset);
 
-      const result = {url: czmlUrl, dataSource: czmlDataSource};
-      czmls.push(result);
+//       const result = {url: czmlUrl, dataSource: czmlDataSource};
+//       czmls.push(result);
   
-      cesiumViewer.dataSources.add(czmlDataSource);
-      return result;
-    } catch (error) {
-      console.log(`Error loading czml data source.: ${error}`);
-    }
-  }).filter(Boolean)).finally(() => {
-    oldCzmlUrls = czmlUrls;
-    // console.log("czmls: ", czmls);
-  });
-}
+//       cesiumViewer.dataSources.add(czmlDataSource);
+//       return result;
+//     } catch (error) {
+//       console.log(`Error loading czml data source.: ${error}`);
+//     }
+//   }).filter(Boolean)).finally(() => {
+//     oldCzmlUrls = czmlUrls;
+//     // console.log("czmls: ", czmls);
+//   });
+// }
 
-// ARViewで表示するCZMLをリセット (3DTiles tileset限定版独自描画)
-let oldCzmlUrlsForTilesets = [];
-// czml単位でまとめたタイルセットグループと、return用に平坦にしたタイルセット群を分けて管理する
-let czmlTilesetGroups = [];
-let czmlTilesets = [];
-export async function resetCzmlForTilesets(czmlUrlsForTilesets) {
-  if (!cesiumViewer) { return; }
-  // cesiumViewer.scene.primitives.removeAll();
+// // ARViewで表示するCZMLをリセット (3DTiles tileset限定版独自描画)
+// let oldCzmlUrlsForTilesets = [];
+// // czml単位でまとめたタイルセットグループと、return用に平坦にしたタイルセット群を分けて管理する
+// let czmlTilesetGroups = [];
+// let czmlTilesets = [];
+// export async function resetCzmlForTilesets(czmlUrlsForTilesets) {
+//   if (!cesiumViewer) { return; }
+//   // cesiumViewer.scene.primitives.removeAll();
 
-  console.log("oldCzmlUrlsForTilesets: ", oldCzmlUrlsForTilesets);
-  console.log("czmlUrlsForTilesets: ", czmlUrlsForTilesets);
+//   console.log("oldCzmlUrlsForTilesets: ", oldCzmlUrlsForTilesets);
+//   console.log("czmlUrlsForTilesets: ", czmlUrlsForTilesets);
 
-  // 削除されたczmlのtileset群をremove
-  const removedCzmlUrls = oldCzmlUrlsForTilesets.filter(x => !czmlUrlsForTilesets.includes(x));
-  console.log("removedCzmlUrlsForTilesets: ", removedCzmlUrls);
-  const removingCzmlTilesetGroups = czmlTilesetGroups.filter(czmlTilesetGroup => removedCzmlUrls.includes(czmlTilesetGroup.czmlUrl));
-  console.log("removingCzmlTilesetGroups: ", removingCzmlTilesetGroups);
-  removingCzmlTilesetGroups.map(removingCzmlTilesetGroup => {
-    console.log("removingCzmlTilesetGroup: ", removingCzmlTilesetGroup);
-    removingCzmlTilesetGroup.czmlTilesetGroup.map(removingCzmlTileset => {
-      console.log("removingCzmlTileset: ", removingCzmlTileset);
-      cesiumViewer.scene.primitives.remove(removingCzmlTileset.primitive);
-    });
-  });
-  czmlTilesetGroups = czmlTilesetGroups.filter(czmlTileset => !removedCzmlUrls.includes(czmlTileset.url));
+//   // 削除されたczmlのtileset群をremove
+//   const removedCzmlUrls = oldCzmlUrlsForTilesets.filter(x => !czmlUrlsForTilesets.includes(x));
+//   console.log("removedCzmlUrlsForTilesets: ", removedCzmlUrls);
+//   const removingCzmlTilesetGroups = czmlTilesetGroups.filter(czmlTilesetGroup => removedCzmlUrls.includes(czmlTilesetGroup.czmlUrl));
+//   console.log("removingCzmlTilesetGroups: ", removingCzmlTilesetGroups);
+//   removingCzmlTilesetGroups.map(removingCzmlTilesetGroup => {
+//     console.log("removingCzmlTilesetGroup: ", removingCzmlTilesetGroup);
+//     removingCzmlTilesetGroup.czmlTilesetGroup.map(removingCzmlTileset => {
+//       console.log("removingCzmlTileset: ", removingCzmlTileset);
+//       cesiumViewer.scene.primitives.remove(removingCzmlTileset.primitive);
+//     });
+//   });
+//   czmlTilesetGroups = czmlTilesetGroups.filter(czmlTileset => !removedCzmlUrls.includes(czmlTileset.url));
 
-  // 追加されたczmlのURLを抽出
-  const addedCzmlUrls = czmlUrlsForTilesets.filter(x => !oldCzmlUrlsForTilesets.includes(x));
-  console.log("addedCzmlUrlsForTilesets: ", addedCzmlUrls);
+//   // 追加されたczmlのURLを抽出
+//   const addedCzmlUrls = czmlUrlsForTilesets.filter(x => !oldCzmlUrlsForTilesets.includes(x));
+//   console.log("addedCzmlUrlsForTilesets: ", addedCzmlUrls);
 
-  // czmlからtilesetを取り出し
-  const addedTilesetUrlGroups = await Promise.all(addedCzmlUrls.map(async addedCzmlUrl => {
-    const request = new Request(addedCzmlUrl);
-    const response = await fetch(request);
-    const czmlJson = await response.json();
-    const tilesetPackets = czmlJson.map(packet => packet.tileset).filter(Boolean);
-    const tilesetUrls = tilesetPackets.map(tilesetPacket => tilesetPacket.uri);
-    return tilesetUrls;
-  }));
-  console.log("addedTilesetUrlGroups", addedTilesetUrlGroups);
+//   // czmlからtilesetを取り出し
+//   const addedTilesetUrlGroups = await Promise.all(addedCzmlUrls.map(async addedCzmlUrl => {
+//     const request = new Request(addedCzmlUrl);
+//     const response = await fetch(request);
+//     const czmlJson = await response.json();
+//     const tilesetPackets = czmlJson.map(packet => packet.tileset).filter(Boolean);
+//     const tilesetUrls = tilesetPackets.map(tilesetPacket => tilesetPacket.uri);
+//     return tilesetUrls;
+//   }));
+//   console.log("addedTilesetUrlGroups", addedTilesetUrlGroups);
 
-  // ↑でCZML毎に含まれるTileset群を二重配列で纏めたので、↓で描画する
+//   // ↑でCZML毎に含まれるTileset群を二重配列で纏めたので、↓で描画する
 
-  // 追加されたczmlのTilesets群をadd
-  return await Promise.all(addedTilesetUrlGroups.map(async (tilesetUrlGroup, index) => {
-    const czmlTilesetGroup = await Promise.all(tilesetUrlGroup.map(async tilesetUrl => {
-      try {
-        const plateauTileset = await Cesium.Cesium3DTileset.fromUrl(
-          tilesetUrl,
-          {
-            cacheBytes: Infinity,
-          }
-        );
+//   // 追加されたczmlのTilesets群をadd
+//   return await Promise.all(addedTilesetUrlGroups.map(async (tilesetUrlGroup, index) => {
+//     const czmlTilesetGroup = await Promise.all(tilesetUrlGroup.map(async tilesetUrl => {
+//       try {
+//         const plateauTileset = await Cesium.Cesium3DTileset.fromUrl(
+//           tilesetUrl,
+//           {
+//             cacheBytes: Infinity,
+//           }
+//         );
     
-        console.log("Success loading czml tilesets.");
+//         console.log("Success loading czml tilesets.");
 
-        const czmlTileset = {url: tilesetUrl, primitive: plateauTileset};
-        czmlTilesets.push(czmlTileset);
+//         const czmlTileset = {url: tilesetUrl, primitive: plateauTileset};
+//         czmlTilesets.push(czmlTileset);
     
-        cesiumViewer.scene.primitives.add(plateauTileset);
-        // plateauTileset.initialTilesLoaded.addEventListener(() => {
-        //   cesiumViewer.flyTo(plateauTileset);
-        // })
-        return czmlTileset;
-      } catch (error) {
-        console.log(`Error loading czml tilesets.: ${error}`);
-      }
-    }));
-    czmlTilesetGroups.push({czmlUrl: addedCzmlUrls[index], czmlTilesetGroup: czmlTilesetGroup});
-    return czmlTilesetGroup;
-  }).flat().filter(Boolean)).finally(() => {
-    oldCzmlUrlsForTilesets = czmlUrlsForTilesets;
-    // console.log("tilesets: ", tilesets);
-  });
-}
+//         cesiumViewer.scene.primitives.add(plateauTileset);
+//         // plateauTileset.initialTilesLoaded.addEventListener(() => {
+//         //   cesiumViewer.flyTo(plateauTileset);
+//         // })
+//         return czmlTileset;
+//       } catch (error) {
+//         console.log(`Error loading czml tilesets.: ${error}`);
+//       }
+//     }));
+//     czmlTilesetGroups.push({czmlUrl: addedCzmlUrls[index], czmlTilesetGroup: czmlTilesetGroup});
+//     return czmlTilesetGroup;
+//   }).flat().filter(Boolean)).finally(() => {
+//     oldCzmlUrlsForTilesets = czmlUrlsForTilesets;
+//     // console.log("tilesets: ", tilesets);
+//   });
+// }
 
 // オクルージョン表示を更新
 export function updateOcclusion(shouldHideOtherBldgs) {
