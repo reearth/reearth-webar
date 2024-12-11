@@ -132,6 +132,7 @@ const createViewLayerWithComponentGroup = (
 ): LayerModel => {
   invariant(type);
   return {
+    // ここでtypeがBUILDING_LAYERかUSE_CASE_LAYERかによってcreateBuildingLayerかcreateGeneralDatasetLayerを行ってレイヤーを作成
     ...createViewLayer({
       type,
       municipalityCode: "",
@@ -211,6 +212,8 @@ const createRootLayer = ({
 export const createRootLayerAtom = (params: RootLayerAtomParams): RootLayerConfig => {
   const dataset = params.dataset;
   const dataList = dataset.items as DatasetItem[];
+  // PlateauDatasetType内にはUseCaseも含まれている一方で、UseCaseはGenericDatasetであるとされており、そこの整合性がイマイチ
+  // BUILDING_LAYERやUSE_CASE_LAYERの形で取得
   const type = datasetTypeLayers[dataset.type.code as PlateauDatasetType];
 
   const initialSettings = params.settings;

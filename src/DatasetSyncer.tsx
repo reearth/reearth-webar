@@ -117,6 +117,7 @@ export default function DatasetSyncer({...props}) {
     uniqueDatasets.map(dataset => {
       const filteredSettings = settings.filter(s => s.datasetId === dataset.id);
       addLayer(
+        // BuildingLayerやGeneralDatasetLayerを作成してレイヤー一覧に追加
         createRootLayerAtom({
           dataset,
           settings: filteredSettings,
@@ -193,12 +194,14 @@ export default function DatasetSyncer({...props}) {
       const tilesetUrls = resourceUrls.filter(x => x.type == "3dtiles");
       resetTileset(tilesetUrls.map(t => t.url)).then((tilesets: LoadedTileset[]) => {
         setTilesets((prevTilesets) => {
-          // 今回removeされたtilesetを除去して前回と今回で共通のtilesetだけを残す
+          // 前回のtilesetsから今回removeされたtilesetsを除去して今回残ったtilesetだけを取り出す
           const filteredPrevTilesets = prevTilesets.filter(t => tilesetUrls.find(c => c.id === t.id));
           // 新規追加されたtilesetにidも付ける
           const nextTilesets = tilesets.map(t => ({ ...t, id: tilesetUrls.find(c => c.url === t.url).id }));
           // TODO: CZMLの場合もその内部から予めtileset群を取得してresetTilesetに渡してレンダリングする実装にしたので、LayersRendererに登録されるようになったはず。なのでこんどはデータセットパネルでユースケースのスタイルを操作した際にそれがLayersRendererに反応するようにするためにはどうすればよいか調査する
-          return [...filteredPrevTilesets, ...nextTilesets];
+          const tilesetsForLayersRenderer = [...filteredPrevTilesets, ...nextTilesets];
+          console.log("Tilesets for LayersRenderer: ", tilesetsForLayersRenderer);
+          return tilesetsForLayersRenderer;
         });
       });
     }

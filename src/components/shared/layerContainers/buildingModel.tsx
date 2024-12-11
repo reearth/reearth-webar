@@ -258,7 +258,12 @@ export const BuildingModelLayerContainer: FC<TilesetContainerProps> = ({
 
   useEffect(() => {
     if(!renderedTileset) return;
+    // TODO: 通常の建築物レイヤーの表示・非表示ボタンをトグルするとhiddenのAtomが更新されここがトリガーされるが、ユースケースから追加したレイヤーの表示・非表示ボタンをトグルしてもここがトリガーされないので、renderedTilesetsに追加されたユースケースのレイヤーは建築物レイヤーとして追加されていない可能性がある
+    // → ビンゴだった。ユースケースから追加したレイヤーはGeneralDatasetLayerで、ボタンのトグルはuseLayerの方に巡っていた。それをBuildingLayerとして追加されるようにするか、GeneralDatasetLayerでrenderedTilesetを操作するようにする?
+    // ところで、ユースケースから追加したprimitiveについても、DatasetSyncerの方でrenderedTilesetに入れてLaysesRendererでレンダリングするようにしてあるので、弄るべきはデータセットパネルのレイヤー行がGeneralDatasetLayerの場合でも表示・非表示ボタンが変更しているhidden Atomが反応するBuildingLayerになるようにするなどかもしれない。
+    console.log("yo");
     renderedTileset.primitive.show = !hidden;
+    console.log(renderedTileset);
   }, [renderedTileset, hidden]);
 
   return null;

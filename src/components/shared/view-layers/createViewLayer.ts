@@ -97,11 +97,15 @@ export function createViewLayer<T extends LayerType>(
     // Dataset layers
     // Building model
     case BUILDING_LAYER: return createBuildingLayer(params as BuildingLayerModelParams)
+    // 一旦ユースケースレイヤーをBuildingLayerとして作成するようにしている
+    case USE_CASE_LAYER: return createBuildingLayer(params as BuildingLayerModelParams)
+
     // Flood model
     case INLAND_FLOODING_RISK_LAYER: return createFloodLayer(params as FloodLayerModelParams)
     case HIGH_TIDE_RISK_LAYER: return createFloodLayer(params as FloodLayerModelParams)
     case RIVER_FLOODING_RISK_LAYER: return createFloodLayer(params as FloodLayerModelParams)
     case TSUNAMI_RISK_LAYER: return createFloodLayer(params as FloodLayerModelParams)
+
     // General
     case BORDER_LAYER: return createGeneralDatasetLayer(params as GeneralLayerModelParams)
     case BRIDGE_LAYER: return createGeneralDatasetLayer(params as GeneralLayerModelParams)
@@ -118,7 +122,8 @@ export function createViewLayer<T extends LayerType>(
     case SHELTER_LAYER: return createGeneralDatasetLayer(params as GeneralLayerModelParams)
     case STATION_LAYER: return createGeneralDatasetLayer(params as GeneralLayerModelParams)
     case URBAN_PLANNING_LAYER: return createGeneralDatasetLayer(params as GeneralLayerModelParams)
-    case USE_CASE_LAYER: return createGeneralDatasetLayer(params as GeneralLayerModelParams)
+    // 一旦ユースケースレイヤーをGeneralDatasetLayerとして作成しないようにしている
+    //case USE_CASE_LAYER: return createGeneralDatasetLayer(params as GeneralLayerModelParams)
     case VEGETATION_LAYER: return createGeneralDatasetLayer(params as GeneralLayerModelParams)
   }
 }
