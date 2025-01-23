@@ -1,7 +1,7 @@
 import { useAtomValue } from "jotai";
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { resetTileset } from "./ar";
+import { resetTileset, resetGeojson } from "./ar";
 import { LayersRenderer, useAddLayer } from "./components/prototypes/layers";
 import { arStartedAtom } from "./components/prototypes/view/states/ar";
 import { useDatasetsByIds } from "./components/shared/graphql";
@@ -183,7 +183,15 @@ export default function DatasetSyncer({...props}) {
               return {url: tilesetUrl, id: plateauDataset.id, type:"3dtiles"};
             });
           } else {
-            return null;
+            const geojsonItems = plateauDatasetItems.filter(item => item.format === "GEOJSON");
+            // 一旦GEOJSONの場合はユースケースであると限定してitem数は1であるとする
+            if (geojsonItems.length == 1 && geojsonItems[0]) {
+              const geojsonItem = geojsonItems[0];
+              // GEOJSONのユースケースはitemのurlに直接.geojsonファイルが指定されているのでそのまま使う
+              return {url: geojsonItem.url, id: plateauDataset.id, type:"geojson"};
+            } else {
+              return null;
+            }
           }
         }
       }).flat().filter(x => x));
@@ -198,12 +206,17 @@ export default function DatasetSyncer({...props}) {
           const filteredPrevTilesets = prevTilesets.filter(t => tilesetUrls.find(c => c.id === t.id));
           // 新規追加されたtilesetにidも付ける
           const nextTilesets = tilesets.map(t => ({ ...t, id: tilesetUrls.find(c => c.url === t.url).id }));
-          // TODO: CZMLの場合もその内部から予めtileset群を取得してresetTilesetに渡してレンダリングする実装にしたので、LayersRendererに登録されるようになったはず。なのでこんどはデータセットパネルでユースケースのスタイルを操作した際にそれがLayersRendererに反応するようにするためにはどうすればよいか調査する
+          // CZMLの場合もその内部から予めtileset群を取得してresetTilesetに渡してレンダリングする実装にしたので、LayersRendererに登録されるようになった。
+          // 加えて、データセットパネルでユースケースのスタイルを操作した際に、それがLayersRendererに反応するようにするためにARではユースケースの場合もGeneralLayseではなくBuildingLayerにしている。
           const tilesetsForLayersRenderer = [...filteredPrevTilesets, ...nextTilesets];
           console.log("Tilesets for LayersRenderer: ", tilesetsForLayersRenderer);
           return tilesetsForLayersRenderer;
         });
       });
+
+      // geojsonをリセット
+      const geojsonUrls = resourceUrls.filter(x => x.type == "geojson").map(t => t.url);
+      resetGeojson(geojsonUrls);
     }
 
     renderTilesets();

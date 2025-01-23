@@ -781,6 +781,43 @@ export async function resetTileset(tilesetUrls) {
   });
 }
 
+let oldGeojsonUrls = [];
+let geojsons = [];
+export async function resetGeojson(geojsonUrls) {
+  if (!cesiumViewer) { return; }
+
+  console.log("oldGeojsonUrls: ", oldGeojsonUrls);
+  console.log("newGeojsonUrls: ", geojsonUrls);
+
+  // 削除されたgeojsonをremove
+  const removedUrls = oldGeojsonUrls.filter(x => !geojsonUrls.includes(x));
+  console.log("removedGeojsonUrls: ", removedUrls);
+  const removingDataSources = geojsons.filter(geojson => removedUrls.includes(geojson.url)).map(t => t.dataSource);
+  console.log("removingDataSources: ", removingDataSources);
+  removingDataSources.map(removingDataSource => {
+    cesiumViewer.dataSources.remove(removingDataSource, true);
+  });
+  geojsons = geojsons.filter(geojson => !removedUrls.includes(geojson.url));
+
+  // 追加されたgeojsonをadd
+  const addedUrls = geojsonUrls.filter(x => !oldGeojsonUrls.includes(x));
+  console.log("addedGeojsonUrls: ", addedUrls);
+  return await Promise.all(addedUrls.map(async geojsonUrl => {
+    // console.log(geojsonUrl);
+    try {
+      const geoJsonDataSource = await Cesium.GeoJsonDataSource.load(geojsonUrl);
+      console.log("Success loading geojson data source.");
+      cesiumViewer.dataSources.add(geoJsonDataSource);
+      const result = {url: geojsonUrl, dataSource: geoJsonDataSource};
+      geojsons.push(result);
+    } catch (error) {
+      console.log(`Error loading geojson data source.: ${error}`);
+    }
+  }).filter(Boolean)).finally(() => {
+    oldGeojsonUrls = geojsonUrls;
+  });
+}
+
 // // ARViewで表示するCZMLをリセット
 // let oldCzmlUrls = [];
 // let czmls = [];
