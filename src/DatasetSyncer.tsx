@@ -140,7 +140,7 @@ export default function DatasetSyncer({...props}) {
 
     const renderTilesets = async () => {
       // データセット群をタイルセットURL群に変換
-      const resourceUrls = await Promise.all(filteredDatasets.map(async plateauDataset => {
+      var resourceUrls = await Promise.all(filteredDatasets.map(async plateauDataset => {
         const plateauDatasetItems = plateauDataset.items as PlateauDatasetItem[];
         // CESIUM3DTILESかどうかチェックしLOD2(テクスチャあり)->LOD2(テクスチャなし)->LOD1->テクスチャ・LODを持たないcsecase用3DTilesの順でフォールバック
         const cesium3dtilesItems = plateauDatasetItems.filter(item => item.format === "CESIUM3DTILES");
@@ -183,18 +183,11 @@ export default function DatasetSyncer({...props}) {
               return {url: tilesetUrl, id: plateauDataset.id, type:"3dtiles"};
             });
           } else {
-            const geojsonItems = plateauDatasetItems.filter(item => item.format === "GEOJSON");
-            // 一旦GEOJSONの場合はユースケースであると限定してitem数は1であるとする
-            if (geojsonItems.length == 1 && geojsonItems[0]) {
-              const geojsonItem = geojsonItems[0];
-              // GEOJSONのユースケースはitemのurlに直接.geojsonファイルが指定されているのでそのまま使う
-              return {url: geojsonItem.url, id: plateauDataset.id, type:"geojson"};
-            } else {
-              return null;
-            }
+            return null;
           }
         }
-      }).flat().filter(x => x));
+      }).flat());
+      resourceUrls = resourceUrls.filter(x => x);
 
       if (!resourceUrls || !arStarted) { return; }
 
@@ -213,14 +206,35 @@ export default function DatasetSyncer({...props}) {
           return tilesetsForLayersRenderer;
         });
       });
+    }
+
+    renderTilesets();
+
+    const renderGeojsons = async () => {
+      // データセット群をGEOJSON URL群に変換
+      var resourceUrls = await Promise.all(filteredDatasets.map(async plateauDataset => {
+        const plateauDatasetItems = plateauDataset.items as PlateauDatasetItem[];
+        const geojsonItems = plateauDatasetItems.filter(item => item.format === "GEOJSON");
+        // 一旦GEOJSONの場合はユースケースであると限定してitem数は1であるとする
+        if (geojsonItems.length == 1 && geojsonItems[0]) {
+          const geojsonItem = geojsonItems[0];
+          // GEOJSONのユースケースはitemのurlに直接.geojsonファイルが指定されているのでそのまま使う
+          return {url: geojsonItem.url, id: plateauDataset.id, type:"geojson"};
+        } else {
+          return null;
+        }
+      }));
+      resourceUrls = resourceUrls.filter(x => x);
+
+      if (!resourceUrls || !arStarted) { return; }
 
       // geojsonをリセット
       const geojsonUrls = resourceUrls.filter(x => x.type == "geojson").map(t => t.url);
       resetGeojson(geojsonUrls);
     }
 
-    renderTilesets();
-  
+    renderGeojsons();
+
     return () => {
       // resetTileset([]);
     };
