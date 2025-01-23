@@ -42,6 +42,7 @@ export const useLayer = ({
   useEffect(() => {
     // ユースケースから追加したレイヤーはGeneralDatasetLayerなのでこっちが反応する
     console.log("pow!");
+    console.log("visible: ", visible);
     const layerId = layerIdRef.current;
     if (!layerId) return;
 

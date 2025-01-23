@@ -98,7 +98,7 @@ export function createViewLayer<T extends LayerType>(
     // Building model
     case BUILDING_LAYER: return createBuildingLayer(params as BuildingLayerModelParams)
     // 一旦ユースケースレイヤーをBuildingLayerとして作成するようにしている
-    case USE_CASE_LAYER: return createBuildingLayer(params as BuildingLayerModelParams)
+    // case USE_CASE_LAYER: return createBuildingLayer(params as BuildingLayerModelParams)
 
     // Flood model
     case INLAND_FLOODING_RISK_LAYER: return createFloodLayer(params as FloodLayerModelParams)
@@ -125,5 +125,14 @@ export function createViewLayer<T extends LayerType>(
     // 一旦ユースケースレイヤーをGeneralDatasetLayerとして作成しないようにしている
     //case USE_CASE_LAYER: return createGeneralDatasetLayer(params as GeneralLayerModelParams)
     case VEGETATION_LAYER: return createGeneralDatasetLayer(params as GeneralLayerModelParams)
+
+    // ユースケースレイヤーの場合は中身のitemのformatを見て判断する
+    case USE_CASE_LAYER: {
+      if (params.format === "CESIUM3DTILES") {
+        return createBuildingLayer(params as BuildingLayerModelParams)
+      } else {
+        return createGeneralDatasetLayer(params as GeneralLayerModelParams)
+      }
+    }
   }
 }
