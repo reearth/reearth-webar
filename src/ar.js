@@ -805,7 +805,7 @@ export async function resetGeojson(geojsonUrls) {
   return await Promise.all(addedUrls.map(async geojsonUrl => {
     // console.log(geojsonUrl);
     try {
-      const geoJsonDataSource = await Cesium.GeoJsonDataSource.load(geojsonUrl);
+      const geoJsonDataSource = await Cesium.GeoJsonDataSource.load(geojsonUrl, { clampToGround: true });
       console.log("Success loading geojson data source.");
       cesiumViewer.dataSources.add(geoJsonDataSource);
       const result = {url: geojsonUrl, dataSource: geoJsonDataSource};

@@ -176,6 +176,7 @@ export default function DatasetSyncer({...props}) {
             const request = new Request(czmlItem.url);
             const response = await fetch(request);
             const czmlJson = await response.json();
+            // TODO: czmlがglb(gtlf)を持っている場合にも対応する
             const tilesetPackets = czmlJson.map(packet => packet.tileset).filter(Boolean);
             const tilesetUrls = tilesetPackets.map(tilesetPacket => tilesetPacket.uri);
             // 便宜的に配列にしているのであとでflatしている
