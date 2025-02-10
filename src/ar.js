@@ -781,6 +781,46 @@ export async function resetTileset(tilesetUrls) {
   });
 }
 
+// ARViewで表示するCZMLをリセット
+let oldCzmlUrls = [];
+let czmls = [];
+export async function resetCzmlAsDatasource(czmlUrls) {
+  if (!cesiumViewer) { return; }
+
+  console.log("oldCzmlUrls: ", oldCzmlUrls);
+  console.log("newCzmlUrls: ", czmlUrls);
+
+  // 削除されたczmlをremove
+  const removedUrls = oldCzmlUrls.filter(x => !czmlUrls.includes(x));
+  console.log("removedCzmlUrls: ", removedUrls);
+  const removingDataSources = czmls.filter(czml => removedUrls.includes(czml.url));
+  removingDataSources.map(removingDataSource => {
+    cesiumViewer.dataSources.remove(removingDataSource, true);
+  });
+  czmls = czmls.filter(czml => !removedUrls.includes(czml.url));
+
+  // 追加されたczmlをadd
+  const addedUrls = czmlUrls.filter(x => !oldCzmlUrls.includes(x));
+  console.log("addedCzmlUrls: ", addedUrls);
+
+  return await Promise.all(addedUrls.map(async czmlUrl => {
+    // console.log(czmlUrl);
+    try {
+      // https://cesium.com/learn/cesiumjs/ref-doc/CzmlDataSource.html
+      const czmlDataSource = await Cesium.CzmlDataSource.load(czmlUrl);
+      console.log("Success loading czml data source.");
+      cesiumViewer.dataSources.add(czmlDataSource);
+      const result = {url: czmlUrl, dataSource: czmlDataSource};
+      czmls.push(result);
+    } catch (error) {
+      console.log(`Error loading czml data source.: ${error}`);
+    }
+  }).filter(Boolean)).finally(() => {
+    oldCzmlUrls = czmlUrls;
+    // console.log("czmls: ", czmls);
+  });
+}
+
 let oldGeojsonUrls = [];
 let geojsons = [];
 export async function resetGeojson(geojsonUrls) {
@@ -817,54 +857,6 @@ export async function resetGeojson(geojsonUrls) {
     oldGeojsonUrls = geojsonUrls;
   });
 }
-
-// // ARViewで表示するCZMLをリセット
-// let oldCzmlUrls = [];
-// let czmls = [];
-// export async function resetCzml(czmlUrls) {
-//   if (!cesiumViewer) { return; }
-//   // cesiumViewer.scene.primitives.removeAll();
-
-//   console.log("oldCzmlUrls: ", oldCzmlUrls);
-//   console.log("newCzmlUrls: ", czmlUrls);
-
-//   // 削除されたczmlをremove
-//   const removedUrls = oldCzmlUrls.filter(x => !czmlUrls.includes(x));
-//   console.log("removedCzmlUrls: ", removedUrls);
-//   const removingDataSources = czmls.filter(czml => removedUrls.includes(czml.url));
-//   removingDataSources.map(removingDataSource => {
-//     cesiumViewer.dataSources.remove(removingDataSource, true);
-//   });
-//   czmls = czmls.filter(czml => !removedUrls.includes(czml.url));
-
-//   // 追加されたczmlをadd
-//   const addedUrls = czmlUrls.filter(x => !oldCzmlUrls.includes(x));
-//   console.log("addedCzmlUrls: ", addedUrls);
-
-//   return await Promise.all(addedUrls.map(async czmlUrl => {
-//     // console.log(czmlUrl);
-//     try {
-//       // https://cesium.com/learn/cesiumjs/ref-doc/CzmlDataSource.html
-//       const czmlDataSource = await Cesium.CzmlDataSource.load(czmlUrl);
-  
-//       console.log("Success loading czml data source.");
-
-//       // CZMLの3DTilesもLayersRendererで表示スタイルを適用するためだけにtilesetを抽出
-//       // const czmlTilesets = czmlDataSource.entities.values.filter(e => e.tileset);
-
-//       const result = {url: czmlUrl, dataSource: czmlDataSource};
-//       czmls.push(result);
-  
-//       cesiumViewer.dataSources.add(czmlDataSource);
-//       return result;
-//     } catch (error) {
-//       console.log(`Error loading czml data source.: ${error}`);
-//     }
-//   }).filter(Boolean)).finally(() => {
-//     oldCzmlUrls = czmlUrls;
-//     // console.log("czmls: ", czmls);
-//   });
-// }
 
 // // ARViewで表示するCZMLをリセット (3DTiles tileset限定版独自描画)
 // let oldCzmlUrlsForTilesets = [];

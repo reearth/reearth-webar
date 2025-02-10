@@ -1,7 +1,7 @@
 import { useAtomValue } from "jotai";
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { resetTileset, resetGeojson } from "./ar";
+import { resetTileset, resetCzmlAsDatasource, resetGeojson } from "./ar";
 import { LayersRenderer, useAddLayer } from "./components/prototypes/layers";
 import { arStartedAtom } from "./components/prototypes/view/states/ar";
 import { useDatasetsByIds } from "./components/shared/graphql";
@@ -176,7 +176,6 @@ export default function DatasetSyncer({...props}) {
             const request = new Request(czmlItem.url);
             const response = await fetch(request);
             const czmlJson = await response.json();
-            // TODO: czmlがglb(gtlf)を持っている場合にも対応する
             const tilesetPackets = czmlJson.map(packet => packet.tileset).filter(Boolean);
             const tilesetUrls = tilesetPackets.map(tilesetPacket => tilesetPacket.uri);
             // 便宜的に配列にしているのであとでflatしている
@@ -208,8 +207,39 @@ export default function DatasetSyncer({...props}) {
         });
       });
     }
-
     renderTilesets();
+
+    // tilesetを持たないCZMLの場合はDataSourceとしてレンダリングする
+    const renderCzmlAsDatasource = async () => {
+      var resourceUrls = await Promise.all(filteredDatasets.map(async plateauDataset => {
+        const plateauDatasetItems = plateauDataset.items as PlateauDatasetItem[];
+        const czmlItems = plateauDatasetItems.filter(item => item.format === "CZML");
+        // 一旦CZMLの場合はユースケースであると限定してitem数は1であるとする
+        if (czmlItems.length == 1 && czmlItems[0]) {
+          const czmlItem = czmlItems[0];
+          const request = new Request(czmlItem.url);
+          const response = await fetch(request);
+          const czmlJson = await response.json();
+          const tilesetPackets = czmlJson.map(packet => packet.tileset).filter(Boolean);
+          // czmlがtilesetを持たなければそのままczmlとして保持
+          if (!tilesetPackets.length) {
+            return {url: czmlItem.url, id: plateauDataset.id, type:"czml"};
+          } else {
+            return null;
+          }
+        } else {
+          return null;
+        }
+      }));
+      resourceUrls = resourceUrls.filter(x => x);
+
+      if (!resourceUrls || !arStarted) { return; }
+
+      // czmlをリセット
+      const czmlUrls = resourceUrls.filter(x => x.type == "czml").map(t => t.url);
+      resetCzmlAsDatasource(czmlUrls);
+    }
+    renderCzmlAsDatasource();
 
     const renderGeojsons = async () => {
       // データセット群をGEOJSON URL群に変換
@@ -233,7 +263,6 @@ export default function DatasetSyncer({...props}) {
       const geojsonUrls = resourceUrls.filter(x => x.type == "geojson").map(t => t.url);
       resetGeojson(geojsonUrls);
     }
-
     renderGeojsons();
 
     return () => {
