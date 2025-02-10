@@ -144,6 +144,7 @@ export default function DatasetSyncer({...props}) {
         const plateauDatasetItems = plateauDataset.items as PlateauDatasetItem[];
         // CESIUM3DTILESかどうかチェックしLOD2(テクスチャあり)->LOD2(テクスチャなし)->LOD1->テクスチャ・LODを持たないcsecase用3DTilesの順でフォールバック
         const cesium3dtilesItems = plateauDatasetItems.filter(item => item.format === "CESIUM3DTILES");
+        console.log("Cesium3DTiles Items: ", cesium3dtilesItems);
         if (cesium3dtilesItems.length != 0) {
           const cesium3dtilesLod2TexItem = cesium3dtilesItems.find(({ lod, texture }) => lod == 2 && texture == "TEXTURE");
           if (cesium3dtilesLod2TexItem && cesium3dtilesLod2TexItem.url) {
@@ -157,13 +158,9 @@ export default function DatasetSyncer({...props}) {
               if (cesium3dtilesLod1Item && cesium3dtilesLod1Item.url) {
                 return {url: cesium3dtilesLod1Item.url, id: plateauDataset.id, type:"3dtiles"};
               } else {
-                // ユースケースの際はitem数が1
-                if (cesium3dtilesItems.length == 1 && cesium3dtilesItems[0]) {
-                  const cesium3dtilesUseCaseItem = cesium3dtilesItems[0];
-                  return {url: cesium3dtilesUseCaseItem.url, id: plateauDataset.id, type:"3dtiles"};
-                } else {              
-                  return null;
-                }
+                return cesium3dtilesItems.map(item => {
+                  return {url: item.url, id: plateauDataset.id, type:"3dtiles"};
+                });
               }
             }
           }
@@ -187,7 +184,12 @@ export default function DatasetSyncer({...props}) {
           }
         }
       }).flat());
+      const nestedResourceUrls = resourceUrls as {url: string, id: string, type: string}[][];
+      if (nestedResourceUrls.length) {
+        resourceUrls = nestedResourceUrls.flat();
+      }
       resourceUrls = resourceUrls.filter(x => x);
+      console.log("tileset Resource URLs: ", resourceUrls);
 
       if (!resourceUrls || !arStarted) { return; }
 
