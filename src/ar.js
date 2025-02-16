@@ -352,6 +352,8 @@ function gpsTrackingProcess(pos) {
   // const destination = Cesium.Cartesian3.fromDegrees(139.74530681029205, 35.65807022172221, 60); // 東京タワー前
   // const destination = Cesium.Cartesian3.fromDegrees(140.38804838405298, 37.39840050666605, 400); // 郡山駅前
   // const destination = Cesium.Cartesian3.fromDegrees(139.7406809, 35.6355207, 400); // 高輪ゲートウェイ
+  // const destination = Cesium.Cartesian3.fromDegrees(139.7759438, 35.6758959, 400); // 八丁堀
+  // const destination = Cesium.Cartesian3.fromDegrees(134.143, 34.7435, 400); // 備前市
   const destination = Cesium.Cartesian3.fromDegrees(long, lat, biasedAlt);
 
   // カメラ座標を更新
@@ -689,7 +691,7 @@ export function startAR() {
   setupUserInput();
   // Repoセットアップ
   startDeviceCameraPreview();
-  startGpsTracking();
+  // startGpsTracking();
   // iOSではパーミッション取ってからIMUの値を読む
   if (!isios) {
     startOrientationTracking();
@@ -768,9 +770,9 @@ export async function resetTileset(tilesetUrls) {
       tilesets.push(result);
   
       cesiumViewer.scene.primitives.add(plateauTileset);
-      // plateauTileset.initialTilesLoaded.addEventListener(() => {
-      //   cesiumViewer.flyTo(plateauTileset);
-      // })
+      plateauTileset.initialTilesLoaded.addEventListener(() => {
+        cesiumViewer.flyTo(plateauTileset);
+      })
       return result;
     } catch (error) {
       console.log(`Error loading tileset: ${error}`);
@@ -809,9 +811,12 @@ export async function resetCzmlAsDatasource(czmlUrls) {
       // https://cesium.com/learn/cesiumjs/ref-doc/CzmlDataSource.html
       const czmlDataSource = await Cesium.CzmlDataSource.load(czmlUrl);
       console.log("Success loading czml data source.");
-      cesiumViewer.dataSources.add(czmlDataSource);
-      const result = {url: czmlUrl, dataSource: czmlDataSource};
+      cesiumViewer.dataSources.add(czmlDataSource).then((dataSource) => {
+        cesiumViewer.flyTo(dataSource);
+      });
+      const result = {url: czmlUrl, datasource: czmlDataSource};
       czmls.push(result);
+      return result;
     } catch (error) {
       console.log(`Error loading czml data source.: ${error}`);
     }
@@ -847,9 +852,12 @@ export async function resetGeojson(geojsonUrls) {
     try {
       const geoJsonDataSource = await Cesium.GeoJsonDataSource.load(geojsonUrl, { clampToGround: true });
       console.log("Success loading geojson data source.");
-      cesiumViewer.dataSources.add(geoJsonDataSource);
-      const result = {url: geojsonUrl, dataSource: geoJsonDataSource};
+      cesiumViewer.dataSources.add(geoJsonDataSource).then((dataSource) => {
+        cesiumViewer.flyTo(dataSource);
+      });
+      const result = {url: geojsonUrl, datasource: geoJsonDataSource};
       geojsons.push(result);
+      return result;
     } catch (error) {
       console.log(`Error loading geojson data source.: ${error}`);
     }
@@ -976,5 +984,10 @@ export function updateCompassBias(compassBias) {
 // 高度手動調整用のバイアスを更新
 export function updateAltitudeBias(altitudeBias) {
   viewModel.altitudeBias = altitudeBias;
+}
+
+export function cesiumFlyTo(cesium3DTileset) {
+  console.log("Cesium FlyTo");
+  cesiumViewer.flyTo(cesium3DTileset);
 }
 

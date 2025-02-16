@@ -1,9 +1,9 @@
-import { useAtomValue } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { resetTileset, resetCzmlAsDatasource, resetGeojson } from "./ar";
-import { LayersRenderer, useAddLayer } from "./components/prototypes/layers";
-import { arStartedAtom } from "./components/prototypes/view/states/ar";
+import { layerSelectionAtom, LayersRenderer, useAddLayer } from "./components/prototypes/layers";
+import { arStartedAtom, selectedTilesetsOrDatasourcesAtom } from "./components/prototypes/view/states/ar";
 import { useDatasetsByIds } from "./components/shared/graphql";
 import { Dataset, GenericDataset, PlateauDataset, PlateauDatasetItem } from "./components/shared/graphql/types/catalog";
 import { rootLayersAtom } from "./components/shared/states/rootLayer";
@@ -12,6 +12,7 @@ import { templatesAtom } from "./components/shared/states/template";
 import { createRootLayerAtom } from "./components/shared/view-layers";
 import { layerComponents } from "./components/shared/view-layers/layerComponents";
 import { LoadedTileset } from "./components/shared/types";
+import { CzmlDataSource, GeoJsonDataSource } from "cesium";
 
 // クエパラとデータセットパネルの間の双方向同期ならびにタイルセット描画更新を行うためのヘッドレス(非表示)コンポーネント
 export default function DatasetSyncer({...props}) {
@@ -36,6 +37,15 @@ export default function DatasetSyncer({...props}) {
   const arStarted = useAtomValue(arStartedAtom);
 
   const [tilesets, setTilesets] = useState<LoadedTileset[]>([]);
+
+  type LoadedDatasourceInfo = {
+      url: string;
+      datasource: CzmlDataSource | GeoJsonDataSource;
+  }
+  const [loadedDatasourceInfos, setLoadedDatasourceInfos] = useState<LoadedDatasourceInfo[]>([]);
+
+  const layersSelection = useAtomValue(layerSelectionAtom);
+  const setSelectedTilesetsOrDatasources = useSetAtom(selectedTilesetsOrDatasourcesAtom);
 
   // authトークンをクエパラに付けて叩いていた場合はそれを保持
   const auth = searchParams.get("auth");
@@ -213,7 +223,7 @@ export default function DatasetSyncer({...props}) {
 
     // tilesetを持たないCZMLの場合はDataSourceとしてレンダリングする
     const renderCzmlAsDatasource = async () => {
-      var resourceUrls = await Promise.all(filteredDatasets.map(async plateauDataset => {
+      var resourceInfos = await Promise.all(filteredDatasets.map(async plateauDataset => {
         const plateauDatasetItems = plateauDataset.items as PlateauDatasetItem[];
         const czmlItems = plateauDatasetItems.filter(item => item.format === "CZML");
         // 一旦CZMLの場合はユースケースであると限定してitem数は1であるとする
@@ -233,19 +243,29 @@ export default function DatasetSyncer({...props}) {
           return null;
         }
       }));
-      resourceUrls = resourceUrls.filter(x => x);
+      resourceInfos = resourceInfos.filter(x => x);
 
-      if (!resourceUrls || !arStarted) { return; }
+      if (!resourceInfos || !arStarted) { return; }
 
       // czmlをリセット
-      const czmlUrls = resourceUrls.filter(x => x.type == "czml").map(t => t.url);
-      resetCzmlAsDatasource(czmlUrls);
+      const czmlUrls = resourceInfos.filter(x => x.type == "czml").map(t => t.url);
+      resetCzmlAsDatasource(czmlUrls).then((datasources: LoadedDatasourceInfo[]) => {
+        setLoadedDatasourceInfos((prevDatasources) => {
+          // 前回のdatasourcesから今回removeされたdatasourcesを除去して今回残ったdatasourceだけを取り出す
+          const filteredPrevDatasources = prevDatasources.filter(d => czmlUrls.find(c => c === d.url));
+          // 新規追加されたdatasourceにidも付ける
+          const nextDatasources = datasources.map(d => ({ ...d, id: czmlUrls.find(c => c === d.url) }));
+          const finalDatasources = [...filteredPrevDatasources, ...nextDatasources];
+          // console.log("Final Datasources: ", finalDatasources);
+          return finalDatasources;
+        });
+      });
     }
     renderCzmlAsDatasource();
 
     const renderGeojsons = async () => {
       // データセット群をGEOJSON URL群に変換
-      var resourceUrls = await Promise.all(filteredDatasets.map(async plateauDataset => {
+      var resourceInfos = await Promise.all(filteredDatasets.map(async plateauDataset => {
         const plateauDatasetItems = plateauDataset.items as PlateauDatasetItem[];
         const geojsonItems = plateauDatasetItems.filter(item => item.format === "GEOJSON");
         // 一旦GEOJSONの場合はユースケースであると限定してitem数は1であるとする
@@ -257,13 +277,21 @@ export default function DatasetSyncer({...props}) {
           return null;
         }
       }));
-      resourceUrls = resourceUrls.filter(x => x);
+      resourceInfos = resourceInfos.filter(x => x);
 
-      if (!resourceUrls || !arStarted) { return; }
+      if (!resourceInfos || !arStarted) { return; }
 
       // geojsonをリセット
-      const geojsonUrls = resourceUrls.filter(x => x.type == "geojson").map(t => t.url);
-      resetGeojson(geojsonUrls);
+      const geojsonUrls = resourceInfos.filter(x => x.type == "geojson").map(t => t.url);
+      resetGeojson(geojsonUrls).then((datasources: LoadedDatasourceInfo[]) => {
+        setLoadedDatasourceInfos((prevDatasources) => {
+          // 前回のdatasourcesから今回removeされたdatasourcesを除去して今回残ったdatasourceだけを取り出す
+          const filteredPrevDatasources = prevDatasources.filter(d => geojsonUrls.find(c => c === d.url));
+          // 新規追加されたdatasourceにidも付ける
+          const nextDatasources = datasources.map(d => ({ ...d, id: geojsonUrls.find(c => c === d.url) }));
+          return [...filteredPrevDatasources, ...nextDatasources];
+        });
+      });
     }
     renderGeojsons();
 
@@ -299,6 +327,35 @@ export default function DatasetSyncer({...props}) {
       // setSearchParams({});
     };
   }, [rootLayers]);
+
+  // データセットパネルで選択されたレイヤーに対応するタイルセットを取得して本コンポーネントを再レンダリング (レイヤーコンテンツパネルの移動ボタンで使用)
+  useEffect(() => {
+    console.log("Layers Selection: ", layersSelection);
+    const seleectedRootLayers = rootLayers.filter(rootLayer => layersSelection.map(layer => layer.id).includes(rootLayer.id));
+    console.log("Selected Root Layers: ", seleectedRootLayers);
+    // const selectedDatasetItemIds = seleectedRootLayers?.map(rootLayer => rootLayer.rawDataset.items.map(item => item.id)).flat();
+    // console.log("Selected Dataset Item Ids: ", selectedDatasetItemIds);
+    // const selectedDatasetIds = seleectedRootLayers?.map(rootLayer => rootLayer.rawDataset.id);
+    // console.log("Selected Dataset Ids: ", selectedDatasetIds);
+    const selectedDatasetItemUrls = seleectedRootLayers?.map(rootLayer => rootLayer.rawDataset.items.map(item => item.url)).flat();
+    console.log("Selected Dataset Item Urls: ", selectedDatasetItemUrls);
+  
+    const selectedTilesets = tilesets.filter(tileset => selectedDatasetItemUrls.includes(tileset.url));
+    console.log("Loaded Tileset Urls: ", tilesets.map(tileset => tileset.url));
+    console.log("Selected Tilesets: ", selectedTilesets);
+    const selectedDatasourceInfos = loadedDatasourceInfos.filter(datasource => selectedDatasetItemUrls.includes(datasource.url));
+    console.log("Loaded Datasource Urls: ", loadedDatasourceInfos.map(datasource => datasource.url));
+    console.log("Selected Datasource Infos: ", selectedDatasourceInfos);
+
+    if (!selectedTilesets.length && !selectedDatasourceInfos.length) { return; }
+    const primitives = selectedTilesets.map(tileset => tileset.primitive);
+    console.log("Selected Tileset Primitives: ", primitives);
+    const datasources = selectedDatasourceInfos.map(datasource => datasource.datasource);
+    console.log("Selected Datasources: ", datasources);
+    setSelectedTilesetsOrDatasources([...primitives, ...datasources]);
+
+    return () => {};
+  }, [layersSelection]);
 
   return (
     <div id="dataset_syncer" {...props}>

@@ -35,8 +35,8 @@ import { LayerOpacitySection } from "./LayerOpacitySection";
 // import { LayerSketchSection } from "./LayerSketchSection";
 
 import { BuildingIcon } from "../../ui-components";
-import { buildingConcentratedAtom } from "../states/ar";
-import { updateOcclusion } from "../../../../ar";
+import { buildingConcentratedAtom, selectedTilesetsOrDatasourcesAtom } from "../states/ar";
+import { cesiumFlyTo, updateOcclusion } from "../../../../ar";
 
 export interface LayerContentProps<T extends LayerType> {
   values: (SelectionGroup & {
@@ -68,6 +68,8 @@ export function LayerContent<T extends LayerType>({
     setSelection([]);
   }, [setSelection]);
 
+  const selectedTilesetsOrDatasources = useAtomValue(selectedTilesetsOrDatasourcesAtom);
+
   const hiddenAtom = useMemo(() => {
     const atoms = values.map(value => value.hiddenAtom);
     return atom(
@@ -88,17 +90,25 @@ export function LayerContent<T extends LayerType>({
   const layerId = useAtomValue(layer.layerIdAtom);
   const layerCamera = useOptionalAtomValue(layer.cameraAtom);
   const handleMove = useCallback(() => {
-    const camera = rootLayer?.general?.camera;
-    if (camera) {
-      return flyToCamera(camera);
+    // const camera = rootLayer?.general?.camera;
+    // if (camera) {
+    //   return flyToCamera(camera);
+    // }
+    // if (layerCamera) {
+    //   return flyToCamera(layerCamera);
+    // }
+    // if (layerId) {
+    //   return flyToLayerId(layerId);
+    // }
+    console.log("Look!!", selectedTilesetsOrDatasources);
+    if (selectedTilesetsOrDatasources && selectedTilesetsOrDatasources.length) {
+      console.log("LayerContent - selectedTilesets:", selectedTilesetsOrDatasources);
+      const tileset = selectedTilesetsOrDatasources[0];
+      console.log("LayerContent - tileset:", tileset);
+      cesiumFlyTo(tileset);
     }
-    if (layerCamera) {
-      return flyToCamera(layerCamera);
-    }
-    if (layerId) {
-      return flyToLayerId(layerId);
-    }
-  }, [layerId, layerCamera, rootLayer?.general?.camera]);
+  //}, [layerId, layerCamera, rootLayer?.general?.camera]);
+  }, [selectedTilesetsOrDatasources]);
 
   const remove = useSetAtom(removeLayerAtom);
   const handleRemove = useCallback(() => {
@@ -168,13 +178,11 @@ export function LayerContent<T extends LayerType>({
                   {hidden ? <VisibilityOffIcon /> : <VisibilityOnIcon />}
                 </IconButton>
               </Tooltip>
-              {/* <Tooltip title="移動">
-                <span>
-                  <IconButton aria-label="移動" disabled={layerId == null} onClick={handleMove}>
-                    <AddressIcon />
-                  </IconButton>
-                </span>
-              </Tooltip> */}
+              <Tooltip title="移動">
+                <IconButton aria-label="移動" onClick={handleMove}>
+                  <AddressIcon />
+                </IconButton>
+              </Tooltip>
               {/* {buildingLayers.length !== 0 && (
                 <Tooltip title="検索">
                   <IconButton

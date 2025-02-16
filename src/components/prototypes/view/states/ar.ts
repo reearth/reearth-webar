@@ -1,6 +1,7 @@
 import { isBoolean, isNumber } from "class-validator";
 import { atomWithStorageValidation, type AtomValue } from "../../shared-states";
 import { atom } from "jotai";
+import { Cesium3DTileset, CzmlDataSource, GeoJsonDataSource } from "cesium";
 // import { atomWithReset } from "jotai/utils";
 
 export const altitudeBiasAtom = atomWithStorageValidation({
@@ -42,3 +43,5 @@ export const selectedFeatureAtom = atomWithStorageValidation<Feature | null>({
   validate: (value: unknown): value is Feature | null => 
   value === null || typeof value === "object",
 });
+
+export const selectedTilesetsOrDatasourcesAtom = atom<(Cesium3DTileset | CzmlDataSource | GeoJsonDataSource)[]>([]);
