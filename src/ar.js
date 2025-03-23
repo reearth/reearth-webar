@@ -691,7 +691,7 @@ export function startAR() {
   setupUserInput();
   // Repoセットアップ
   startDeviceCameraPreview();
-  // startGpsTracking();
+  startGpsTracking();
   // iOSではパーミッション取ってからIMUの値を読む
   if (!isios) {
     startOrientationTracking();
