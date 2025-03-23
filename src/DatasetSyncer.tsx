@@ -150,7 +150,7 @@ export default function DatasetSyncer({...props}) {
 
     const renderTilesets = async () => {
       // データセット群をタイルセットURL群に変換
-      var resourceUrls = await Promise.all(filteredDatasets.map(async plateauDataset => {
+      const resourceUrls: ({url: string, id: string, type: string} | {url: string, id: string, type: string}[])[] = await Promise.all(filteredDatasets.map(async plateauDataset => {
         const plateauDatasetItems = plateauDataset.items as PlateauDatasetItem[];
         // CESIUM3DTILESかどうかチェックしLOD2(テクスチャあり)->LOD2(テクスチャなし)->LOD1->テクスチャ・LODを持たないcsecase用3DTilesの順でフォールバック
         const cesium3dtilesItems = plateauDatasetItems.filter(item => item.format === "CESIUM3DTILES");
@@ -194,17 +194,21 @@ export default function DatasetSyncer({...props}) {
           }
         }
       }).flat());
+
+      var flattenedResourceUrls: {url: string, id: string, type: string}[];
       const nestedResourceUrls = resourceUrls as {url: string, id: string, type: string}[][];
       if (nestedResourceUrls.length) {
-        resourceUrls = nestedResourceUrls.flat();
+        flattenedResourceUrls = nestedResourceUrls.flat();
+      } else {
+        flattenedResourceUrls = resourceUrls as {url: string, id: string, type: string}[];
       }
-      resourceUrls = resourceUrls.filter(x => x);
-      console.log("tileset Resource URLs: ", resourceUrls);
+      flattenedResourceUrls = flattenedResourceUrls.filter(x => x);
+      console.log("tileset Resource URLs: ", flattenedResourceUrls);
 
       if (!resourceUrls || !arStarted) { return; }
 
       // tilesetをリセット
-      const tilesetUrls = resourceUrls.filter(x => x.type == "3dtiles");
+      const tilesetUrls = flattenedResourceUrls.filter(x => x.type == "3dtiles");
       resetTileset(tilesetUrls.map(t => t.url)).then((tilesets: LoadedTileset[]) => {
         setTilesets((prevTilesets) => {
           // 前回のtilesetsから今回removeされたtilesetsを除去して今回残ったtilesetだけを取り出す
